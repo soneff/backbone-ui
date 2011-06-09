@@ -1,0 +1,249 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <title>Backbone UI</title>
+
+    <script src="../lib/json2.js"></script>
+    <script src="../lib/jquery-1.6-min.js"></script>
+    <script src="../lib/underscore-1.1.6.js"></script>
+    <script src="../lib/backbone-0.3.3.js"></script>
+    <script src="../lib/jquery-mousewheel-3.0.4min.js"></script>
+    <script src="../lib/prettify.js"></script>
+    <script src="../lib/jsbeautify.js"></script>
+
+    <script src="../src/js/backbone_ui.js"></script>
+    <script src="../src/js/has_glyph.js"></script>
+    <script src="../src/js/has_collection_property.js"></script>
+    <script src="../src/js/button.js"></script>
+    <script src="../src/js/pulldown.js"></script>
+    <script src="../src/js/text_field.js"></script>
+    <script src="../src/js/text_area.js"></script>
+    <script src="../src/js/tab_set.js"></script>
+    <script src="../src/js/checkbox.js"></script>
+    <script src="../src/js/radio_group.js"></script>
+    <script src="../src/js/scroller.js"></script>
+    <script src="../src/js/collection_view.js"></script>
+    <script src="../src/js/table_view.js"></script>
+    <script src="../src/js/drag_session.js"></script>
+
+    <link rel="stylesheet" href="../src/css/reset.css"> 
+    <link rel="stylesheet" href="../src/css/button.css"> 
+    <link rel="stylesheet" href="../src/css/pulldown.css"> 
+    <link rel="stylesheet" href="../src/css/text_field.css"> 
+    <link rel="stylesheet" href="../src/css/text_area.css"> 
+    <link rel="stylesheet" href="../src/css/tab_set.css"> 
+    <link rel="stylesheet" href="../src/css/scroller.css"> 
+    <link rel="stylesheet" href="../src/css/checkbox.css"> 
+    <link rel="stylesheet" href="../src/css/radio_group.css"> 
+    <link rel="stylesheet" href="../src/css/table_view.css"> 
+    <link rel="stylesheet" href="../src/css/has_glyph.css"> 
+
+    <link rel="stylesheet" href="./lib/prettify.css"> 
+
+    <style>
+      html {
+         height:100%;
+      }
+
+      body {
+        padding:20px;
+      }
+
+      h1 {
+        font-size:30px;
+        margin-bottom:40px;
+      }
+
+      pre {
+        overflow:hidden;
+      }
+
+      body > dl {
+        margin-left:10px;
+      }
+
+      body > dl dd {
+        margin:-20px 0 0 180px;  
+        padding:0 0 40px 0;
+      }
+
+      .example {
+        width:800px;
+      }
+
+      .code_container {
+        position:relative;
+        width:400px;
+        margin-left:400px;
+      }
+
+      .show_more {
+        position:absolute;
+        right:10px;
+        bottom:10px;
+      }
+
+      .result {
+        float:left;
+        width:300px;
+      }
+
+    </style>
+
+    <script>
+      var addExample = function(title, f) {
+        dl.appendChild($.el('dt', title));
+
+        // strip off setup code
+        var code = f.toString();
+        code = js_beautify(code.substring(code.indexOf('new Back'), code.length -1));
+        var pre = $.el('pre', {className : 'prettyprint'}, code);
+
+        // create a container for the code and the expand link
+        var codeContainer = $.el('div', {className : 'code_container'}, pre);
+        if(code.split('\n').length > 5) {
+          pre.style.height = '85px';
+          // link to expand lengthy examples
+          var expand = $.el('a', {className : 'show_more', href : '#'}, 'show more')
+          expand.onclick = function() {
+            pre.style.height = 'inherit';
+            expand.parentNode.removeChild(expand);
+            return false;
+          };
+          codeContainer.appendChild(expand);
+        }
+
+        var dd = $.el('dd', {className : 'example'}, [
+          $.el('div', {className : 'result'}, f().el),
+          codeContainer,
+          $.el('br', {style : 'clear:both'})
+        ]);
+        dl.appendChild(dd);
+      };
+
+      $(window).bind('load', function() {
+        Backbone.UI.IMAGE_DIR_PATH = './images';
+
+        dl = $.el('dl');
+        document.body.appendChild(dl);
+
+        // Button
+        addExample('Button', function() {
+          return new Backbone.UI.Button({
+            label : 'Press Me'
+          }).render();
+        });
+
+        // Pulldown
+        addExample('Pulldown', function() {
+          return new Backbone.UI.Pulldown({
+            placeholder : 'Select an Option...',
+            collection : [
+              {label : 'option one', value : 1},
+              {label : 'option two', value : 2},
+              {label : 'option three', value : 3},
+              {label : 'option four', value : 4},
+              {label : 'option five', value : 5},
+              {label : 'option six', value : 6},
+              {label : 'option seven', value : 7},
+              {label : 'option eight', value : 8}
+            ]
+          }).render();
+        });
+
+        // checkbox
+        addExample('Checkbox', function() {
+          return new Backbone.UI.Checkbox({
+            label : 'Check Me',
+            checked : 'true'
+          }).render();
+        });
+
+        // radio group
+        addExample('Radio Group', function() {
+          return new Backbone.UI.RadioGroup({
+            collection : [
+              {label : 'Option 1', value : 0},
+              {label : 'Option 2', value : 1}
+            ]
+          }).render();
+        });
+
+        // Text Field
+        addExample('Text Field', function() {
+          return new Backbone.UI.TextField({
+            //glyph : 'lock',
+            //glyphRight : 'lock'
+          }).render();
+        });
+
+        // Tab Set
+        addExample('Tab Set', function() {
+          return new Backbone.UI.TabSet({
+            tabs : [
+              {label : 'Foo', content : "foo's content"},
+              {label : 'Bar', content : "bar's content"} ,
+              {label : 'Baz', content : "baz's content"} 
+            ]
+          }).render();
+        });
+
+        // Scroller
+        var lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu metus turpis. Vestibulum quis mauris quis lectus tincidunt sollicitudin. Nunc a lobortis urna. Vivamus pharetra, odio ut sollicitudin mattis, metus nulla scelerisque sapien, sit amet pulvinar dui tellus a velit. Aliquam sapien tellus, auctor et pellentesque in, sodales et lectus. Praesent in massa nec dui hendrerit elementum. Vestibulum egestas, velit non pharetra porta, leo ligula tincidunt dui, sed egestas tortor ipsum in nisl. Vestibulum tincidunt tortor quis metus lacinia non pretium velit bibendum. Donec id erat at dui sodales adipiscing. Sed eleifend vulputate magna, luctus placerat nibh lobortis eu. Aenean vehicula molestie enim, ac suscipit nulla fermentum a. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla sodales, nisl id volutpat blandit, sem erat tincidunt massa, ac pharetra neque lacus ut justo. Vestibulum auctor hendrerit risus, vitae ultrices risus porttitor id. " 
+        addExample('Scroller', function() {
+          var text = document.createElement('p');
+          text.appendChild(document.createTextNode(lorem));
+          text.style.height = '150px';
+          return new Backbone.UI.Scroller({
+            content : text 
+          }).render();
+        });
+
+        // text area
+        addExample('Text Area', function() {
+          return new Backbone.UI.TextArea({
+            value : lorem
+          }).render();
+        });
+
+        // table
+        addExample('Table View', function() {
+          var collection = new Backbone.Collection([
+            {firstName : 'Jeremy', lastName : 'Ashkenas'},
+            {firstName : 'Will', lastName : 'Bailey'},
+            {firstName : 'Jay', lastName : 'Harlow'},
+            {firstName : 'Joe', lastName : 'Stelmach'}
+          ]);
+
+          return new Backbone.UI.TableView({
+            model : collection,
+            onItemClick : function(model) {
+              alert(model.get('firstName'));
+            },
+            columns : [{
+                label : 'First Name',
+                width : 100,
+                content : function(model) {
+                  return model.get('firstName');
+                }
+              }, {
+                label : 'Last Name',
+                content : function(model) {
+                  return model.get('lastName');
+                }
+              }
+            ]
+          }).render();
+        });
+
+        prettyPrint();
+
+      });
+    </script>
+  </head>
+
+  <body>
+  </body>
+</html>
+

@@ -1,0 +1,22 @@
+.text_area {
+  position:relative;
+  float:left;
+  border:1px solid #666;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  background-color:#fff;
+}
+
+.text_area.disabled {
+  filter:alpha(opacity=60);
+  opacity:0.6;
+}
+
+.text_area textarea {
+  border:none;
+  outline:none;
+  margin:5px 4px 4px 4px;
+  font-size:14px;
+  background-color:#fff;
+}

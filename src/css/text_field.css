@@ -1,0 +1,30 @@
+.text_field {
+  position:relative;
+  float:left;
+  border:1px solid #666;
+  width:200px;
+  height:28px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  background-color:#fff;
+}
+
+.text_field.disabled {
+  filter:alpha(opacity=60);
+  opacity:0.6;
+}
+
+.text_field .input_wrapper {
+  position:absolute;
+  left:5px;
+  right:5px;
+  top:3px;
+}
+
+.text_field input {
+  width:100%;
+  border:none;
+  outline:none;
+  font-size:14px;
+}

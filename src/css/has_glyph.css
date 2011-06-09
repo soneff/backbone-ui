@@ -1,0 +1,16 @@
+.glyph {
+  position:absolute;
+  top:50%;
+  left:50%;
+  line-height:24px;
+  text-align:center;
+  color:#666;
+  font-style:normal;
+  font-size:11px;
+}
+
+.glyph.right {
+  left:auto;
+  right:4px;
+}
+
