@@ -62,13 +62,13 @@
 
       // otherwise, we render each row
       else {
-        _(this.model.models).each(function(model) {
+        this.model.each(function(m) {
           var row = $.el('tr');
 
           // for each model, we walk through each column and generate the content 
           _(this.options.columns).each(function(column, index, list) {
             var style = column.width ? 'width:' + column.width + 'px' : null;
-            var content = this.resolveContent(column.content, model, column.property);
+            var content = this.resolveContent(column.content, m, column.property);
             row.appendChild($.el('td', 
               {className : _(list).nameForIndex(index), style : style}, 
               $.el('div', {className : 'wrapper'}, content)));
@@ -76,7 +76,7 @@
 
           // bind the item click callback if given
           if(this.options.onItemClick) {
-            $(row).click(_(this.options.onItemClick).bind(this, model));
+            $(row).click(_(this.options.onItemClick).bind(this, m));
           }
 
           tableBody.appendChild(row);

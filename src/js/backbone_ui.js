@@ -54,16 +54,17 @@
     // resolves the value of the given property on the given 
     // object.
     resolveProperty : function(object, property) {
-      if(!property) return null;
+      var result = null;
+      if(_(property).exists() && _(property).isString()) {
+        var parts = property.split('.');
+        _(parts).each(function(part) {
+          if(!_(object).isNull() && !_(object).isUndefined()){ 
+            result = _(object.get).isFunction() ? object.get(part) : object[part];
+          }
+        });
+      }
 
-      var parts = property.split('.');
-      _(parts).each(function(part) {
-        if(!_(object).isNull() && !_(object).isUndefined()){ 
-          object = _(object.get).isFunction() ? object.get(part) : object[part];
-        }
-      });
-
-      return object;
+      return result;
     },
 
     // sets the given value for the given property on the given 
