@@ -31,7 +31,6 @@
     },
 
     render : function() {
-    console.log('rendering');
       this.checked = 
         _(this.model).exists() && _(this.options.property).exists() ? 
         _(this.model).resolveProperty(this.options.property) : 

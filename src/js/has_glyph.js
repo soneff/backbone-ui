@@ -23,19 +23,26 @@
       if(name.length == 1) {
         var span = $.el('span', {
           className : className,
-          style : 'margin: -11px 8px 0 0'
+          style : 'margin: 0 8px 0 0'
         }, name);
         el.insertBefore(span, isRight ? null : el.firstChild);
       }
 
       else {
         var image = new Image();
+        $(image).hide();
         image.onload = function() {
+          // center the image inside a 28px square
+          var topOffset = Math.max(1, ((28 - image.height) / 2));
+          var leftOffset = Math.max(3, ((28 - image.width) / 2));
+
           $(image).css({
-            marginTop : '-' + (image.height / 2) + 'px', 
-            marginLeft : '-' + (image.width / 2) + 'px'
+            top : topOffset + 'px', 
+            left : isRight ? 'auto' : leftOffset + 'px',
+            right : isRight ? leftOffset + 'px' : 'auto'
           });
-        }
+          $(image).show();
+        };
         image.src = Backbone.UI.IMAGE_DIR_PATH + '/glyphs/' + name + '.png';
         image.className = className;
 

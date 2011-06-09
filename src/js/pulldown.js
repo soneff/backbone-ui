@@ -116,15 +116,17 @@
     
     //forces the menu to show
     showMenu : function(e) {
-      var position = (this.options.alignRight ? '-right' : '-left') + ' bottom';
+      var anchor = this.button.el;
+      var showOnTop = $(window).height() - ($(anchor).offset().top - document.body.scrollTop) < 150;
+      var position = (this.options.alignRight ? '-right' : '-left') + (showOnTop ? 'top' : ' bottom');
       $(this._scroller.el).show();
-      $(this._scroller.el).alignTo(this.button.el, position, 0, 1);
+      $(this._scroller.el).alignTo(anchor, position, 0, 1);
       $(this._scroller.el).autohide({
         ignoreKeys : [Backbone.UI.KEYS.KEY_UP, Backbone.UI.KEYS.KEY_DOWN], 
         ignoreInputs : true,
         hideCallback : _.bind(this._onAutoHide, this)
       });
-      $(this._scroller.el).css({width : Math.max($(this.button.el).innerWidth(), $(this._scroller.el).width())});
+      $(this._scroller.el).css({width : Math.max($(this.button.el).innerWidth(), 60)});
       if(this.options.onMenuShow) this.options.onMenuShow(e);
       this._scroller.setScrollRatio(0);
     },
