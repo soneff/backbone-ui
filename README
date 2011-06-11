@@ -1,0 +1,4 @@
+Backbone-UI provides a rich set of UI widgets that integrate tightly with Backbone.js.  
+All widgets extend from Backbone.View, and are meant to be bound to a particular piece 
+of data within a Backbone.Model, Collection, or both.
+
