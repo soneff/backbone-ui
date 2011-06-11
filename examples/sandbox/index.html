@@ -12,34 +12,10 @@
     <script src="../lib/prettify.js"></script>
     <script src="../lib/jsbeautify.js"></script>
 
-    <script src="../../src/js/backbone_ui.js"></script>
-    <script src="../../src/js/has_glyph.js"></script>
-    <script src="../../src/js/has_collection_property.js"></script>
-    <script src="../../src/js/button.js"></script>
-    <script src="../../src/js/pulldown.js"></script>
-    <script src="../../src/js/text_field.js"></script>
-    <script src="../../src/js/text_area.js"></script>
-    <script src="../../src/js/tab_set.js"></script>
-    <script src="../../src/js/checkbox.js"></script>
-    <script src="../../src/js/radio_group.js"></script>
-    <script src="../../src/js/scroller.js"></script>
-    <script src="../../src/js/collection_view.js"></script>
-    <script src="../../src/js/table_view.js"></script>
-    <script src="../../src/js/drag_session.js"></script>
-
-    <link rel="stylesheet" href="../../src/css/reset.css"> 
-    <link rel="stylesheet" href="../../src/css/button.css"> 
-    <link rel="stylesheet" href="../../src/css/pulldown.css"> 
-    <link rel="stylesheet" href="../../src/css/text_field.css"> 
-    <link rel="stylesheet" href="../../src/css/text_area.css"> 
-    <link rel="stylesheet" href="../../src/css/tab_set.css"> 
-    <link rel="stylesheet" href="../../src/css/scroller.css"> 
-    <link rel="stylesheet" href="../../src/css/checkbox.css"> 
-    <link rel="stylesheet" href="../../src/css/radio_group.css"> 
-    <link rel="stylesheet" href="../../src/css/table_view.css"> 
-    <link rel="stylesheet" href="../../src/css/has_glyph.css"> 
+    <script src="../../dist/backbone-ui.js"></script>
 
     <link rel="stylesheet" href="../lib/prettify.css"> 
+    <link rel="stylesheet" href="../../dist/backbone-ui.css"> 
 
     <style>
       html {
@@ -133,8 +109,7 @@
         // Button
         addExample('Button', function() {
           return new Backbone.UI.Button({
-            label : 'Press Me',
-            glyph : 'minus'
+            label : 'Press Me'
           }).render();
         });
 
