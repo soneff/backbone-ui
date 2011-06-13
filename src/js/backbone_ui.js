@@ -58,8 +58,9 @@
       if(_(property).exists() && _(property).isString()) {
         var parts = property.split('.');
         _(parts).each(function(part) {
-          if(!_(object).isNull() && !_(object).isUndefined()){ 
-            result = _(object.get).isFunction() ? object.get(part) : object[part];
+          if(_(object).exists()) {
+            var target = result || object;
+            result = _(target.get).isFunction() ? target.get(part) : target[part];
           }
         });
       }
