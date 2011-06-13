@@ -2,6 +2,30 @@ $(function(){
   Backbone.UI.IMAGE_DIR_PATH = './images';
 
   window.todoList = new Backbone.Collection();
+  todoList.serialize = function() {
+    if (!localStorage) return;
+    var data = JSON.stringify(this.toJSON());
+    localStorage.setItem('data', data);
+  };
+
+  todoList.deserialize = function() {
+    try {
+      if (!localStorage) return;
+      data = JSON.parse(localStorage.getItem('data'));
+      _.forEach(data || [], function(datum) {
+        this.add(new Backbone.Model(datum));
+      }, this);
+    } catch (e) {
+      console.log('unable to deserialize data');
+      localStorage.setItem('data', null);
+    }
+  };
+
+  todoList.deserialize();
+
+  window.onbeforeunload = function() {
+    todoList.serialize();
+  };
 
   window.TodoItemView = Backbone.View.extend({
     className : 'todo_item',
