@@ -1,9 +1,13 @@
-Backbone-UI is a JavaScript user interface framework that aims to acheive the following goals:
+Backbone-UI is a JavaScript UI framework that aims to acheive the following goals:
 
-* To work intimitely with the Backbone.Model and Backbone.Collection concepts to bind particular pieces of data to their associated representation in the DOM.
+* To work intimitely with the Backbone.Model and Backbone.Collection concepts 
+  to bind particular pieces of data to their associated representation in the DOM.
 
-* To embrace the DOM, warts and all, as opposed to adding a level of indirection with view templates.
+* To embrace the DOM, warts and all, as opposed to adding a level of indirection 
+  with view templates.
 
-* To provide a consistent, skinnable look-and-feel to form elements across all modern browsers.  
+* To provide a consistent, skinnable look-and-feel to form elements across all 
+  modern browsers.  
 
-* To stay out of your way when laying out your views.  This framework is about generating and maintaining content, not layout.
+* To stay out of your way when laying out your views.  This framework is about 
+  generating and maintaining content, not layout.
