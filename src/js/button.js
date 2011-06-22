@@ -48,15 +48,23 @@
     },
 
     render : function() {
+      var labelText = this.options.label;
+      if(_(this.model).exists() && _(this.options.labelProperty).exists()) {
+        var key = 'change:' + this.options.labelProperty;
+        this.model.unbind(key);
+        this.model.bind(key, _.bind(function() {
+          this.render();
+        }, this));
+        labelText = _(this.model).resolveProperty(this.options.labelProperty);
+      }
+
       $(this.el).empty();
       $(this.el).addClass('button');
       $(this.el).toggleClass('has_border', this.options.hasBorder);
 
       // insert label
-      if(this.options.label) {
-        var span = $.el('span', {className : 'label'}, this.options.label);
-        this.el.appendChild(span);
-      }
+      var span = $.el('span', {className : 'label'}, labelText);
+      this.el.appendChild(span);
 
       // insert glyphs
       this.insertGlyph(this.el, this.options.glyph);
