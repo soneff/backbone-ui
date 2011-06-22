@@ -62,8 +62,9 @@
     },
 
     initialize : function() {
-      _.extend(this, Backbone.UI.HasGlyph);
-      _.extend(this, Backbone.UI.HasCollectionProperty);
+      _(this).extend(Backbone.UI.HasGlyph);
+      _(this).extend(Backbone.UI.HasCollectionProperty);
+      _(this).bindAll('render');
       $(this.el).addClass('pulldown');
     },
 
@@ -74,6 +75,22 @@
 
     render : function() {
       $(this.el).empty();
+
+      // observe model changes
+      if(_(this.model).exists() && _(this.model.bind).isFunction()) {
+        this.model.unbind('change', this.render);
+        
+        // observe model changes
+        if(_(this.options.property).exists()) {
+          this.model.bind('change:' + this.options.property, this.render);
+        }
+      }
+
+      // observe collection changes
+      if(_(this.options.collection).exists() && _(this.options.collection.bind).isFunction()) {
+        this.options.collection.unbind('all', this.render);
+        this.options.collection.bind('all', this.render);
+      }
 
       this._renderMenu();
 
@@ -126,7 +143,7 @@
         ignoreInputs : true,
         hideCallback : _.bind(this._onAutoHide, this)
       });
-      $(this._scroller.el).css({width : Math.max($(this.button.el).innerWidth(), 60)});
+      $(this._scroller.el).css({width : Math.max($(this.button.el).innerWidth(), this._menuWidth)});
       if(this.options.onMenuShow) this.options.onMenuShow(e);
       this._scroller.setScrollRatio(0);
     },
@@ -134,7 +151,10 @@
     // Renders the menu entries based on the current options
     _renderMenu : function() {
       // clear the existing menu
-      if(this._scroller) this._scroller.el.parentNode.removeChild(this._scroller.el);
+      if(this._scroller) {
+        this._scroller.el.parentNode.removeChild(this._scroller.el);
+        $(this._scroller.el).css({width : 'auto'});
+      }
       
       // create a new list of items
       var list = $.el('ul', {className : 'pulldown_menu'});
@@ -173,7 +193,9 @@
       }).render();
       $(this._scroller.el).hide();
       $(this._scroller.el).addClass('pulldown_menu_scroller');
+
       document.body.appendChild(this._scroller.el);
+      this._menuWidth = $(this._scroller.el).width() + 20;
     },
 
     // Adds the given pulldown item (creating a new li element) 

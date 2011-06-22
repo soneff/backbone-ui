@@ -31,6 +31,8 @@
     initialize : function() {
       _.extend(this, Backbone.UI.HasGlyph);
 
+      _.bindAll(this, 'render');
+
       $(this.el).mousedown(_.bind(function(e) {
         $(this.el).addClass('active');
       }, this));
@@ -49,13 +51,14 @@
 
     render : function() {
       var labelText = this.options.label;
-      if(_(this.model).exists() && _(this.options.labelProperty).exists()) {
-        var key = 'change:' + this.options.labelProperty;
-        this.model.unbind(key);
-        this.model.bind(key, _.bind(function() {
-          this.render();
-        }, this));
-        labelText = _(this.model).resolveProperty(this.options.labelProperty);
+
+      if(_(this.model).exists()) {
+        this.model.unbind(null, this.render);
+      }
+
+      if(_(this.model).exists() && _(this.options.property).exists()) {
+        this.model.bind('change:' + this.options.property, this.render);
+        labelText = _(this.model).resolveProperty(this.options.property);
       }
 
       $(this.el).empty();

@@ -216,7 +216,7 @@
 
     stack : function() {
       var padding = '10px';
-      var stackEl = $.el('div', {className : 'stack'});
+      var stackEl = $.el('span', {className : 'stack'});
       var parts = _split.apply(this, _(arguments).toArray());
       if(!!parts.attributes.padding) {
         padding = parts.attributes.padding;
