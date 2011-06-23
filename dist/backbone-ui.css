@@ -59,6 +59,17 @@
 .button.has_border.active {
   background-color:#ccc;
 }
+
+.button input[type=submit] {
+  border:1px solid transparent;
+  background-color:transparent;
+  position:absolute;
+  top:-5px;
+  right:-5px;
+  bottom:-5px;
+  left:-5px;
+  cursor:pointer;
+}
 .checkbox {
   float:left;
   display:block;

@@ -25,7 +25,9 @@
       hasBorder : true,
 
       // A callback to invoke when the button is clicked
-      onClick : null
+      onClick : null,
+
+      isSubmit : false
     },
 
     initialize : function() {
@@ -64,6 +66,15 @@
       $(this.el).empty();
       $(this.el).addClass('button');
       $(this.el).toggleClass('has_border', this.options.hasBorder);
+
+      if(this.options.isSubmit) {
+        var submit = $.el('input', {
+          type : 'submit',
+          value : ''
+        });
+        submit.onclick = this.options.onClick;
+        this.el.appendChild(submit);
+      }
 
       // insert label
       var span = $.el('span', {className : 'label'}, labelText);

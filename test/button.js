@@ -32,4 +32,14 @@ $(document).ready(function() {
     text = $(button.el).find('.label').text();
     equals(text, 'baz');
   });
+
+  test("submitType", function() {
+    var button = new Backbone.UI.Button({
+      label : 'foo',
+      isSubmit : true
+    }).render();
+
+    var inputs = $(button.el).find('input[type=submit]');
+    equals(inputs.length, 1);
+  });
 });
