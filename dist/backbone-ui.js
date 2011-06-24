@@ -58,8 +58,9 @@
       if(_(property).exists() && _(property).isString()) {
         var parts = property.split('.');
         _(parts).each(function(part) {
-          if(!_(object).isNull() && !_(object).isUndefined()){ 
-            result = _(object.get).isFunction() ? object.get(part) : object[part];
+          if(_(object).exists()) {
+            var target = result || object;
+            result = _(target.get).isFunction() ? target.get(part) : target[part];
           }
         });
       }
@@ -215,7 +216,7 @@
 
     stack : function() {
       var padding = '10px';
-      var stackEl = $.el('div', {className : 'stack'});
+      var stackEl = $.el('span', {className : 'stack'});
       var parts = _split.apply(this, _(arguments).toArray());
       if(!!parts.attributes.padding) {
         padding = parts.attributes.padding;
@@ -432,11 +433,15 @@
       hasBorder : true,
 
       // A callback to invoke when the button is clicked
-      onClick : null
+      onClick : null,
+
+      isSubmit : false
     },
 
     initialize : function() {
       _.extend(this, Backbone.UI.HasGlyph);
+
+      _.bindAll(this, 'render');
 
       $(this.el).mousedown(_.bind(function(e) {
         $(this.el).addClass('active');
@@ -455,15 +460,33 @@
     },
 
     render : function() {
+      var labelText = this.options.label;
+
+      if(_(this.model).exists()) {
+        this.model.unbind(null, this.render);
+      }
+
+      if(_(this.model).exists() && _(this.options.property).exists()) {
+        this.model.bind('change:' + this.options.property, this.render);
+        labelText = _(this.model).resolveProperty(this.options.property);
+      }
+
       $(this.el).empty();
       $(this.el).addClass('button');
       $(this.el).toggleClass('has_border', this.options.hasBorder);
 
-      // insert label
-      if(this.options.label) {
-        var span = $.el('span', {className : 'label'}, this.options.label);
-        this.el.appendChild(span);
+      if(this.options.isSubmit) {
+        var submit = $.el('input', {
+          type : 'submit',
+          value : ''
+        });
+        submit.onclick = this.options.onClick;
+        this.el.appendChild(submit);
       }
+
+      // insert label
+      var span = $.el('span', {className : 'label'}, labelText);
+      this.el.appendChild(span);
 
       // insert glyphs
       this.insertGlyph(this.el, this.options.glyph);
@@ -506,30 +529,33 @@
     },
 
     initialize : function() {
+      _.bindAll(this, 'render');
       $(this.el).click(_(this._onClick).bind(this));
       $(this.el).attr({href : '#'});
       $(this.el).addClass('checkbox');
-
-      if(_(this.model).exists() && _(this.options.property).exists()) {
-        this.model.bind('change:' + this.options.property, _.bind(function() {
-          this.checked = !this.checked;
-          this.render();
-        }, this));
-      }
-
-      if(_(this.model).exists() && _(this.options.labelProperty).exists()) {
-        this.model.bind('change:' + this.options.labelProperty, _.bind(function() {
-          this.render();
-        }, this));
-      }
     },
 
     render : function() {
       this.checked = 
-        _(this.model).exists() && _(this.options.property).exists() ? 
-        _(this.model).resolveProperty(this.options.property) : 
         _(this.checked).exists() ? this.checked : 
         _(this.options.checked).exists() ? this.options.checked : false;
+      var labelText = this.options.label;
+
+      if(_(this.model).exists()) {
+        this.model.unbind(null, this.render);
+      }
+
+      // observe property changes
+      if(_(this.model).exists() && _(this.options.property).exists()) {
+        this.model.bind('change:' + this.options.property, _(this.render).bind(this));
+        this.checked = _(this.model).resolveProperty(this.options.property);
+      }
+
+      // observe label property changes
+      if(_(this.model).exists() && _(this.options.labelProperty).exists()) {
+        this.model.bind('change:' + this.options.labelProperty, _(this.render).bind(this));
+        labelText = _(this.model).resolveProperty(this.options.labelProperty);
+      }
 
       $(this.el).empty();
 
@@ -537,11 +563,6 @@
       if(this.checked) {
         mark.appendChild($.el('div', {className : 'checkmark_fill'}));
       }
-
-      var labelText = _(this.options.label).exists() ? 
-        this.options.label : 
-        _(this.model).exists() && _(this.options.labelProperty).exists() ?
-        _(this.model).resolveProperty(this.options.labelProperty) : '';
 
       this._label = $.el('div', {className : 'label'}, labelText);
 
@@ -1039,8 +1060,9 @@
     },
 
     initialize : function() {
-      _.extend(this, Backbone.UI.HasGlyph);
-      _.extend(this, Backbone.UI.HasCollectionProperty);
+      _(this).extend(Backbone.UI.HasGlyph);
+      _(this).extend(Backbone.UI.HasCollectionProperty);
+      _(this).bindAll('render');
       $(this.el).addClass('pulldown');
     },
 
@@ -1051,6 +1073,22 @@
 
     render : function() {
       $(this.el).empty();
+
+      // observe model changes
+      if(_(this.model).exists() && _(this.model.bind).isFunction()) {
+        this.model.unbind('change', this.render);
+        
+        // observe model changes
+        if(_(this.options.property).exists()) {
+          this.model.bind('change:' + this.options.property, this.render);
+        }
+      }
+
+      // observe collection changes
+      if(_(this.options.collection).exists() && _(this.options.collection.bind).isFunction()) {
+        this.options.collection.unbind('all', this.render);
+        this.options.collection.bind('all', this.render);
+      }
 
       this._renderMenu();
 
@@ -1103,7 +1141,7 @@
         ignoreInputs : true,
         hideCallback : _.bind(this._onAutoHide, this)
       });
-      $(this._scroller.el).css({width : Math.max($(this.button.el).innerWidth(), 60)});
+      $(this._scroller.el).css({width : Math.max($(this.button.el).innerWidth(), this._menuWidth)});
       if(this.options.onMenuShow) this.options.onMenuShow(e);
       this._scroller.setScrollRatio(0);
     },
@@ -1111,7 +1149,10 @@
     // Renders the menu entries based on the current options
     _renderMenu : function() {
       // clear the existing menu
-      if(this._scroller) this._scroller.el.parentNode.removeChild(this._scroller.el);
+      if(this._scroller) {
+        this._scroller.el.parentNode.removeChild(this._scroller.el);
+        $(this._scroller.el).css({width : 'auto'});
+      }
       
       // create a new list of items
       var list = $.el('ul', {className : 'pulldown_menu'});
@@ -1150,7 +1191,9 @@
       }).render();
       $(this._scroller.el).hide();
       $(this._scroller.el).addClass('pulldown_menu_scroller');
+
       document.body.appendChild(this._scroller.el);
+      this._menuWidth = $(this._scroller.el).width() + 20;
     },
 
     // Adds the given pulldown item (creating a new li element) 
