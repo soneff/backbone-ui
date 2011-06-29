@@ -26,7 +26,7 @@ $(document).ready(function() {
   test("withDataBinding", function() {
     var model = new Backbone.Model({
       description : 'property name',
-      active : false
+      active : true 
     });
 
     var checkbox = new Backbone.UI.Checkbox({
@@ -41,12 +41,12 @@ $(document).ready(function() {
 
     // checkmark should be active based on the 'active' property
     var mark = $(checkbox.el).find('.checkmark_fill');
-    equals(0, mark.length);
+    equals(1, mark.length);
 
     // update our model
     model.set({
       description : 'baz',
-      active : true
+      active : false
     });
 
     // text should have changed
@@ -55,6 +55,6 @@ $(document).ready(function() {
 
     // and we should now have a checkmark fill
     mark = $(checkbox.el).find('.checkmark_fill');
-    equals(1, mark.length);
+    equals(0, mark.length);
   });
 });

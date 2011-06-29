@@ -54,12 +54,10 @@
     render : function() {
       var labelText = this.options.label;
 
-      if(_(this.model).exists()) {
-        this.model.unbind(null, this.render);
-      }
-
       if(_(this.model).exists() && _(this.options.property).exists()) {
-        this.model.bind('change:' + this.options.property, this.render);
+        var key = 'change:' + this.options.property;
+        this.model.unbind(key, this.render);
+        this.model.bind(key, this.render);
         labelText = _(this.model).resolveProperty(this.options.property);
       }
 
@@ -72,7 +70,6 @@
           type : 'submit',
           value : ''
         });
-        submit.onclick = this.options.onClick;
         this.el.appendChild(submit);
       }
 

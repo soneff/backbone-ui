@@ -24,19 +24,21 @@
         _(this.options.checked).exists() ? this.options.checked : false;
       var labelText = this.options.label;
 
-      if(_(this.model).exists()) {
-        this.model.unbind(null, this.render);
-      }
-
       // observe property changes
       if(_(this.model).exists() && _(this.options.property).exists()) {
-        this.model.bind('change:' + this.options.property, _(this.render).bind(this));
+        // TODO this key should be based on the last set property, not the new one.
+        // This will leak an observer if we dont keep track of previously bound keys 
+        var key = 'change:' + this.options.property;
+        this.model.unbind(key, this.render);
+        this.model.bind(key, this.render);
         this.checked = _(this.model).resolveProperty(this.options.property);
       }
 
       // observe label property changes
       if(_(this.model).exists() && _(this.options.labelProperty).exists()) {
-        this.model.bind('change:' + this.options.labelProperty, _(this.render).bind(this));
+        var labelKey = 'change:' + this.options.labelProperty;
+        this.model.unbind(labelKey, this.render);
+        this.model.bind(labelKey, this.render);
         labelText = _(this.model).resolveProperty(this.options.labelProperty);
       }
 
