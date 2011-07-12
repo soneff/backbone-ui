@@ -72,8 +72,16 @@
         $(tab).removeClass('selected');
       });
 
+      if(_(this._selectedIndex).exists()) {
+        $(this.el).removeClass('index_' + this._selectedIndex);
+      }
+      $(this.el).addClass('index_' + index);
+      this._selectedIndex = index;
+
       // select the appropriate tab
       $(this._tabs[index]).addClass('selected');
+
+
 
       // show the proper contents
       $(this._contents[index]).show();

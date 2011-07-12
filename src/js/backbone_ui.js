@@ -185,7 +185,7 @@
       var constructor = Backbone.UI[arguments[0]];
       var parts = _split.apply(this, _(arguments).toArray().slice(1));
       if(!!constructor && _(constructor).isFunction()) {
-        widget = new constructor(parts.attributes || {}).render();
+        widget = new constructor(parts.attributes || {});
         _(parts.children).each(function(child) {
           widget.el.appendChild(child);
         });
@@ -216,7 +216,7 @@
 
     stack : function() {
       var padding = '10px';
-      var stackEl = $.el('span', {className : 'stack'});
+      var stackEl = $.el('div', {className : 'stack'});
       var parts = _split.apply(this, _(arguments).toArray());
       if(!!parts.attributes.padding) {
         padding = parts.attributes.padding;
@@ -266,9 +266,9 @@
       for(i=children.length-1; i>leftLimit; i--) {
         var el = children[i];
         $(el).css({
-          'float' : 'right', 
           marginLeft : padding
         });
+        $(el).addClass('right');
         if(i === 0) $(el).addClass('last');
 
         !!previousEl && !!previousEl.nextChild ?
@@ -283,15 +283,15 @@
         // render/rerender the children as requested
         var elementLeft = children[i].el ? children[i].el : children[i];
         $(elementLeft).css({
-          'float' : 'left', 
           marginRight : (i !== leftLimit - 1) ? padding : null
         });
+        $(elementLeft).addClass('left');
         if(i === 0) $(elementLeft).addClass('first');
         if((i === leftLimit - 1) && (springIndex === -1)) $(elementLeft).addClass('last');
         flowEl.appendChild(elementLeft);
       }
       
-      flowEl.appendChild($.el('br', {style: 'clear:both;height:0px;line-height:0px'}));
+      flowEl.appendChild($.el('br', {className : 'clear'}));
 
       return flowEl;
     }

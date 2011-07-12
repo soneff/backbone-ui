@@ -53,3 +53,21 @@ table {
 label {
   line-height:30px;
 }
+
+.flow .left {
+  /* inline-block with IE7 hack */
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  vertical-align:top;
+}
+
+.flow .right {
+  float: right;
+}
+
+.flow br.clear {
+  clear:both;
+  height:0px;
+  line-height:0px;
+}
