@@ -4,9 +4,7 @@
 }
 
 .radio_group .mark {
-  float:left;
   margin:0 5px 0 0;
-  display:block;
   width:20px;
   height:20px;
   line-height:17px;
@@ -25,7 +23,6 @@
 }
 
 .radio_group li {
-  float:left;
   margin:0 10px 0 0;
 }
 
@@ -35,7 +32,18 @@
 }
 
 .radio_group .label {
-  float:left;
   line-height:22px;
   color:#444;
 }
+
+
+.radio_group .mark,
+.radio_group li,
+.radio_group .label {
+  /* inline-block with IE7 hack */
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  vertical-align:top;
+}
+

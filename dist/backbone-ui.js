@@ -233,7 +233,6 @@
         if(!!el.nodeType) {
           $(el).css({marginBottom : isLast ? '0' : padding});
           stackEl.appendChild(el);
-          stackEl.appendChild($.el('span', {style : 'clear:both;'}));
         }
       });
 

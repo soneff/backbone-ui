@@ -1,6 +1,4 @@
 .checkbox {
-  float:left;
-  display:block;
   text-decoration:none;
   height:30px;
 }
@@ -10,7 +8,6 @@
 }
 
 .checkbox .checkmark {
-  float:left;
   position:relative;
   width:20px;
   height:20px;
@@ -44,9 +41,18 @@
 }
 
 .checkbox .label {
-  float:left;
   line-height:32px;
   padding:0 0 0 10px;
   text-decoration:none;
   color:#444;
+}
+
+.checkbox,
+.checkbox .checkmark,
+.checkbox .label {
+  /* inline-block with IE7 hack */
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  vertical-align:top;
 }

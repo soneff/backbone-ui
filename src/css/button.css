@@ -1,12 +1,16 @@
 .button {
   position:relative;
-  float:left;
-  display:block;
   height:28px;
   text-decoration:none;
   color:#333;
   font-size:14px;
   font-family:Helvetica;
+
+  /* inline-block with IE7 hack */
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  vertical-align:top;
 }
 
 .button.has_border {

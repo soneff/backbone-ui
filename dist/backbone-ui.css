@@ -1,12 +1,16 @@
 .button {
   position:relative;
-  float:left;
-  display:block;
   height:28px;
   text-decoration:none;
   color:#333;
   font-size:14px;
   font-family:Helvetica;
+
+  /* inline-block with IE7 hack */
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  vertical-align:top;
 }
 
 .button.has_border {
@@ -71,8 +75,6 @@
   cursor:pointer;
 }
 .checkbox {
-  float:left;
-  display:block;
   text-decoration:none;
   height:30px;
 }
@@ -82,7 +84,6 @@
 }
 
 .checkbox .checkmark {
-  float:left;
   position:relative;
   width:20px;
   height:20px;
@@ -116,11 +117,20 @@
 }
 
 .checkbox .label {
-  float:left;
   line-height:32px;
   padding:0 0 0 10px;
   text-decoration:none;
   color:#444;
+}
+
+.checkbox,
+.checkbox .checkmark,
+.checkbox .label {
+  /* inline-block with IE7 hack */
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  vertical-align:top;
 }
 .glyph {
   position:absolute;
@@ -139,9 +149,12 @@
 }
 
 .pulldown {
-  float:left;
   position:relative;
   height:30px;
+  /* inline-block with IE7 hack */
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
 }
 
 .pulldown.placeholder {
@@ -230,9 +243,7 @@
 }
 
 .radio_group .mark {
-  float:left;
   margin:0 5px 0 0;
-  display:block;
   width:20px;
   height:20px;
   line-height:17px;
@@ -251,7 +262,6 @@
 }
 
 .radio_group li {
-  float:left;
   margin:0 10px 0 0;
 }
 
@@ -261,10 +271,21 @@
 }
 
 .radio_group .label {
-  float:left;
   line-height:22px;
   color:#444;
 }
+
+
+.radio_group .mark,
+.radio_group li,
+.radio_group .label {
+  /* inline-block with IE7 hack */
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  vertical-align:top;
+}
+
 /* http://meyerweb.com/eric/tools/css/reset/ 
    v2.0 | 20110126
    License: none (public domain)
@@ -408,7 +429,6 @@ label {
 }
 
 .tab_set .tab {
-  float:left;
   text-decoration:none;
   color:#222;
   border:1px solid #444;
@@ -422,6 +442,11 @@ label {
   border-top-right-radius: 4px;
   -webkit-border-top-right-radius: 4px;
   -moz-border-radius-topright: 4px;
+  /* inline-block with IE7 hack */
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  vertical-align:top;
 }
 
 .tab_set .tab.selected,
@@ -514,12 +539,16 @@ label {
 }
 .text_area {
   position:relative;
-  float:left;
   border:1px solid #666;
   -moz-border-radius: 4px;
   -webkit-border-radius: 4px;
   border-radius: 4px;
   background-color:#fff;
+  /* inline-block with IE7 hack */
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  vertical-align:top;
 }
 
 .text_area.disabled {
@@ -536,7 +565,6 @@ label {
 }
 .text_field {
   position:relative;
-  float:left;
   border:1px solid #666;
   width:200px;
   height:28px;
@@ -544,6 +572,11 @@ label {
   -webkit-border-radius: 4px;
   border-radius: 4px;
   background-color:#fff;
+  /* inline-block with IE7 hack */
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  vertical-align:top;
 }
 
 .text_field.disabled {
