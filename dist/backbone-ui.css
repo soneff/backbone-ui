@@ -486,47 +486,39 @@ label {
 .table_view table {
   text-align:left;
   width:100%;
+  border-collapse:collapse;
+}
+
+.table_view table th {
+  padding:0;
+  margin:0;
 }
 
 .table_view .heading .wrapper {
-  padding:5px;
   border-width:1px 0 1px 1px;
   border-style:solid;
   border-color:#444;
   background-color:#eee;
 }
 
-.table_view .heading .first .wrapper {
-  border-top-left-radius: 4px;
-  -webkit-border-top-left-radius: 4px;
-  -moz-border-radius-topleft: 4px;
-}
-
 .table_view .heading .last .wrapper {
   border-width:1px 1px 1px 1px;
-  border-top-right-radius: 4px;
-  -webkit-border-top-right-radius: 4px;
-  -moz-border-radius-topright: 4px;
 }
 
 .table_view .scroller {
   border-style:solid;
   border-color:#444;
   border-width:0 1px 1px 1px;
-  border-bottom-left-radius: 4px;
-  -webkit-border-bottom-left-radius: 4px;
-  -moz-border-radius-bottomleft: 4px;
-  border-bottom-right-radius: 4px;
-  -webkit-border-bottom-right-radius: 4px;
-  -moz-border-radius-bottomright: 4px;
-}
-
-.table_view .scroller .content table {
-  margin:5px 0 5px 5px;
+  padding:5px;
+  background-color:#fff;
 }
 
 .table_view .wrapper {
-  padding:5px;
+  padding:5px 10px;
+}
+
+.table_view .content .first .wrapper {
+  padding-left:5px;
 }
 
 .table_view .content .last .wrapper {
@@ -536,24 +528,6 @@ label {
 .table_view.clickable .content tr:hover .wrapper {
   background-color:#ddd;
   cursor:pointer;
-}
-
-.table_view.clickable .content tr:hover .first .wrapper {
-  border-bottom-left-radius: 4px;
-  -webkit-border-bottom-left-radius: 4px;
-  -moz-border-radius-bottomleft: 4px;
-  border-top-left-radius: 4px;
-  -webkit-border-top-left-radius: 4px;
-  -moz-border-radius-topleft: 4px;
-}
-
-.table_view.clickable .content tr:hover .last .wrapper {
-  border-top-right-radius: 4px;
-  -webkit-border-top-right-radius: 4px;
-  -moz-border-radius-topright: 4px;
-  border-bottom-right-radius: 4px;
-  -webkit-border-bottom-right-radius: 4px;
-  -moz-border-radius-bottomright: 4px;
 }
 .text_area {
   position:relative;

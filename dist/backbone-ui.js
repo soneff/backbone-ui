@@ -1702,7 +1702,9 @@
 
       // A callback to invoke when a row is clicked.  If this callback
       // is present, the rows will highlight on hover.
-      onItemClick : jQuery.noop
+      onItemClick : jQuery.noop,
+
+      maxHeight : null
     },
 
     initialize : function() {
@@ -1717,11 +1719,13 @@
       // generate a table row for our headings
       var headingRow = $.el('tr');
       _(this.options.columns).each(function(column, index, list) {
+        var width = column.width ? column.width : index == list.length -1 ? null : 150;
+        if(width && index === 0) width += 5; 
         var label = _(column.label).isFunction() ? column.label() : column.label;
-        var style = column.width ? 'width:' + column.width + 'px' : null;
+        var style = width ? 'width:' + width + 'px' : null;
         headingRow.appendChild($.el('th', 
           {className : _(list).nameForIndex(index), style : style}, 
-          $.el('div', {className : 'wrapper', style : style}, label)));
+          $.el('div', {className : 'wrapper'}, label)));
       });
 
       // Add the heading row to it's very own table so we can allow the 
@@ -1749,7 +1753,8 @@
 
           // for each model, we walk through each column and generate the content 
           _(this.options.columns).each(function(column, index, list) {
-            var style = column.width ? 'width:' + column.width + 'px' : null;
+            var width = column.width ? column.width : index == list.length -1 ? null : 150;
+            var style = width ? 'width:' + width + 'px' : null;
             var content = this.resolveContent(column.content, m, column.property);
             row.appendChild($.el('td', 
               {className : _(list).nameForIndex(index), style : style}, 
@@ -1769,8 +1774,9 @@
       this._collectionView.appendChild(tableBody);
 
       // wrap the table in a scroller
+      var style = _(this.options.maxHeight).exists() ? 'max-height:' + this.options.maxHeight + 'px' : null;
       var scroller = new Backbone.UI.Scroller({
-        content : $.el('div', this._collectionView)
+        content : $.el('div', {style : style}, this._collectionView)
       }).render();
 
       this.el.appendChild(scroller.el);
