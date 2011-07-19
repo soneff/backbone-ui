@@ -1,7 +1,7 @@
 .button {
   position:relative;
   height:28px;
-  text-decoration:none;
+  text-decoration:underline;
   color:#333;
   font-size:14px;
   font-family:Helvetica;
@@ -24,23 +24,31 @@
   -o-user-select: none;
   user-select: none;
   background-color:#eee;
+  text-decoration:none;
 }
 
 .button.has_glyph {
-  padding-left:26px;
+  padding-left:30px;
 }
 
 .button.has_glyph_right {
-  padding-right:26px;
+  padding-right:30px;
 }
 
 .button .label {
   line-height:28px;
+  padding:0;
+}
+
+.button.has_border .label {
   padding:0 5px;
 }
 
-.button.has_border.disabled {
+.button.disabled {
   color:#aaa;
+}
+
+.button.has_border.disabled {
   border-color:#999;
 }
 
