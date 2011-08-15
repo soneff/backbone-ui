@@ -1,4 +1,4 @@
-(function() {
+!function(context) {
   // ensure backbone and jquery are available
   typeof Backbone !== 'undefined' || alert('backbone environment not loaded') ;
   typeof $ !== 'undefined' || alert('jquery environment not loaded');
@@ -182,11 +182,21 @@
   // Add some utility methods to Backbone.UI
   _($).extend({
     ui : function() {
-      var constructor = Backbone.UI[arguments[0]];
-      var parts = _split.apply(this, _(arguments).toArray().slice(1));
+      var args = arguments;
+      var constructor = Backbone.UI[args[0]];
+
+      // process any formation options or element attributes
+      var firstArg = args[1];
+      var startingIndex = 1;
+      var attributes = null;
+      if(firstArg.nodeType !== 1 && typeof(firstArg) === 'object') {
+        startingIndex = 2;
+        attributes = firstArg;
+      }
+      args = Array.prototype.slice.call(arguments, startingIndex);
       if(!!constructor && _(constructor).isFunction()) {
-        widget = new constructor(parts.attributes || {});
-        _(parts.children).each(function(child) {
+        widget = new constructor(attributes || {});
+        _(args).each(function(child) {
           widget.el.appendChild(child);
         });
       }
@@ -194,154 +204,14 @@
       return widget;
     }, 
 
-    // Generates a new DOM node with optional 
-    // attributes and child elements
-    el : function() {
-      // create the element and split the arguments into 
-      // attributes and children
-      var tagName = arguments.length === 0 ? 'div' : arguments[0];
-      var el = document.createElement(tagName);
-      var parts = _split.apply(this, _(arguments).toArray().slice(1));
-
-      // apply attributes
-      $(el).safeAttr(parts.attributes);
-      
-      // insert children
-      _(parts.children).each(function(child) {
-        el.appendChild(child);
-      });
-
-      return el;
-    },
-
     stack : function() {
-      var padding = '10px';
-      var stackEl = $.el('div', {className : 'stack'});
-      var parts = _split.apply(this, _(arguments).toArray());
-      if(!!parts.attributes.padding) {
-        padding = parts.attributes.padding;
-        delete(parts.attributes.padding);
-      }
-      $(stackEl).safeAttr(parts.attributes);
-      var children = parts.children;
-
-      var i = 0;
-      _(children).each(function(arg, i) {
-        var isLast = i == children.length - 1;
-
-        var el = arg.el ? arg.el : arg; 
-        if(!!el.nodeType) {
-          $(el).css({marginBottom : isLast ? '0' : padding});
-          stackEl.appendChild(el);
-        }
-      });
-
-      return stackEl;
+      return $.formation.stack.apply(this, arguments);
     },
 
     flow : function() {
-      var padding = '10px';
-      var flowEl = $.el('div', {className : 'flow'});
-      var parts = _split.apply(this, _(arguments).toArray());
-      if(!!parts.attributes.padding) {
-        padding = parts.attributes.padding;
-        delete(parts.attributes.padding);
-      }
-      $(flowEl).safeAttr(parts.attributes);
-      var children = parts.children;
-
-      // determine the spring index 
-      var springIndex = -1;
-      var i;
-      for(i=0; i<children.length; i++) {
-        var child = children[i];
-        if(!_(child).isElement() && child.textContent == 'spring') {
-          springIndex = i;
-          break;
-        }
-      }
-
-      // add children after the spring from right to left
-      var leftLimit = springIndex < 0 ? children.length : springIndex;
-      for(i=children.length-1; i>leftLimit; i--) {
-        var el = children[i];
-        $(el).css({
-          marginLeft : padding
-        });
-        $(el).addClass('right');
-        if(i === 0) $(el).addClass('last');
-
-        !!previousEl && !!previousEl.nextChild ?
-          flowEl.insertBefore(el, previousEl.nextChild) :
-          flowEl.appendChild(el);
-
-        var previousEl = el;
-      }
-
-      // add children before the spring from left to right
-      for(i=0; i<leftLimit; i++) {
-        // render/rerender the children as requested
-        var elementLeft = children[i].el ? children[i].el : children[i];
-        $(elementLeft).css({
-          marginRight : (i !== leftLimit - 1) ? padding : null
-        });
-        $(elementLeft).addClass('left');
-        if(i === 0) $(elementLeft).addClass('first');
-        if((i === leftLimit - 1) && (springIndex === -1)) $(elementLeft).addClass('last');
-        flowEl.appendChild(elementLeft);
-      }
-      
-      flowEl.appendChild($.el('br', {className : 'clear'}));
-
-      return flowEl;
+      return $.formation.flow.apply(this, arguments);
     }
   });
-
-  var _split = function() {
-    var attributes = {}, children = [];
-    if(arguments.length > 0) {
-      // check if the first argument represents child nodes
-      children = _findChildren(arguments[0]);
-
-      // if not, we assume it's an attribute arguemnt, and we look
-      // for a second argument that may contain child nodes
-      if(!children) {
-        attributes = arguments[0];
-        if(arguments.length > 1) { 
-          children = _findChildren(arguments[1]);
-        }
-      }
-    }
-    return {attributes : attributes, children : children};
-  };
-
-  var _findChildren = function(arg) {
-    var children;
-
-    if(!!arg){
-      // if the argument is a dom node, we simply add
-      // it to our collection
-      if(_(arg).isElement()) {
-        children = [arg];
-      }
-
-      // if the argument is an array, we walk through it
-      else if(_(arg).isArray()) {
-        children = [];
-        for(var i=0; i<arg.length; i++) {
-          children.push(_(arg[i]).isElement() ? 
-            arg[i] : document.createTextNode(arg[i]));
-        }
-      }
-
-      // if the argument is a string or a number, we create a text node
-      else if(_(arg).isString() || _(arg).isNumber()) {
-        children = [document.createTextNode(arg)];
-      }
-    }
-    
-    return children;
-  };
 
   var _alignCoords = function(el, anchor, pos, xFudge, yFudge) {
     el = $(el);
@@ -404,4 +274,4 @@
     return {x : x, y : y};
   };
 
-})();
+}(this);

@@ -1,4 +1,4 @@
-(function() {
+!function(context) {
   // ensure backbone and jquery are available
   typeof Backbone !== 'undefined' || alert('backbone environment not loaded') ;
   typeof $ !== 'undefined' || alert('jquery environment not loaded');
@@ -182,11 +182,21 @@
   // Add some utility methods to Backbone.UI
   _($).extend({
     ui : function() {
-      var constructor = Backbone.UI[arguments[0]];
-      var parts = _split.apply(this, _(arguments).toArray().slice(1));
+      var args = arguments;
+      var constructor = Backbone.UI[args[0]];
+
+      // process any formation options or element attributes
+      var firstArg = args[1];
+      var startingIndex = 1;
+      var attributes = null;
+      if(firstArg.nodeType !== 1 && typeof(firstArg) === 'object') {
+        startingIndex = 2;
+        attributes = firstArg;
+      }
+      args = Array.prototype.slice.call(arguments, startingIndex);
       if(!!constructor && _(constructor).isFunction()) {
-        widget = new constructor(parts.attributes || {});
-        _(parts.children).each(function(child) {
+        widget = new constructor(attributes || {});
+        _(args).each(function(child) {
           widget.el.appendChild(child);
         });
       }
@@ -194,154 +204,14 @@
       return widget;
     }, 
 
-    // Generates a new DOM node with optional 
-    // attributes and child elements
-    el : function() {
-      // create the element and split the arguments into 
-      // attributes and children
-      var tagName = arguments.length === 0 ? 'div' : arguments[0];
-      var el = document.createElement(tagName);
-      var parts = _split.apply(this, _(arguments).toArray().slice(1));
-
-      // apply attributes
-      $(el).safeAttr(parts.attributes);
-      
-      // insert children
-      _(parts.children).each(function(child) {
-        el.appendChild(child);
-      });
-
-      return el;
-    },
-
     stack : function() {
-      var padding = '10px';
-      var stackEl = $.el('div', {className : 'stack'});
-      var parts = _split.apply(this, _(arguments).toArray());
-      if(!!parts.attributes.padding) {
-        padding = parts.attributes.padding;
-        delete(parts.attributes.padding);
-      }
-      $(stackEl).safeAttr(parts.attributes);
-      var children = parts.children;
-
-      var i = 0;
-      _(children).each(function(arg, i) {
-        var isLast = i == children.length - 1;
-
-        var el = arg.el ? arg.el : arg; 
-        if(!!el.nodeType) {
-          $(el).css({marginBottom : isLast ? '0' : padding});
-          stackEl.appendChild(el);
-        }
-      });
-
-      return stackEl;
+      return $.formation.stack.apply(this, arguments);
     },
 
     flow : function() {
-      var padding = '10px';
-      var flowEl = $.el('div', {className : 'flow'});
-      var parts = _split.apply(this, _(arguments).toArray());
-      if(!!parts.attributes.padding) {
-        padding = parts.attributes.padding;
-        delete(parts.attributes.padding);
-      }
-      $(flowEl).safeAttr(parts.attributes);
-      var children = parts.children;
-
-      // determine the spring index 
-      var springIndex = -1;
-      var i;
-      for(i=0; i<children.length; i++) {
-        var child = children[i];
-        if(!_(child).isElement() && child.textContent == 'spring') {
-          springIndex = i;
-          break;
-        }
-      }
-
-      // add children after the spring from right to left
-      var leftLimit = springIndex < 0 ? children.length : springIndex;
-      for(i=children.length-1; i>leftLimit; i--) {
-        var el = children[i];
-        $(el).css({
-          marginLeft : padding
-        });
-        $(el).addClass('right');
-        if(i === 0) $(el).addClass('last');
-
-        !!previousEl && !!previousEl.nextChild ?
-          flowEl.insertBefore(el, previousEl.nextChild) :
-          flowEl.appendChild(el);
-
-        var previousEl = el;
-      }
-
-      // add children before the spring from left to right
-      for(i=0; i<leftLimit; i++) {
-        // render/rerender the children as requested
-        var elementLeft = children[i].el ? children[i].el : children[i];
-        $(elementLeft).css({
-          marginRight : (i !== leftLimit - 1) ? padding : null
-        });
-        $(elementLeft).addClass('left');
-        if(i === 0) $(elementLeft).addClass('first');
-        if((i === leftLimit - 1) && (springIndex === -1)) $(elementLeft).addClass('last');
-        flowEl.appendChild(elementLeft);
-      }
-      
-      flowEl.appendChild($.el('br', {className : 'clear'}));
-
-      return flowEl;
+      return $.formation.flow.apply(this, arguments);
     }
   });
-
-  var _split = function() {
-    var attributes = {}, children = [];
-    if(arguments.length > 0) {
-      // check if the first argument represents child nodes
-      children = _findChildren(arguments[0]);
-
-      // if not, we assume it's an attribute arguemnt, and we look
-      // for a second argument that may contain child nodes
-      if(!children) {
-        attributes = arguments[0];
-        if(arguments.length > 1) { 
-          children = _findChildren(arguments[1]);
-        }
-      }
-    }
-    return {attributes : attributes, children : children};
-  };
-
-  var _findChildren = function(arg) {
-    var children;
-
-    if(!!arg){
-      // if the argument is a dom node, we simply add
-      // it to our collection
-      if(_(arg).isElement()) {
-        children = [arg];
-      }
-
-      // if the argument is an array, we walk through it
-      else if(_(arg).isArray()) {
-        children = [];
-        for(var i=0; i<arg.length; i++) {
-          children.push(_(arg[i]).isElement() ? 
-            arg[i] : document.createTextNode(arg[i]));
-        }
-      }
-
-      // if the argument is a string or a number, we create a text node
-      else if(_(arg).isString() || _(arg).isNumber()) {
-        children = [document.createTextNode(arg)];
-      }
-    }
-    
-    return children;
-  };
 
   var _alignCoords = function(el, anchor, pos, xFudge, yFudge) {
     el = $(el);
@@ -404,7 +274,7 @@
     return {x : x, y : y};
   };
 
-})();
+}(this);
 (function(){
   window.Backbone.UI.Button = Backbone.View.extend({
     options : {
@@ -473,16 +343,16 @@
       $(this.el).toggleClass('has_border', this.options.hasBorder);
 
       if(this.options.isSubmit) {
-        var submit = $.el('input', {
+        $.el.input({
           type : 'submit',
           value : ''
-        });
-        this.el.appendChild(submit);
+        }).appendTo(this.el);
       }
 
       // insert label
-      var span = $.el('span', {className : 'label'}, labelText);
-      this.el.appendChild(span);
+      $.el.span({
+        className : 'label'
+      }, labelText).appendTo(this.el);
 
       // insert glyphs
       this.insertGlyph(this.el, this.options.glyph);
@@ -557,16 +427,16 @@
 
       $(this.el).empty();
 
-      var mark = $.el('div', {className : 'checkmark'});
+      var mark = $.el.div({className : 'checkmark'});
       if(this.checked) {
-        mark.appendChild($.el('div', {className : 'checkmark_fill'}));
+        mark.appendChild($.el.div({className : 'checkmark_fill'}));
       }
 
-      this._label = $.el('div', {className : 'label'}, labelText);
+      this._label = $.el.div({className : 'label'}, labelText);
 
       this.el.appendChild(mark);
       this.el.appendChild(this._label);
-      this.el.appendChild($.el('br', {style : 'clear:both'}));
+      this.el.appendChild($.el.br({style : 'clear:both'}));
 
       return this;
     },
@@ -892,7 +762,7 @@
 
       var className = 'glyph ' + name + (isRight ? ' right' : '');
       if(name.length == 1) {
-        var span = $.el('span', {
+        var span = $.el.span({
           className : className,
           style : 'margin: 0 8px 0 0'
         }, name);
@@ -950,12 +820,12 @@
     render : function() {
       $(this.el).empty();
 
-      var list = $.el('ul');
+      var list = $.el.ul();
 
       // if the collection is empty, we render the empty content
       if(!_(this.model).exists()  || this.model.length === 0) {
         var emptyContent = this.options.emptyContent;
-        list.appendChild($.el('li', _(emptyContent).isFunction() ? emptyContent() : emptyContent));
+        list.appendChild($.el.li(_(emptyContent).isFunction() ? emptyContent() : emptyContent));
       }
 
       // otherwise, we render each row
@@ -971,8 +841,7 @@
             content = this.resolveContent(null, model, this.options.labelProperty);
           }
 
-          item = $.el('li', content);
-          list.appendChild(item);
+          item = $.el.li(content).appendTo(list);
 
           // bind the item click callback if given
           if(this.options.onItemClick) {
@@ -985,7 +854,7 @@
 
       // wrap the list in a scroller
       var scroller = new Backbone.UI.Scroller({
-        content : $.el('div', list)
+        content : $.el.div(list)
       }).render();
 
       this.el.appendChild(scroller.el);
@@ -1153,19 +1022,19 @@
       }
       
       // create a new list of items
-      var list = $.el('ul', {className : 'pulldown_menu'});
+      var list = $.el.ul({className : 'pulldown_menu'});
 
       if(_(this.options.newModel).exists()) {
         var newLabel = this._labelForItem(this.options.newModel) || "";
-        var newAnchor = $.el('a', {href : '#'}, $.el('span', newLabel));
+        var newAnchor = $.el.a({href : '#'}, $.el.span(newLabel));
         $(newAnchor).click(_(this._onAddNewItem).bind(this));
-        list.appendChild($.el('li', {className : 'new_item'}, newAnchor));
+        list.appendChild($.el.li({className : 'new_item'}, newAnchor));
       }
 
       var emptyModel = this.options.emptyModel;
       if(_(emptyModel).exists()) {
         var emptyLabel = this._labelForItem(emptyModel);
-        var emptyAnchor = $.el('a', {href : '#'}, $.el('span', emptyLabel));
+        var emptyAnchor = $.el.a({href : '#'}, $.el.span(emptyLabel));
         $(emptyAnchor).click(_.bind(function() {
           this._setSelectedItem(null);
           this.hideMenu();
@@ -1173,7 +1042,7 @@
           if(this.options.onChange) this.options.onChange(emptyModel);
           return false;
         }, this));
-        list.appendChild($.el('li', {className : 'new_item'}, emptyAnchor));
+        list.appendChild($.el.li({className : 'new_item'}, emptyAnchor));
       }
 
       var collection = _(this.options.collection).exists() ?
@@ -1197,8 +1066,8 @@
     // Adds the given pulldown item (creating a new li element) 
     // to the given menu ul element
     _addItemToMenu : function(menu, item) {
-      var anchor = $.el('a', {href : '#'}, 
-        $.el('span', this._labelForItem(item) || '\u00a0'));
+      var anchor = $.el.a({href : '#'}, 
+        $.el.span(this._labelForItem(item) || '\u00a0'));
 
       var glyph;
       if(this.options.glyphProperty) {
@@ -1211,7 +1080,7 @@
         Backbone.UI.HasGlyph.insertGlyphRight(anchor, glyph);
       }
 
-      var liElement = $.el('li', anchor);
+      var liElement = $.el.li(anchor);
 
       $(anchor).bind('click', _.bind(function(e) {
         this.hideMenu();
@@ -1333,18 +1202,19 @@
 
       $(this.el).empty();
 
-      var ul = $.el('ul');
+      var ul = $.el.ul();
       _.each(this.options.collection, function(item) {
 
         var selected = this.selectedValue == this._valueForItem(item);
 
         var label = _(item).resolveProperty(this.options.labelProperty);
         
-        var li = $.el('li', [$.el('a', {className : 'choice', href : '#'}, [
-            $.el('div', {className : 'mark'}, selected ? '\u25cf' : ''),
-            $.el('div', {className : 'label'}, label),
-            $.el('br', {style : 'clear:both'})
-          ]), $.el('br', {style : 'clear:both'})]);
+        var li = $.el.li(
+          $.el.a({className : 'choice', href : '#'},
+            $.el.div({className : 'mark'}, selected ? '\u25cf' : ''),
+            $.el.div({className : 'label'}, label),
+            $.el.br({style : 'clear:both'})), 
+          $.el.br({style : 'clear:both'}));
         ul.appendChild(li);
 
         $(li).bind('click', _.bind(this._onChange, this, item));
@@ -1392,18 +1262,18 @@
       this._scrollContent = this.options.content; 
       $(this._scrollContent).addClass('content');
 
-      this._knob = $.el('div', {className : 'knob'}, [
-        $.el('div', {className : 'knob_top'}),
-        $.el('div', {className : 'knob_middle'}),
-        $.el('div', {className : 'knob_bottom'})]);
+      this._knob = $.el.div({className : 'knob'},
+        $.el.div({className : 'knob_top'}),
+        $.el.div({className : 'knob_middle'}),
+        $.el.div({className : 'knob_bottom'}));
 
-      this._tray = $.el('div', {className : 'tray'});
+      this._tray = $.el.div({className : 'tray'});
       this._tray.appendChild(this._knob);
 
       // for firefox on windows we need to wrap the scroller content in an overflow
       // auto div to avoid a rendering bug that causes artifacts on the screen when
       // the hidden content is scrolled...wsb
-      this._scrollContentWrapper = $.el('div', {className : 'content_wrapper'});
+      this._scrollContentWrapper = $.el.div({className : 'content_wrapper'});
       this._scrollContentWrapper.appendChild(this._scrollContent);
 
       this.el.appendChild(this._tray);
@@ -1610,8 +1480,8 @@
       this._tabs = [];
       this._contents = [];
       this._callbacks = [];
-      this._tabBar = $.el('div', {className : 'tab_bar'});
-      this._contentContainer = $.el('div', {className : 'content_container'});
+      this._tabBar = $.el.div({className : 'tab_bar'});
+      this._contentContainer = $.el.div({className : 'content_container'});
       this.el.appendChild(this._tabBar);
       this.el.appendChild(this._contentContainer);
 
@@ -1625,7 +1495,7 @@
     },
 
     addTab : function(tabOptions) {
-      var tab = $.el('a', {href : '#', className : 'tab'});
+      var tab = $.el.a({href : '#', className : 'tab'});
       if(tabOptions.glyphRight) this.insertGlyph(tab, tabOptions.glyphRight);
       tab.appendChild(document.createTextNode(tabOptions.label));
       if(tabOptions.glyph) this.insertGlyph(tab, tabOptions.glyph);
@@ -1634,7 +1504,7 @@
 
       var content = !!tabOptions.content.nodeType ? 
         tabOptions.content : 
-        $.el('div', tabOptions.content);
+        $.el.div(tabOptions.content);
       this._contents.push(content);
       $(content).hide();
       this._contentContainer.appendChild(content);
@@ -1717,31 +1587,31 @@
       $(this.el).toggleClass('clickable', this.options.onItemClick !== jQuery.noop);
 
       // generate a table row for our headings
-      var headingRow = $.el('tr');
+      var headingRow = $.el.tr();
       _(this.options.columns).each(function(column, index, list) {
         var width = column.width ? column.width : index == list.length -1 ? null : 150;
         if(width && index === 0) width += 5; 
         var label = _(column.label).isFunction() ? column.label() : column.label;
         var style = width ? 'width:' + width + 'px' : null;
-        headingRow.appendChild($.el('th', 
+        headingRow.appendChild($.el.th( 
           {className : _(list).nameForIndex(index), style : style}, 
-          $.el('div', {className : 'wrapper'}, label)));
+          $.el.div({className : 'wrapper'}, label)));
       });
 
       // Add the heading row to it's very own table so we can allow the 
       // actual table to scroll with a fixed heading.
-      this.el.appendChild($.el('table', 
+      this.el.appendChild($.el.table(
         {className : 'heading'}, 
-        $.el('thead', headingRow)));
+        $.el.thead(headingRow)));
 
       // now we'll generate the body of the content table, with a row
       // for each model in the bound collection
-      var tableBody = $.el('tbody');
+      var tableBody = $.el.tbody();
 
       // if the collection is empty, we render the empty content
       if(this.model.length === 0) {
         var emptyContent = this.options.emptyContent;
-        tableBody.appendChild($.el('tr', 
+        tableBody.appendChild($.el.tr(
           {colspan : this.options.columns.length}, 
           _(emptyContent).isFunction() ? emptyContent() : emptyContent));
       }
@@ -1749,16 +1619,16 @@
       // otherwise, we render each row
       else {
         this.model.each(function(m) {
-          var row = $.el('tr');
+          var row = $.el.tr();
 
           // for each model, we walk through each column and generate the content 
           _(this.options.columns).each(function(column, index, list) {
             var width = column.width ? column.width : index == list.length -1 ? null : 150;
             var style = width ? 'width:' + width + 'px' : null;
             var content = this.resolveContent(column.content, m, column.property);
-            row.appendChild($.el('td', 
+            row.appendChild($.el.td(
               {className : _(list).nameForIndex(index), style : style}, 
-              $.el('div', {className : 'wrapper'}, content)));
+              $.el.div({className : 'wrapper'}, content)));
           }, this);
 
           // bind the item click callback if given
@@ -1770,13 +1640,13 @@
         }, this);
       }
 
-      this._collectionView = $.el('table');
+      this._collectionView = $.el.table();
       this._collectionView.appendChild(tableBody);
 
       // wrap the table in a scroller
       var style = _(this.options.maxHeight).exists() ? 'max-height:' + this.options.maxHeight + 'px' : null;
       var scroller = new Backbone.UI.Scroller({
-        content : $.el('div', {style : style}, this._collectionView)
+        content : $.el.div({style : style}, this._collectionView)
       }).render();
 
       this.el.appendChild(scroller.el);
@@ -1820,7 +1690,7 @@
 
       $(this.el).empty();
 
-      this.textArea = $.el('textarea', {
+      this.textArea = $.el.textarea({
         id : this.options.textAreaId,
         tabIndex : this.options.tabIndex, 
         placeholder : this.options.placeholder}, value);
@@ -1911,7 +1781,7 @@
       $(this.el).empty();
       $(this.el).addClass('text_field');
 
-      this.input = $.el('input', {
+      this.input = $.el.input({
         type : this.options.type, 
         name : this.options.name,
         id : this.options.name,
@@ -1927,7 +1797,7 @@
       }, this));
 
       this.insertGlyphRight(this.el, this.options.glyphRight);
-      this.el.appendChild($.el('div', {className : 'input_wrapper'}, this.input));
+      this.el.appendChild($.el.div({className : 'input_wrapper'}, this.input));
       this.insertGlyph(this.el, this.options.glyph);
 
       this.setEnabled(!this.options.disabled);

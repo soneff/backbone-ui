@@ -157,19 +157,19 @@
       }
       
       // create a new list of items
-      var list = $.el('ul', {className : 'pulldown_menu'});
+      var list = $.el.ul({className : 'pulldown_menu'});
 
       if(_(this.options.newModel).exists()) {
         var newLabel = this._labelForItem(this.options.newModel) || "";
-        var newAnchor = $.el('a', {href : '#'}, $.el('span', newLabel));
+        var newAnchor = $.el.a({href : '#'}, $.el.span(newLabel));
         $(newAnchor).click(_(this._onAddNewItem).bind(this));
-        list.appendChild($.el('li', {className : 'new_item'}, newAnchor));
+        list.appendChild($.el.li({className : 'new_item'}, newAnchor));
       }
 
       var emptyModel = this.options.emptyModel;
       if(_(emptyModel).exists()) {
         var emptyLabel = this._labelForItem(emptyModel);
-        var emptyAnchor = $.el('a', {href : '#'}, $.el('span', emptyLabel));
+        var emptyAnchor = $.el.a({href : '#'}, $.el.span(emptyLabel));
         $(emptyAnchor).click(_.bind(function() {
           this._setSelectedItem(null);
           this.hideMenu();
@@ -177,7 +177,7 @@
           if(this.options.onChange) this.options.onChange(emptyModel);
           return false;
         }, this));
-        list.appendChild($.el('li', {className : 'new_item'}, emptyAnchor));
+        list.appendChild($.el.li({className : 'new_item'}, emptyAnchor));
       }
 
       var collection = _(this.options.collection).exists() ?
@@ -201,8 +201,8 @@
     // Adds the given pulldown item (creating a new li element) 
     // to the given menu ul element
     _addItemToMenu : function(menu, item) {
-      var anchor = $.el('a', {href : '#'}, 
-        $.el('span', this._labelForItem(item) || '\u00a0'));
+      var anchor = $.el.a({href : '#'}, 
+        $.el.span(this._labelForItem(item) || '\u00a0'));
 
       var glyph;
       if(this.options.glyphProperty) {
@@ -215,7 +215,7 @@
         Backbone.UI.HasGlyph.insertGlyphRight(anchor, glyph);
       }
 
-      var liElement = $.el('li', anchor);
+      var liElement = $.el.li(anchor);
 
       $(anchor).bind('click', _.bind(function(e) {
         this.hideMenu();

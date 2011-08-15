@@ -50,7 +50,7 @@
       $(this.el).empty();
       $(this.el).addClass('text_field');
 
-      this.input = $.el('input', {
+      this.input = $.el.input({
         type : this.options.type, 
         name : this.options.name,
         id : this.options.name,
@@ -66,7 +66,7 @@
       }, this));
 
       this.insertGlyphRight(this.el, this.options.glyphRight);
-      this.el.appendChild($.el('div', {className : 'input_wrapper'}, this.input));
+      this.el.appendChild($.el.div({className : 'input_wrapper'}, this.input));
       this.insertGlyph(this.el, this.options.glyph);
 
       this.setEnabled(!this.options.disabled);

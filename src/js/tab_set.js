@@ -22,8 +22,8 @@
       this._tabs = [];
       this._contents = [];
       this._callbacks = [];
-      this._tabBar = $.el('div', {className : 'tab_bar'});
-      this._contentContainer = $.el('div', {className : 'content_container'});
+      this._tabBar = $.el.div({className : 'tab_bar'});
+      this._contentContainer = $.el.div({className : 'content_container'});
       this.el.appendChild(this._tabBar);
       this.el.appendChild(this._contentContainer);
 
@@ -37,7 +37,7 @@
     },
 
     addTab : function(tabOptions) {
-      var tab = $.el('a', {href : '#', className : 'tab'});
+      var tab = $.el.a({href : '#', className : 'tab'});
       if(tabOptions.glyphRight) this.insertGlyph(tab, tabOptions.glyphRight);
       tab.appendChild(document.createTextNode(tabOptions.label));
       if(tabOptions.glyph) this.insertGlyph(tab, tabOptions.glyph);
@@ -46,7 +46,7 @@
 
       var content = !!tabOptions.content.nodeType ? 
         tabOptions.content : 
-        $.el('div', tabOptions.content);
+        $.el.div(tabOptions.content);
       this._contents.push(content);
       $(content).hide();
       this._contentContainer.appendChild(content);

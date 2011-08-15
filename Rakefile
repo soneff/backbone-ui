@@ -15,13 +15,13 @@ task :build do
   end
   css_compressor = YUI::CssCompressor.new
   File.open('dist/backbone-ui.css', 'w+') do |dev_file|
-    File.open('dist/backbone-ui-min.css', 'w+') do |min_file|
+    #File.open('dist/backbone-ui-min.css', 'w+') do |min_file|
       css_source_files.each do |source_file|
         source = File.read './src/css/' + source_file
-        min_file.write css_compressor.compress(source)
+        #min_file.write css_compressor.compress(source)
         dev_file.write source
       end
-    end
+    #end
   end
 
   js_source_files = Dir.entries("./src/js").find_all do |source_file|
@@ -30,13 +30,13 @@ task :build do
   closure = Closure::Compiler.new
 
   File.open('dist/backbone-ui.js', 'w+') do |dev_file|
-    File.open('dist/backbone-ui-min.js', 'w+') do |min_file|
+    #File.open('dist/backbone-ui-min.js', 'w+') do |min_file|
       js_source_files.each do |source_file|
         source = File.read './src/js/' + source_file
-        min_file.write closure.compress(source)
+        #min_file.write closure.compress(source)
         dev_file.write source
       end
-    end
+    #end
   end
 end
 

@@ -33,7 +33,7 @@
 
       $(this.el).empty();
 
-      this.textArea = $.el('textarea', {
+      this.textArea = $.el.textarea({
         id : this.options.textAreaId,
         tabIndex : this.options.tabIndex, 
         placeholder : this.options.placeholder}, value);

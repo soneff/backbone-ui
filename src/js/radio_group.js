@@ -41,18 +41,19 @@
 
       $(this.el).empty();
 
-      var ul = $.el('ul');
+      var ul = $.el.ul();
       _.each(this.options.collection, function(item) {
 
         var selected = this.selectedValue == this._valueForItem(item);
 
         var label = _(item).resolveProperty(this.options.labelProperty);
         
-        var li = $.el('li', [$.el('a', {className : 'choice', href : '#'}, [
-            $.el('div', {className : 'mark'}, selected ? '\u25cf' : ''),
-            $.el('div', {className : 'label'}, label),
-            $.el('br', {style : 'clear:both'})
-          ]), $.el('br', {style : 'clear:both'})]);
+        var li = $.el.li(
+          $.el.a({className : 'choice', href : '#'},
+            $.el.div({className : 'mark'}, selected ? '\u25cf' : ''),
+            $.el.div({className : 'label'}, label),
+            $.el.br({style : 'clear:both'})), 
+          $.el.br({style : 'clear:both'}));
         ul.appendChild(li);
 
         $(li).bind('click', _.bind(this._onChange, this, item));

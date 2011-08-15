@@ -4,10 +4,12 @@
     <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
     <title>Backbone UI</title>
 
-    <script src="../../test/vendor/json2.js"></script>
     <script src="../../test/vendor/jquery-1.6.1.js"></script>
-    <script src="../../test/vendor/underscore-1.1.6.js"></script>
-    <script src="../../test/vendor/backbone-0.3.3.js"></script>
+    <script src="../../test/vendor/laconic.js"></script>
+    <script src="../../test/vendor/formation.js"></script>
+    <script src="../../test/vendor/json2.js"></script>
+    <script src="../../test/vendor/underscore-1.1.7.js"></script>
+    <script src="../../test/vendor/backbone-0.5.3.js"></script>
     <script src="../../test/vendor/jquery-mousewheel-3.0.4.js"></script>
     <script src="../../test/vendor/prettify.js"></script>
     <script src="../../test/vendor/jsbeautify.js"></script>
@@ -71,19 +73,19 @@
       Backbone.UI.IMAGE_DIR_PATH = './images';
 
       var addExample = function(title, f) {
-        dl.appendChild($.el('dt', title));
+        dl.appendChild($.el.dt(title));
 
         // strip off setup code
         var code = f.toString();
         code = js_beautify(code.substring(code.indexOf('new Back'), code.length -1));
-        var pre = $.el('pre', {className : 'prettyprint'}, code);
+        var pre = $.el.pre({className : 'prettyprint'}, code);
 
         // create a container for the code and the expand link
-        var codeContainer = $.el('div', {className : 'code_container'}, pre);
+        var codeContainer = $.el.div({className : 'code_container'}, pre);
         if(code.split('\n').length > 5) {
           pre.style.height = '85px';
           // link to expand lengthy examples
-          var expand = $.el('a', {className : 'show_more', href : '#'}, 'show more')
+          var expand = $.el.a({className : 'show_more', href : '#'}, 'show more')
           expand.onclick = function() {
             pre.style.height = 'inherit';
             expand.parentNode.removeChild(expand);
@@ -92,10 +94,10 @@
           codeContainer.appendChild(expand);
         }
 
-        var dd = $.el('dd', {className : 'example'}, [
-          $.el('div', {className : 'result'}, f().el),
+        var dd = $.el.dd({className : 'example'}, [
+          $.el.div({className : 'result'}, f().el),
           codeContainer,
-          $.el('br', {style : 'clear:both'})
+          $.el.br({style : 'clear:both'})
         ]);
         dl.appendChild(dd);
       };
@@ -103,8 +105,7 @@
       $(window).bind('load', function() {
         Backbone.UI.IMAGE_DIR_PATH = './images';
 
-        dl = $.el('dl');
-        document.body.appendChild(dl);
+        dl = $.el.dl().appendTo(document.body);
 
         // Button
         addExample('Button', function() {

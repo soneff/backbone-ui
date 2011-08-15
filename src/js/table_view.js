@@ -35,31 +35,31 @@
       $(this.el).toggleClass('clickable', this.options.onItemClick !== jQuery.noop);
 
       // generate a table row for our headings
-      var headingRow = $.el('tr');
+      var headingRow = $.el.tr();
       _(this.options.columns).each(function(column, index, list) {
         var width = column.width ? column.width : index == list.length -1 ? null : 150;
         if(width && index === 0) width += 5; 
         var label = _(column.label).isFunction() ? column.label() : column.label;
         var style = width ? 'width:' + width + 'px' : null;
-        headingRow.appendChild($.el('th', 
+        headingRow.appendChild($.el.th( 
           {className : _(list).nameForIndex(index), style : style}, 
-          $.el('div', {className : 'wrapper'}, label)));
+          $.el.div({className : 'wrapper'}, label)));
       });
 
       // Add the heading row to it's very own table so we can allow the 
       // actual table to scroll with a fixed heading.
-      this.el.appendChild($.el('table', 
+      this.el.appendChild($.el.table(
         {className : 'heading'}, 
-        $.el('thead', headingRow)));
+        $.el.thead(headingRow)));
 
       // now we'll generate the body of the content table, with a row
       // for each model in the bound collection
-      var tableBody = $.el('tbody');
+      var tableBody = $.el.tbody();
 
       // if the collection is empty, we render the empty content
       if(this.model.length === 0) {
         var emptyContent = this.options.emptyContent;
-        tableBody.appendChild($.el('tr', 
+        tableBody.appendChild($.el.tr(
           {colspan : this.options.columns.length}, 
           _(emptyContent).isFunction() ? emptyContent() : emptyContent));
       }
@@ -67,16 +67,16 @@
       // otherwise, we render each row
       else {
         this.model.each(function(m) {
-          var row = $.el('tr');
+          var row = $.el.tr();
 
           // for each model, we walk through each column and generate the content 
           _(this.options.columns).each(function(column, index, list) {
             var width = column.width ? column.width : index == list.length -1 ? null : 150;
             var style = width ? 'width:' + width + 'px' : null;
             var content = this.resolveContent(column.content, m, column.property);
-            row.appendChild($.el('td', 
+            row.appendChild($.el.td(
               {className : _(list).nameForIndex(index), style : style}, 
-              $.el('div', {className : 'wrapper'}, content)));
+              $.el.div({className : 'wrapper'}, content)));
           }, this);
 
           // bind the item click callback if given
@@ -88,13 +88,13 @@
         }, this);
       }
 
-      this._collectionView = $.el('table');
+      this._collectionView = $.el.table();
       this._collectionView.appendChild(tableBody);
 
       // wrap the table in a scroller
       var style = _(this.options.maxHeight).exists() ? 'max-height:' + this.options.maxHeight + 'px' : null;
       var scroller = new Backbone.UI.Scroller({
-        content : $.el('div', {style : style}, this._collectionView)
+        content : $.el.div({style : style}, this._collectionView)
       }).render();
 
       this.el.appendChild(scroller.el);

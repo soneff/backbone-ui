@@ -66,16 +66,16 @@
       $(this.el).toggleClass('has_border', this.options.hasBorder);
 
       if(this.options.isSubmit) {
-        var submit = $.el('input', {
+        $.el.input({
           type : 'submit',
           value : ''
-        });
-        this.el.appendChild(submit);
+        }).appendTo(this.el);
       }
 
       // insert label
-      var span = $.el('span', {className : 'label'}, labelText);
-      this.el.appendChild(span);
+      $.el.span({
+        className : 'label'
+      }, labelText).appendTo(this.el);
 
       // insert glyphs
       this.insertGlyph(this.el, this.options.glyph);

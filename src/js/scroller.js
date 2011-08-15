@@ -26,18 +26,18 @@
       this._scrollContent = this.options.content; 
       $(this._scrollContent).addClass('content');
 
-      this._knob = $.el('div', {className : 'knob'}, [
-        $.el('div', {className : 'knob_top'}),
-        $.el('div', {className : 'knob_middle'}),
-        $.el('div', {className : 'knob_bottom'})]);
+      this._knob = $.el.div({className : 'knob'},
+        $.el.div({className : 'knob_top'}),
+        $.el.div({className : 'knob_middle'}),
+        $.el.div({className : 'knob_bottom'}));
 
-      this._tray = $.el('div', {className : 'tray'});
+      this._tray = $.el.div({className : 'tray'});
       this._tray.appendChild(this._knob);
 
       // for firefox on windows we need to wrap the scroller content in an overflow
       // auto div to avoid a rendering bug that causes artifacts on the screen when
       // the hidden content is scrolled...wsb
-      this._scrollContentWrapper = $.el('div', {className : 'content_wrapper'});
+      this._scrollContentWrapper = $.el.div({className : 'content_wrapper'});
       this._scrollContentWrapper.appendChild(this._scrollContent);
 
       this.el.appendChild(this._tray);

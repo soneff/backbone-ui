@@ -24,12 +24,12 @@
     render : function() {
       $(this.el).empty();
 
-      var list = $.el('ul');
+      var list = $.el.ul();
 
       // if the collection is empty, we render the empty content
       if(!_(this.model).exists()  || this.model.length === 0) {
         var emptyContent = this.options.emptyContent;
-        list.appendChild($.el('li', _(emptyContent).isFunction() ? emptyContent() : emptyContent));
+        list.appendChild($.el.li(_(emptyContent).isFunction() ? emptyContent() : emptyContent));
       }
 
       // otherwise, we render each row
@@ -45,8 +45,7 @@
             content = this.resolveContent(null, model, this.options.labelProperty);
           }
 
-          item = $.el('li', content);
-          list.appendChild(item);
+          item = $.el.li(content).appendTo(list);
 
           // bind the item click callback if given
           if(this.options.onItemClick) {
@@ -59,7 +58,7 @@
 
       // wrap the list in a scroller
       var scroller = new Backbone.UI.Scroller({
-        content : $.el('div', list)
+        content : $.el.div(list)
       }).render();
 
       this.el.appendChild(scroller.el);

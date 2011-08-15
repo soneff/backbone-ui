@@ -44,16 +44,16 @@
 
       $(this.el).empty();
 
-      var mark = $.el('div', {className : 'checkmark'});
+      var mark = $.el.div({className : 'checkmark'});
       if(this.checked) {
-        mark.appendChild($.el('div', {className : 'checkmark_fill'}));
+        mark.appendChild($.el.div({className : 'checkmark_fill'}));
       }
 
-      this._label = $.el('div', {className : 'label'}, labelText);
+      this._label = $.el.div({className : 'label'}, labelText);
 
       this.el.appendChild(mark);
       this.el.appendChild(this._label);
-      this.el.appendChild($.el('br', {style : 'clear:both'}));
+      this.el.appendChild($.el.br({style : 'clear:both'}));
 
       return this;
     },
