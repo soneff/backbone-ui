@@ -44,7 +44,7 @@
       this._tabBar.appendChild(tab);
       this._tabs.push(tab);
 
-      var content = !!tabOptions.content.nodeType ? 
+      var content = !!tabOptions.content && !!tabOptions.content.nodeType ? 
         tabOptions.content : 
         $.el.div(tabOptions.content);
       this._contents.push(content);
