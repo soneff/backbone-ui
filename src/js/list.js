@@ -12,6 +12,9 @@
       // when the list is empty.
       emptyContent : null,
 
+      // If true, the contents will be placed inside of a UI.Scroller
+      enableScrolling : false, 
+
       // A callback to invoke when a row is clicked.  If this callback
       // is present, the rows will highlight on hover.
       onItemClick : jQuery.noop
@@ -57,13 +60,20 @@
       }
 
       // wrap the list in a scroller
-      var scroller = new Backbone.UI.Scroller({
-        content : $.el.div(list)
-      }).render();
+      var content = $.el.div(list);
+      if(this.options.enableScrolling) {
+        var scroller = new Backbone.UI.Scroller({
+          content : content
+        }).render();
 
-      this.el.appendChild(scroller.el);
+        this.el.appendChild(scroller.el);
+      }
+      else {
+        this.el.appendChild(content);
+      }
 
       return this;
     }
   });
 })();
+
