@@ -60,16 +60,15 @@
       }
 
       // wrap the list in a scroller
-      var content = $.el.div(list);
       if(this.options.enableScrolling) {
         var scroller = new Backbone.UI.Scroller({
-          content : content
+          content : $.el.div(list)
         }).render();
 
         this.el.appendChild(scroller.el);
       }
       else {
-        this.el.appendChild(content);
+        this.el.appendChild(list);
       }
 
       return this;
