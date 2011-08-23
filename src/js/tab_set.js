@@ -39,7 +39,8 @@
     addTab : function(tabOptions) {
       var tab = $.el.a({href : '#', className : 'tab'});
       if(tabOptions.glyphRight) this.insertGlyph(tab, tabOptions.glyphRight);
-      tab.appendChild(document.createTextNode(tabOptions.label));
+      if(tabOptions.className) $(tab).addClass(tabOptions.className);
+      tab.appendChild(document.createTextNode(tabOptions.label || ''));
       if(tabOptions.glyph) this.insertGlyph(tab, tabOptions.glyph);
       this._tabBar.appendChild(tab);
       this._tabs.push(tab);
@@ -81,14 +82,11 @@
       // select the appropriate tab
       $(this._tabs[index]).addClass('selected');
 
-
-
       // show the proper contents
       $(this._contents[index]).show();
 
       this._callbacks[index]();
     }
-
   });
 })();
 

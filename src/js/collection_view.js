@@ -11,16 +11,13 @@
       this._itemViews = {};
     },
 
-    render : function() {
-
-    },
-
-    _onModelAdded : function() {
+    _onModelAdded : function(model, list, options) {
       this.render();
     },
 
-    _onModelChanged : function() {
-      //this.render();
+    _onModelChanged : function(model) {
+      var view = this._itemViews[model.cid];
+      if(!!view) view.render();
     },
 
     _onModelRemoved : function() {
@@ -28,3 +25,4 @@
     }
   });
 })();
+

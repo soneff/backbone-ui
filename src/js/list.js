@@ -37,12 +37,14 @@
 
       // otherwise, we render each row
       else {
-        _(this.model.models).each(function(model) {
+        _(this.model.models).each(function(model, index) {
           var content;
           if(_(this.options.itemView).exists()) {
-            content = new this.options.itemView({
+            var view = new this.options.itemView({
               model : model
-            }).render().el;
+            }).render();
+            this._itemViews[model.cid] = view;
+            content = view.el;
           }
           else {
             content = this.resolveContent(null, model, this.options.labelProperty);
@@ -55,6 +57,14 @@
             $(item).click(_(this.options.onItemClick).bind(this, model));
           }
 
+          if(index === 0) {
+            $(item).addClass('first'); 
+          }
+
+          if(index === this.model.models.length - 1) {
+            $(item).addClass('last'); 
+          }
+
           list.appendChild(item);
         }, this);
       }
@@ -62,7 +72,7 @@
       // wrap the list in a scroller
       if(this.options.enableScrolling) {
         var scroller = new Backbone.UI.Scroller({
-          content : $.el.div(list)
+          content : $.el.div(list) 
         }).render();
 
         this.el.appendChild(scroller.el);
