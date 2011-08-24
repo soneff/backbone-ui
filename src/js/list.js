@@ -27,61 +27,67 @@
     render : function() {
       $(this.el).empty();
 
-      var list = $.el.ul();
+      this.collectionEl = $.el.ul();
 
       // if the collection is empty, we render the empty content
       if(!_(this.model).exists()  || this.model.length === 0) {
         var emptyContent = this.options.emptyContent;
-        list.appendChild($.el.li(_(emptyContent).isFunction() ? emptyContent() : emptyContent));
+        this.collectionEl.appendChild($.el.li(_(emptyContent).isFunction() ? emptyContent() : emptyContent));
       }
 
       // otherwise, we render each row
       else {
         _(this.model.models).each(function(model, index) {
-          var content;
-          if(_(this.options.itemView).exists()) {
-            var view = new this.options.itemView({
-              model : model
-            }).render();
-            this._itemViews[model.cid] = view;
-            content = view.el;
-          }
-          else {
-            content = this.resolveContent(null, model, this.options.labelProperty);
-          }
-
-          item = $.el.li(content).appendTo(list);
-
-          // bind the item click callback if given
-          if(this.options.onItemClick) {
-            $(item).click(_(this.options.onItemClick).bind(this, model));
-          }
-
-          if(index === 0) {
-            $(item).addClass('first'); 
-          }
-
-          if(index === this.model.models.length - 1) {
-            $(item).addClass('last'); 
-          }
-
-          list.appendChild(item);
+          var item = this._renderItem(model, index);
+          this.collectionEl.appendChild(item);
         }, this);
       }
 
       // wrap the list in a scroller
       if(this.options.enableScrolling) {
         var scroller = new Backbone.UI.Scroller({
-          content : $.el.div(list) 
+          content : $.el.div(this.collectionEl) 
         }).render();
 
         this.el.appendChild(scroller.el);
       }
       else {
-        this.el.appendChild(list);
+        this.el.appendChild(this.collectionEl);
       }
 
       return this;
+    },
+
+    // renders an item for the given model, at the given index
+    _renderItem : function(model, index) {
+      var content;
+      if(_(this.options.itemView).exists()) {
+        var view = new this.options.itemView({
+          model : model
+        }).render();
+        this._itemViews[model.cid] = view;
+        content = view.el;
+      }
+      else {
+        content = this.resolveContent(null, model, this.options.labelProperty);
+      }
+
+      item = $.el.li(content);
+
+      // bind the item click callback if given
+      if(this.options.onItemClick) {
+        $(item).click(_(this.options.onItemClick).bind(this, model));
+      }
+
+      if(index === 0) {
+        $(item).addClass('first'); 
+      }
+
+      if(index === this.model.models.length - 1) {
+        $(item).addClass('last'); 
+      }
+
+      return item;
     }
   });
 })();
