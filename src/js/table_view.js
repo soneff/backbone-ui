@@ -20,7 +20,7 @@
 
       // A callback to invoke when a row is clicked.  If this callback
       // is present, the rows will highlight on hover.
-      onItemClick : jQuery.noop,
+      onItemClick : Backbone.UI.noop,
 
       maxHeight : null
     },
@@ -32,7 +32,7 @@
     render : function() {
       $(this.el).empty();
 
-      $(this.el).toggleClass('clickable', this.options.onItemClick !== jQuery.noop);
+      $(this.el).toggleClass('clickable', this.options.onItemClick !== Backbone.UI.noop);
 
       // generate a table row for our headings
       var headingRow = $.el.tr();

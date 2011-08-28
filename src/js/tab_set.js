@@ -59,7 +59,7 @@
         return false;
       }, this));
 
-      this._callbacks.push(tabOptions.onActivate || jQuery.noop);
+      this._callbacks.push(tabOptions.onActivate || Backbone.UI.noop);
     },
 
     activateTab : function(index) {

@@ -17,7 +17,7 @@
 
       // A callback to invoke when a row is clicked.  If this callback
       // is present, the rows will highlight on hover.
-      onItemClick : jQuery.noop
+      onItemClick : Backbone.UI.noop
     },
 
     initialize : function() {

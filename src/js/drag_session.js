@@ -8,24 +8,24 @@
       scope : null,
 
       //Sent when the session is ends up being a sloppy mouse click
-      onClick: jQuery.noop,
+      onClick: Backbone.UI.noop,
 
       // Sent when a drag session starts for real 
       // (after the mouse has moved SLOP pixels)
-      onStart: jQuery.noop,
+      onStart: Backbone.UI.noop,
 
       // Sent for each mouse move event that occurs during the drag session
-      onMove: jQuery.noop,
+      onMove: Backbone.UI.noop,
 
       // Sent when the session stops normally (the mouse was released)
-      onStop: jQuery.noop,
+      onStop: Backbone.UI.noop,
 
       // Sent when the session is aborted (ESC key pressed)
-      onAbort: jQuery.noop,
+      onAbort: Backbone.UI.noop,
 
       // Sent when the drag session finishes, regardless of
       // whether it stopped normally or was aborted.
-      onDone: jQuery.noop
+      onDone: Backbone.UI.noop
     }, options);
 
     if(Backbone.UI.DragSession.currentSession) {

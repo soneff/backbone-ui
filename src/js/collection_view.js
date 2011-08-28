@@ -3,7 +3,7 @@
     _itemViews : {},
 
     // must be over-ridden to describe how an item is rendered
-    _renderItem : jQuery.noop,
+    _renderItem : Backbone.UI.noop,
 
     initialize : function() {
       if(this.model) {

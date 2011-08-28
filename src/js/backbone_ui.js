@@ -22,7 +22,9 @@
       KEY_INSERT:   45
     },
 
-    IMAGE_DIR_PATH : '/images'
+    IMAGE_DIR_PATH : '/images',
+
+    noop : function(){}
   };
 
   _(Backbone.View.prototype).extend({

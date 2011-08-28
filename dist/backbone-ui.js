@@ -22,7 +22,9 @@
       KEY_INSERT:   45
     },
 
-    IMAGE_DIR_PATH : '/images'
+    IMAGE_DIR_PATH : '/images',
+
+    noop : function(){}
   };
 
   _(Backbone.View.prototype).extend({
@@ -455,34 +457,39 @@
 })();
 (function(){
   window.Backbone.UI.CollectionView = Backbone.View.extend({
+    _itemViews : {},
+
+    // must be over-ridden to describe how an item is rendered
+    _renderItem : Backbone.UI.noop,
 
     initialize : function() {
       if(this.model) {
-        this.model.bind('add', _.bind(this._onModelAdded, this));
-        this.model.bind('change', _.bind(this._onModelChanged, this));
-        this.model.bind('remove', _.bind(this._onModelRemoved, this));
+        this.model.bind('add', _.bind(this._onItemAdded, this));
+        this.model.bind('change', _.bind(this._onItemChanged, this));
+        this.model.bind('remove', _.bind(this._onItemRemoved, this));
         this.model.bind('refresh', _.bind(this.render, this));
       }
-      this._itemViews = {};
     },
 
-    render : function() {
-
+    _onItemAdded : function(model, list, options) {
+      var el = this._renderItem(model, list.indexOf(model));
+      this.collectionEl.appendChild(el);
+      // TODO insert at the proper index
     },
 
-    _onModelAdded : function() {
-      this.render();
+    _onItemChanged : function(model) {
+      var view = this._itemViews[model.cid];
+      if(!!view && view.el.parentNode) view.render();
+      // TODO this may require re-sorting
     },
 
-    _onModelChanged : function() {
-      //this.render();
-    },
-
-    _onModelRemoved : function() {
-      this.render();
+    _onItemRemoved : function(model) {
+      var view = this._itemViews[model.cid];
+      if(!!view && !!view.el.parentNode) view.el.parentNode.removeChild(view.el);
     }
   });
 })();
+
 (function() {
   Backbone.UI.DragSession = function(options) {
     this.options = _.extend({
@@ -493,24 +500,24 @@
       scope : null,
 
       //Sent when the session is ends up being a sloppy mouse click
-      onClick: jQuery.noop,
+      onClick: Backbone.UI.noop,
 
       // Sent when a drag session starts for real 
       // (after the mouse has moved SLOP pixels)
-      onStart: jQuery.noop,
+      onStart: Backbone.UI.noop,
 
       // Sent for each mouse move event that occurs during the drag session
-      onMove: jQuery.noop,
+      onMove: Backbone.UI.noop,
 
       // Sent when the session stops normally (the mouse was released)
-      onStop: jQuery.noop,
+      onStop: Backbone.UI.noop,
 
       // Sent when the session is aborted (ESC key pressed)
-      onAbort: jQuery.noop,
+      onAbort: Backbone.UI.noop,
 
       // Sent when the drag session finishes, regardless of
       // whether it stopped normally or was aborted.
-      onDone: jQuery.noop
+      onDone: Backbone.UI.noop
     }, options);
 
     if(Backbone.UI.DragSession.currentSession) {
@@ -808,9 +815,12 @@
       // when the list is empty.
       emptyContent : null,
 
+      // If true, the contents will be placed inside of a UI.Scroller
+      enableScrolling : false, 
+
       // A callback to invoke when a row is clicked.  If this callback
       // is present, the rows will highlight on hover.
-      onItemClick : jQuery.noop
+      onItemClick : Backbone.UI.noop
     },
 
     initialize : function() {
@@ -820,49 +830,71 @@
     render : function() {
       $(this.el).empty();
 
-      var list = $.el.ul();
+      this.collectionEl = $.el.ul();
 
       // if the collection is empty, we render the empty content
       if(!_(this.model).exists()  || this.model.length === 0) {
         var emptyContent = this.options.emptyContent;
-        list.appendChild($.el.li(_(emptyContent).isFunction() ? emptyContent() : emptyContent));
+        this.collectionEl.appendChild($.el.li(_(emptyContent).isFunction() ? emptyContent() : emptyContent));
       }
 
       // otherwise, we render each row
       else {
-        _(this.model.models).each(function(model) {
-          var content;
-          if(_(this.options.itemView).exists()) {
-            content = new this.options.itemView({
-              model : model
-            }).render().el;
-          }
-          else {
-            content = this.resolveContent(null, model, this.options.labelProperty);
-          }
-
-          item = $.el.li(content).appendTo(list);
-
-          // bind the item click callback if given
-          if(this.options.onItemClick) {
-            $(item).click(_(this.options.onItemClick).bind(this, model));
-          }
-
-          list.appendChild(item);
+        _(this.model.models).each(function(model, index) {
+          var item = this._renderItem(model, index);
+          this.collectionEl.appendChild(item);
         }, this);
       }
 
       // wrap the list in a scroller
-      var scroller = new Backbone.UI.Scroller({
-        content : $.el.div(list)
-      }).render();
+      if(this.options.enableScrolling) {
+        var scroller = new Backbone.UI.Scroller({
+          content : $.el.div(this.collectionEl) 
+        }).render();
 
-      this.el.appendChild(scroller.el);
+        this.el.appendChild(scroller.el);
+      }
+      else {
+        this.el.appendChild(this.collectionEl);
+      }
 
       return this;
+    },
+
+    // renders an item for the given model, at the given index
+    _renderItem : function(model, index) {
+      var content;
+      if(_(this.options.itemView).exists()) {
+        var view = new this.options.itemView({
+          model : model
+        }).render();
+        this._itemViews[model.cid] = view;
+        content = view.el;
+      }
+      else {
+        content = this.resolveContent(null, model, this.options.labelProperty);
+      }
+
+      item = $.el.li(content);
+
+      // bind the item click callback if given
+      if(this.options.onItemClick) {
+        $(item).click(_(this.options.onItemClick).bind(this, model));
+      }
+
+      if(index === 0) {
+        $(item).addClass('first'); 
+      }
+
+      if(index === this.model.models.length - 1) {
+        $(item).addClass('last'); 
+      }
+
+      return item;
     }
   });
 })();
+
 (function(){
   window.Backbone.UI.Pulldown = Backbone.View.extend({
     options : {
@@ -914,16 +946,16 @@
 
       // A callback to invoke with a particular item when that item is
       // selected from the pulldown menu.
-      onChange : jQuery.noop,
+      onChange : Backbone.UI.noop,
 
       // A callback to invoke when the pulldown menu is shown, passing the 
       // button click event.
-      onMenuShow : jQuery.noop,
+      onMenuShow : Backbone.UI.noop,
 
       // A callback to invoke when the pulldown menu is hidden, if the menu was hidden
       // as a result of a second click on the pulldown button, the button click event 
       // will be passed.
-      onMenuHide : jQuery.noop
+      onMenuHide : Backbone.UI.noop
     },
 
     initialize : function() {
@@ -1185,7 +1217,7 @@
       selectedItem : null,
 
       // A callback to invoke with the selected item whenever the selection changes
-      onChange : jQuery.noop
+      onChange : Backbone.UI.noop
     },
 
     initialize : function() {
@@ -1497,12 +1529,13 @@
     addTab : function(tabOptions) {
       var tab = $.el.a({href : '#', className : 'tab'});
       if(tabOptions.glyphRight) this.insertGlyph(tab, tabOptions.glyphRight);
-      tab.appendChild(document.createTextNode(tabOptions.label));
+      if(tabOptions.className) $(tab).addClass(tabOptions.className);
+      tab.appendChild(document.createTextNode(tabOptions.label || ''));
       if(tabOptions.glyph) this.insertGlyph(tab, tabOptions.glyph);
       this._tabBar.appendChild(tab);
       this._tabs.push(tab);
 
-      var content = !!tabOptions.content.nodeType ? 
+      var content = !!tabOptions.content && !!tabOptions.content.nodeType ? 
         tabOptions.content : 
         $.el.div(tabOptions.content);
       this._contents.push(content);
@@ -1516,7 +1549,7 @@
         return false;
       }, this));
 
-      this._callbacks.push(tabOptions.onActivate || jQuery.noop);
+      this._callbacks.push(tabOptions.onActivate || Backbone.UI.noop);
     },
 
     activateTab : function(index) {
@@ -1539,14 +1572,11 @@
       // select the appropriate tab
       $(this._tabs[index]).addClass('selected');
 
-
-
       // show the proper contents
       $(this._contents[index]).show();
 
       this._callbacks[index]();
     }
-
   });
 })();
 
@@ -1572,7 +1602,7 @@
 
       // A callback to invoke when a row is clicked.  If this callback
       // is present, the rows will highlight on hover.
-      onItemClick : jQuery.noop,
+      onItemClick : Backbone.UI.noop,
 
       maxHeight : null
     },
@@ -1584,7 +1614,7 @@
     render : function() {
       $(this.el).empty();
 
-      $(this.el).toggleClass('clickable', this.options.onItemClick !== jQuery.noop);
+      $(this.el).toggleClass('clickable', this.options.onItemClick !== Backbone.UI.noop);
 
       // generate a table row for our headings
       var headingRow = $.el.tr();
@@ -1755,7 +1785,7 @@
 
       tabIndex : null,
 
-      onKeyPress : jQuery.noop
+      onKeyPress : Backbone.UI.noop
     },
 
     // public accessors

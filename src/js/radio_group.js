@@ -24,7 +24,7 @@
       selectedItem : null,
 
       // A callback to invoke with the selected item whenever the selection changes
-      onChange : jQuery.noop
+      onChange : Backbone.UI.noop
     },
 
     initialize : function() {

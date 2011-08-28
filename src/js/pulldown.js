@@ -49,16 +49,16 @@
 
       // A callback to invoke with a particular item when that item is
       // selected from the pulldown menu.
-      onChange : jQuery.noop,
+      onChange : Backbone.UI.noop,
 
       // A callback to invoke when the pulldown menu is shown, passing the 
       // button click event.
-      onMenuShow : jQuery.noop,
+      onMenuShow : Backbone.UI.noop,
 
       // A callback to invoke when the pulldown menu is hidden, if the menu was hidden
       // as a result of a second click on the pulldown button, the button click event 
       // will be passed.
-      onMenuHide : jQuery.noop
+      onMenuHide : Backbone.UI.noop
     },
 
     initialize : function() {

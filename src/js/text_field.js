@@ -24,7 +24,7 @@
 
       tabIndex : null,
 
-      onKeyPress : jQuery.noop
+      onKeyPress : Backbone.UI.noop
     },
 
     // public accessors
