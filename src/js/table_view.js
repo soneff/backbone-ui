@@ -99,6 +99,8 @@
 
       this.el.appendChild(scroller.el);
 
+      this._updateClassNames();
+
       return this;
     }
   });

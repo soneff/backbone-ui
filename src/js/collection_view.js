@@ -15,20 +15,54 @@
     },
 
     _onItemAdded : function(model, list, options) {
+      // first check if we've already rendered an item for this model
+      if(!!this._itemViews[model.cid]) {
+        return;
+      }
+       
+      // render the new item
       var el = this._renderItem(model, list.indexOf(model));
-      this.collectionEl.appendChild(el);
-      // TODO insert at the proper index
+
+      // insert it into the DOM position that matches it's position in the model
+      var properIndex = list.indexOf(model);
+      this.collectionEl.insertBefore(el, this.collectionEl.childNodes[properIndex]);
+
+      // update the first / last class names
+      this._updateClassNames();
+
+      // notify that a change to the collection view has occurred
+      if(this.options.onChange) this.options.onChange();
     },
 
     _onItemChanged : function(model) {
       var view = this._itemViews[model.cid];
       if(!!view && view.el.parentNode) view.render();
+      if(this.options.onChange) this.options.onChange();
+
       // TODO this may require re-sorting
     },
 
     _onItemRemoved : function(model) {
       var view = this._itemViews[model.cid];
       if(!!view && !!view.el.parentNode) view.el.parentNode.removeChild(view.el);
+      delete(this._itemViews[model.cid]);
+
+      // update the first / last class names
+      this._updateClassNames();
+
+      if(this.options.onChange) this.options.onChange();
+    },
+
+    _updateClassNames : function() {
+      var children = this.collectionEl.childNodes;
+      if(children.length > 0) {
+        _(children).each(function(child) {
+          $(child).removeClass('first');
+          $(child).removeClass('last');
+        });
+        $(children[0]).addClass('first');
+        $(children[children.length - 1]).addClass('last');
+      }
     }
   });
 })();

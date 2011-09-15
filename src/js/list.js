@@ -55,6 +55,8 @@
         this.el.appendChild(this.collectionEl);
       }
 
+      this._updateClassNames();
+
       return this;
     },
 
@@ -77,14 +79,6 @@
       // bind the item click callback if given
       if(this.options.onItemClick) {
         $(item).click(_(this.options.onItemClick).bind(this, model));
-      }
-
-      if(index === 0) {
-        $(item).addClass('first'); 
-      }
-
-      if(index === this.model.models.length - 1) {
-        $(item).addClass('last'); 
       }
 
       return item;
