@@ -33,6 +33,15 @@
     initialize : function() {
       _.extend(this, Backbone.UI.HasGlyph);
 
+      this.input = $.el.input();
+
+      $(this.input).keyup(_.bind(function(e) {
+        _.defer(_(this._updateModel).bind(this));
+        if(_(this.options.onKeyPress).exists() && _(this.options.onKeyPress).isFunction()) {
+          this.options.onKeyPress(e);
+        }
+      }, this));
+
       if(!!this.model && this.options.property) {
         this.model.bind('change:' + this.options.property, _.bind(function() {
           var newValue = this.model.get(this.options.property);
@@ -50,20 +59,13 @@
       $(this.el).empty();
       $(this.el).addClass('text_field');
 
-      this.input = $.el.input({
-        type : this.options.type, 
-        name : this.options.name,
-        id : this.options.name,
-        tabIndex : this.options.tabIndex, 
-        placeholder : this.options.placeholder,
-        value : value});
-
-      $(this.input).keyup(_.bind(function(e) {
-        _.defer(_(this._updateModel).bind(this));
-        if(_(this.options.onKeyPress).exists() && _(this.options.onKeyPress).isFunction()) {
-          this.options.onKeyPress(e);
-        }
-      }, this));
+      $(this.input).attr({
+        type : this.options.type ? this.options.type : 'text',
+        name : _(this.options.name).safeString(),
+        id : _(this.options.name).safeString(),
+        tabIndex : this.options.tabIndex,
+        placeholder : _(this.options.placeholder).safeString(),
+        value : _(value).safeString()});
 
       this.insertGlyphRight(this.el, this.options.glyphRight);
       this.el.appendChild($.el.div({className : 'input_wrapper'}, this.input));
@@ -98,3 +100,4 @@
     }
   });
 })();
+

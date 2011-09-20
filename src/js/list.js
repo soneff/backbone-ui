@@ -31,8 +31,12 @@
 
       // if the collection is empty, we render the empty content
       if(!_(this.model).exists()  || this.model.length === 0) {
-        var emptyContent = this.options.emptyContent;
-        this.collectionEl.appendChild($.el.li(_(emptyContent).isFunction() ? emptyContent() : emptyContent));
+        this._emptyContent = _(this.options.emptyContent).isFunction() ? 
+          this.options.emptyContent() : this.options.emptyContent;
+
+        if(!!this._emptyContent) {
+          this.collectionEl.appendChild($.el.li(this._emptyContent));
+        }
       }
 
       // otherwise, we render each row

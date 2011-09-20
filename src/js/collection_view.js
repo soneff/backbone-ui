@@ -1,6 +1,7 @@
 (function(){
   window.Backbone.UI.CollectionView = Backbone.View.extend({
     _itemViews : {},
+    _emptyContent : null,
 
     // must be over-ridden to describe how an item is rendered
     _renderItem : Backbone.UI.noop,
@@ -18,6 +19,12 @@
       // first check if we've already rendered an item for this model
       if(!!this._itemViews[model.cid]) {
         return;
+      }
+
+      // remove empty content if it exists
+      if(!!this._emptyContent) {
+        if(!!this._emptyContent.parentNode) this._emptyContent.parentNode.removeChild(this._emptyContent);
+        this._emptyContent = null;
       }
        
       // render the new item

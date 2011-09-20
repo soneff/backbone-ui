@@ -458,6 +458,7 @@
 (function(){
   window.Backbone.UI.CollectionView = Backbone.View.extend({
     _itemViews : {},
+    _emptyContent : null,
 
     // must be over-ridden to describe how an item is rendered
     _renderItem : Backbone.UI.noop,
@@ -475,6 +476,12 @@
       // first check if we've already rendered an item for this model
       if(!!this._itemViews[model.cid]) {
         return;
+      }
+
+      // remove empty content if it exists
+      if(!!this._emptyContent) {
+        if(!!this._emptyContent.parentNode) this._emptyContent.parentNode.removeChild(this._emptyContent);
+        this._emptyContent = null;
       }
        
       // render the new item
@@ -868,8 +875,12 @@
 
       // if the collection is empty, we render the empty content
       if(!_(this.model).exists()  || this.model.length === 0) {
-        var emptyContent = this.options.emptyContent;
-        this.collectionEl.appendChild($.el.li(_(emptyContent).isFunction() ? emptyContent() : emptyContent));
+        this._emptyContent = _(this.options.emptyContent).isFunction() ? 
+          this.options.emptyContent() : this.options.emptyContent;
+
+        if(!!this._emptyContent) {
+          this.collectionEl.appendChild($.el.li(this._emptyContent));
+        }
       }
 
       // otherwise, we render each row
@@ -1824,6 +1835,15 @@
     initialize : function() {
       _.extend(this, Backbone.UI.HasGlyph);
 
+      this.input = $.el.input();
+
+      $(this.input).keyup(_.bind(function(e) {
+        _.defer(_(this._updateModel).bind(this));
+        if(_(this.options.onKeyPress).exists() && _(this.options.onKeyPress).isFunction()) {
+          this.options.onKeyPress(e);
+        }
+      }, this));
+
       if(!!this.model && this.options.property) {
         this.model.bind('change:' + this.options.property, _.bind(function() {
           var newValue = this.model.get(this.options.property);
@@ -1841,20 +1861,13 @@
       $(this.el).empty();
       $(this.el).addClass('text_field');
 
-      this.input = $.el.input({
-        type : this.options.type, 
-        name : this.options.name,
-        id : this.options.name,
-        tabIndex : this.options.tabIndex, 
-        placeholder : this.options.placeholder,
-        value : value});
-
-      $(this.input).keyup(_.bind(function(e) {
-        _.defer(_(this._updateModel).bind(this));
-        if(_(this.options.onKeyPress).exists() && _(this.options.onKeyPress).isFunction()) {
-          this.options.onKeyPress(e);
-        }
-      }, this));
+      $(this.input).attr({
+        type : this.options.type ? this.options.type : 'text',
+        name : _(this.options.name).safeString(),
+        id : _(this.options.name).safeString(),
+        tabIndex : this.options.tabIndex,
+        placeholder : _(this.options.placeholder).safeString(),
+        value : _(value).safeString()});
 
       this.insertGlyphRight(this.el, this.options.glyphRight);
       this.el.appendChild($.el.div({className : 'input_wrapper'}, this.input));
@@ -1889,3 +1902,4 @@
     }
   });
 })();
+
