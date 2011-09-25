@@ -1,6 +1,6 @@
 (function(){
   window.Backbone.UI.CollectionView = Backbone.View.extend({
-    _itemViews : {},
+    itemViews : {},
     _emptyContent : null,
 
     // must be over-ridden to describe how an item is rendered
@@ -17,7 +17,7 @@
 
     _onItemAdded : function(model, list, options) {
       // first check if we've already rendered an item for this model
-      if(!!this._itemViews[model.cid]) {
+      if(!!this.itemViews[model.cid]) {
         return;
       }
 
@@ -42,7 +42,7 @@
     },
 
     _onItemChanged : function(model) {
-      var view = this._itemViews[model.cid];
+      var view = this.itemViews[model.cid];
       if(!!view && view.el.parentNode) view.render();
       if(this.options.onChange) this.options.onChange();
 
@@ -50,9 +50,9 @@
     },
 
     _onItemRemoved : function(model) {
-      var view = this._itemViews[model.cid];
+      var view = this.itemViews[model.cid];
       if(!!view && !!view.el.parentNode) view.el.parentNode.removeChild(view.el);
-      delete(this._itemViews[model.cid]);
+      delete(this.itemViews[model.cid]);
 
       // update the first / last class names
       this._updateClassNames();

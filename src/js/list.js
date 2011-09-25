@@ -26,6 +26,7 @@
 
     render : function() {
       $(this.el).empty();
+      this.itemViews = {};
 
       this.collectionEl = $.el.ul();
 
@@ -33,9 +34,10 @@
       if(!_(this.model).exists()  || this.model.length === 0) {
         this._emptyContent = _(this.options.emptyContent).isFunction() ? 
           this.options.emptyContent() : this.options.emptyContent;
+        this._emptyContent = $.el.li(this._emptyContent);
 
         if(!!this._emptyContent) {
-          this.collectionEl.appendChild($.el.li(this._emptyContent));
+          this.collectionEl.appendChild(this._emptyContent);
         }
       }
 
@@ -71,7 +73,7 @@
         var view = new this.options.itemView({
           model : model
         }).render();
-        this._itemViews[model.cid] = view;
+        this.itemViews[model.cid] = view;
         content = view.el;
       }
       else {

@@ -35,13 +35,28 @@
 
       _.bindAll(this, 'render');
 
-      $(this.el).mousedown(_.bind(function(e) {
-        $(this.el).addClass('active');
-      }, this));
+      $(this.el).addClass('button');
 
-      $(this.el).mouseup(_.bind(function(e) {
-        $(this.el).removeClass('active');
-      }, this));
+      if(document.ontouchstart !== undefined || document.ontouchstart === null) {
+
+        $(this.el).bind('touchstart', _(function(e) {
+          $(this.el).addClass('active');
+        }).bind(this));
+
+        $(this.el).bind('touchend', _(function(e) {
+          $(this.el).removeClass('active');
+        }).bind(this));
+      }
+
+      else {
+        $(this.el).mousedown(_.bind(function(e) {
+          $(this.el).addClass('active');
+        }, this));
+
+        $(this.el).mouseup(_.bind(function(e) {
+          $(this.el).removeClass('active');
+        }, this));
+      }
 
       $(this.el).click(_.bind(function(e) {
         if(!this.options.active && !this.options.disabled) {
@@ -62,7 +77,6 @@
       }
 
       $(this.el).empty();
-      $(this.el).addClass('button');
       $(this.el).toggleClass('has_border', this.options.hasBorder);
 
       if(this.options.isSubmit) {

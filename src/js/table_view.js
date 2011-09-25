@@ -31,6 +31,7 @@
 
     render : function() {
       $(this.el).empty();
+      this.itemViews = {};
 
       $(this.el).toggleClass('clickable', this.options.onItemClick !== Backbone.UI.noop);
 
@@ -105,3 +106,4 @@
     }
   });
 })();
+
