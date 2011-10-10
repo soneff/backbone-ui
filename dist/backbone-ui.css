@@ -513,7 +513,7 @@ label {
   border-width:1px 1px 1px 1px;
 }
 
-.table_view .scroller {
+.table_view .content{
   border-style:solid;
   border-color:#444;
   border-width:0 1px 1px 1px;
@@ -525,11 +525,16 @@ label {
   padding:5px 10px;
 }
 
-.table_view .content .first .wrapper {
+.table_view .content td {
+  white-space:nowrap;
+  overflow:hidden;
+}
+
+.table_view .content td.first > .wrapper {
   padding-left:5px;
 }
 
-.table_view .content .last .wrapper {
+.table_view .content td.last > .wrapper {
   margin-right:5px;
 }
 
@@ -537,6 +542,7 @@ label {
   background-color:#ddd;
   cursor:pointer;
 }
+
 .text_area {
   position:relative;
   border:1px solid #666;

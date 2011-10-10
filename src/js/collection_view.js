@@ -43,7 +43,7 @@
 
     _onItemChanged : function(model) {
       var view = this.itemViews[model.cid];
-      if(!!view && view.el.parentNode) view.render();
+      if(!!view && view.el && view.el.parentNode) view.render();
       if(this.options.onChange) this.options.onChange();
 
       // TODO this may require re-sorting

@@ -204,14 +204,6 @@
       }
 
       return widget;
-    }, 
-
-    stack : function() {
-      return $.formation.stack.apply(this, arguments);
-    },
-
-    flow : function() {
-      return $.formation.flow.apply(this, arguments);
     }
   });
 
@@ -314,13 +306,28 @@
 
       _.bindAll(this, 'render');
 
-      $(this.el).mousedown(_.bind(function(e) {
-        $(this.el).addClass('active');
-      }, this));
+      $(this.el).addClass('button');
 
-      $(this.el).mouseup(_.bind(function(e) {
-        $(this.el).removeClass('active');
-      }, this));
+      if(document.ontouchstart !== undefined || document.ontouchstart === null) {
+
+        $(this.el).bind('touchstart', _(function(e) {
+          $(this.el).addClass('active');
+        }).bind(this));
+
+        $(this.el).bind('touchend', _(function(e) {
+          $(this.el).removeClass('active');
+        }).bind(this));
+      }
+
+      else {
+        $(this.el).mousedown(_.bind(function(e) {
+          $(this.el).addClass('active');
+        }, this));
+
+        $(this.el).mouseup(_.bind(function(e) {
+          $(this.el).removeClass('active');
+        }, this));
+      }
 
       $(this.el).click(_.bind(function(e) {
         if(!this.options.active && !this.options.disabled) {
@@ -341,7 +348,6 @@
       }
 
       $(this.el).empty();
-      $(this.el).addClass('button');
       $(this.el).toggleClass('has_border', this.options.hasBorder);
 
       if(this.options.isSubmit) {
@@ -457,7 +463,7 @@
 })();
 (function(){
   window.Backbone.UI.CollectionView = Backbone.View.extend({
-    _itemViews : {},
+    itemViews : {},
     _emptyContent : null,
 
     // must be over-ridden to describe how an item is rendered
@@ -474,7 +480,7 @@
 
     _onItemAdded : function(model, list, options) {
       // first check if we've already rendered an item for this model
-      if(!!this._itemViews[model.cid]) {
+      if(!!this.itemViews[model.cid]) {
         return;
       }
 
@@ -499,17 +505,17 @@
     },
 
     _onItemChanged : function(model) {
-      var view = this._itemViews[model.cid];
-      if(!!view && view.el.parentNode) view.render();
+      var view = this.itemViews[model.cid];
+      if(!!view && view.el && view.el.parentNode) view.render();
       if(this.options.onChange) this.options.onChange();
 
       // TODO this may require re-sorting
     },
 
     _onItemRemoved : function(model) {
-      var view = this._itemViews[model.cid];
+      var view = this.itemViews[model.cid];
       if(!!view && !!view.el.parentNode) view.el.parentNode.removeChild(view.el);
-      delete(this._itemViews[model.cid]);
+      delete(this.itemViews[model.cid]);
 
       // update the first / last class names
       this._updateClassNames();
@@ -870,6 +876,7 @@
 
     render : function() {
       $(this.el).empty();
+      this.itemViews = {};
 
       this.collectionEl = $.el.ul();
 
@@ -877,9 +884,10 @@
       if(!_(this.model).exists()  || this.model.length === 0) {
         this._emptyContent = _(this.options.emptyContent).isFunction() ? 
           this.options.emptyContent() : this.options.emptyContent;
+        this._emptyContent = $.el.li(this._emptyContent);
 
         if(!!this._emptyContent) {
-          this.collectionEl.appendChild($.el.li(this._emptyContent));
+          this.collectionEl.appendChild(this._emptyContent);
         }
       }
 
@@ -915,7 +923,7 @@
         var view = new this.options.itemView({
           model : model
         }).render();
-        this._itemViews[model.cid] = view;
+        this.itemViews[model.cid] = view;
         content = view.el;
       }
       else {
@@ -1652,16 +1660,20 @@
 
     render : function() {
       $(this.el).empty();
+      this.itemViews = {};
+
+      var container = $.el.div({className : 'content'},
+        this.collectionEl = $.el.table());
 
       $(this.el).toggleClass('clickable', this.options.onItemClick !== Backbone.UI.noop);
 
       // generate a table row for our headings
       var headingRow = $.el.tr();
       _(this.options.columns).each(function(column, index, list) {
-        var width = column.width ? column.width : index == list.length -1 ? null : 150;
-        if(width && index === 0) width += 5; 
+
         var label = _(column.label).isFunction() ? column.label() : column.label;
-        var style = width ? 'width:' + width + 'px' : null;
+        var width = !!column.width ? parseInt(column.width, 10) + 5 : null;
+        var style = width ? 'width:' + width + 'px; max-width:' + width + 'px' : null;
         headingRow.appendChild($.el.th( 
           {className : _(list).nameForIndex(index), style : style}, 
           $.el.div({className : 'wrapper'}, label)));
@@ -1678,54 +1690,67 @@
       var tableBody = $.el.tbody();
 
       // if the collection is empty, we render the empty content
-      if(this.model.length === 0) {
-        var emptyContent = this.options.emptyContent;
-        tableBody.appendChild($.el.tr(
-          {colspan : this.options.columns.length}, 
-          _(emptyContent).isFunction() ? emptyContent() : emptyContent));
+      // if the collection is empty, we render the empty content
+      if(!_(this.model).exists()  || this.model.length === 0) {
+        this._emptyContent = _(this.options.emptyContent).isFunction() ? 
+          this.options.emptyContent() : this.options.emptyContent;
+        this._emptyContent = $.el.tr($.el.td(this._emptyContent));
+
+        if(!!this._emptyContent) {
+          this.collectionEl.appendChild(this._emptyContent);
+        }
       }
 
       // otherwise, we render each row
       else {
-        this.model.each(function(m) {
-          var row = $.el.tr();
-
-          // for each model, we walk through each column and generate the content 
-          _(this.options.columns).each(function(column, index, list) {
-            var width = column.width ? column.width : index == list.length -1 ? null : 150;
-            var style = width ? 'width:' + width + 'px' : null;
-            var content = this.resolveContent(column.content, m, column.property);
-            row.appendChild($.el.td(
-              {className : _(list).nameForIndex(index), style : style}, 
-              $.el.div({className : 'wrapper'}, content)));
-          }, this);
-
-          // bind the item click callback if given
-          if(this.options.onItemClick) {
-            $(row).click(_(this.options.onItemClick).bind(this, m));
-          }
-
-          tableBody.appendChild(row);
+        _(this.model.models).each(function(model, index) {
+          var item = this._renderItem(model, index);
+          this.collectionEl.appendChild(item);
         }, this);
       }
 
-      this._collectionView = $.el.table();
-      this._collectionView.appendChild(tableBody);
+      // wrap the list in a scroller
+      if(this.options.enableScrolling) {
+        var style = _(this.options.maxHeight).exists() ? 'max-height:' + this.options.maxHeight + 'px' : null;
+        var scroller = new Backbone.UI.Scroller({
+          content : $.el.div({style : style}, container) 
+        }).render();
 
-      // wrap the table in a scroller
-      var style = _(this.options.maxHeight).exists() ? 'max-height:' + this.options.maxHeight + 'px' : null;
-      var scroller = new Backbone.UI.Scroller({
-        content : $.el.div({style : style}, this._collectionView)
-      }).render();
-
-      this.el.appendChild(scroller.el);
+        this.el.appendChild(scroller.el);
+      }
+      else {
+        this.el.appendChild(container);
+      }
 
       this._updateClassNames();
 
       return this;
+    },
+
+    _renderItem : function(model, index) {
+      var row = $.el.tr();
+
+      // for each model, we walk through each column and generate the content 
+      _(this.options.columns).each(function(column, index, list) {
+        var width = !!column.width ? parseInt(column.width, 10) + 5 : null;
+        var style = width ? 'width:' + width + 'px; max-width:' + width + 'px': null;
+        var content = this.resolveContent(column.content, model, column.property);
+        row.appendChild($.el.td(
+          {className : _(list).nameForIndex(index), style : style}, 
+          $.el.div({className : 'wrapper', style : style}, content)));
+      }, this);
+
+      // bind the item click callback if given
+      if(this.options.onItemClick) {
+        $(row).click(_(this.options.onItemClick).bind(this, model));
+      }
+
+      this.itemViews[model.cid] = row;
+      return row;
     }
   });
 })();
+
 (function(){
   window.Backbone.UI.TextArea = Backbone.View.extend({
     options : {

@@ -204,14 +204,6 @@
       }
 
       return widget;
-    }, 
-
-    stack : function() {
-      return $.formation.stack.apply(this, arguments);
-    },
-
-    flow : function() {
-      return $.formation.flow.apply(this, arguments);
     }
   });
 
