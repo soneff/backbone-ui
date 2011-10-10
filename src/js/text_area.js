@@ -12,6 +12,8 @@
       // disables the text area
       disabled : false,
       
+      enableScrolling : true,
+
       // value for the text area
       value : null,
 
@@ -38,12 +40,16 @@
         tabIndex : this.options.tabIndex, 
         placeholder : this.options.placeholder}, value);
 
-      this._scroller = new Backbone.UI.Scroller({
-        content : this.textArea
-      }).render();
+      var content = this.textArea;
+      if(this.options.enableScrolling) {
+        this._scroller = new Backbone.UI.Scroller({
+          content : this.textArea
+        }).render();
+        content = this._scroller.el;
+      }
 
       this.insertGlyphRight(this.el, this.options.glyphRight);
-      this.el.appendChild(this._scroller.el);
+      this.el.appendChild(content);
       this.insertGlyph(this.el, this.options.glyph);
 
       this.setEnabled(!this.options.disabled);
