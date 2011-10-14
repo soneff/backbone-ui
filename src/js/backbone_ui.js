@@ -118,18 +118,6 @@
       });
     },
 
-    safeAttr : function(attributes) {
-      if(_(attributes).exists()) {
-        _(this).each(function(el) {
-          if(attributes.className) {
-            $(el).addClass(attributes.className);
-            delete(attributes.className);
-          }
-          $(el).attr(attributes);
-        });
-      }
-    },
-
     // Hides each element the next time the user clicks the mouse or presses a
     // key.  This is a one-shot action - once the element is hidden, all
     // related event handlers are removed.

@@ -61,11 +61,11 @@
 
       $(this.input).attr({
         type : this.options.type ? this.options.type : 'text',
-        name : _(this.options.name).safeString(),
-        id : _(this.options.name).safeString(),
+        name : this.options.name,
+        id : this.options.name,
         tabIndex : this.options.tabIndex,
-        placeholder : _(this.options.placeholder).safeString(),
-        value : _(value).safeString()});
+        placeholder : this.options.placeholder,
+        value : value});
 
       this.insertGlyphRight(this.el, this.options.glyphRight);
       this.el.appendChild($.el.div({className : 'input_wrapper'}, this.input));
