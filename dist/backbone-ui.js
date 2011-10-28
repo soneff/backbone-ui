@@ -826,7 +826,11 @@
           });
           $(image).show();
         };
-        image.src = Backbone.UI.IMAGE_DIR_PATH + '/glyphs/' + name + '.png';
+        if (!!Backbone.UI.GLYPH_URL_MAP && !!Backbone.UI.GLYPH_URL_MAP[name]) {
+          image.src = Backbone.UI.GLYPH_URL_MAP[name];
+        } else {
+          image.src = Backbone.UI.IMAGE_DIR_PATH + '/glyphs/' + name + '.png';
+        }
         image.className = className;
 
         el.insertBefore(image, isRight ? null : el.firstChild);
