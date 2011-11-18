@@ -51,7 +51,10 @@
 
     _onItemRemoved : function(model) {
       var view = this.itemViews[model.cid];
-      if(!!view && !!view.el.parentNode) view.el.parentNode.removeChild(view.el);
+      var liOrTrElement = view.el.parentNode;
+      if(!!view && !!liOrTrElement && !!liOrTrElement.parentNode) {
+        liOrTrElement.parentNode.removeChild(liOrTrElement);
+      }
       delete(this.itemViews[model.cid]);
 
       // update the first / last class names
