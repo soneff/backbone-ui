@@ -37,33 +37,27 @@
 
       $(this.el).addClass('button');
 
-      if(document.ontouchstart !== undefined || document.ontouchstart === null) {
+      var isMobile = document.ontouchstart !== undefined || document.ontouchstart === null;
+      var downEvent = isMobile ? 'touchstart' : 'mousedown';
+      var upEvent = isMobile ? 'touchend' : 'mouseup';
 
-        $(this.el).bind('touchstart', _(function(e) {
-          $(this.el).addClass('active');
-        }).bind(this));
+      $(this.el).bind(downEvent, _(function(e) {
+        $(this.el).addClass('active');
+        Backbone.UI._activeButton = this;
 
-        $(this.el).bind('touchend', _(function(e) {
-          $(this.el).removeClass('active');
-        }).bind(this));
-      }
+        var bodyUpListener = $(document.body).bind(upEvent, function(event) {
+          if(Backbone.UI._activeButton) {
+            if(event.target === Backbone.UI._activeButton.el || $(event.target).closest('.button.active').length > 0) {
+              if(Backbone.UI._activeButton.options.onClick) Backbone.UI._activeButton.options.onClick(event); 
+            }
+            $(Backbone.UI._activeButton.el).removeClass('active');
+          }
 
-      else {
-        $(this.el).mousedown(_.bind(function(e) {
-          $(this.el).addClass('active');
-        }, this));
-
-        $(this.el).mouseup(_.bind(function(e) {
-          $(this.el).removeClass('active');
-        }, this));
-      }
-
-      $(this.el).click(_.bind(function(e) {
-        if(!this.options.active && !this.options.disabled) {
-          if(this.options.onClick) this.options.onClick(e); 
-        }
+          Backbone.UI._activeButton = null;
+          $(document.body).unbind(upEvent, bodyUpListener);
+        });
         return false;
-      }, this));
+      }).bind(this));
     },
 
     render : function() {

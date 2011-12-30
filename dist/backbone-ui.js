@@ -305,6 +305,13 @@
         $(this.el).bind('touchend', _(function(e) {
           $(this.el).removeClass('active');
         }).bind(this));
+
+        $(this.el).tap(_.bind(function(e) {
+          if(!this.options.active && !this.options.disabled) {
+            if(this.options.onClick) this.options.onClick(e); 
+          }
+          return false;
+        }, this));
       }
 
       else {
@@ -315,14 +322,15 @@
         $(this.el).mouseup(_.bind(function(e) {
           $(this.el).removeClass('active');
         }, this));
+
+        $(this.el).click(_.bind(function(e) {
+          if(!this.options.active && !this.options.disabled) {
+            if(this.options.onClick) this.options.onClick(e); 
+          }
+          return false;
+        }, this));
       }
 
-      $(this.el).click(_.bind(function(e) {
-        if(!this.options.active && !this.options.disabled) {
-          if(this.options.onClick) this.options.onClick(e); 
-        }
-        return false;
-      }, this));
     },
 
     render : function() {
@@ -502,7 +510,10 @@
 
     _onItemRemoved : function(model) {
       var view = this.itemViews[model.cid];
-      if(!!view && !!view.el.parentNode) view.el.parentNode.removeChild(view.el);
+      var liOrTrElement = view.el.parentNode;
+      if(!!view && !!liOrTrElement && !!liOrTrElement.parentNode) {
+        liOrTrElement.parentNode.removeChild(liOrTrElement);
+      }
       delete(this.itemViews[model.cid]);
 
       // update the first / last class names
