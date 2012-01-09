@@ -136,8 +136,8 @@
       var anchor = this.button.el;
       var showOnTop = $(window).height() - ($(anchor).offset().top - document.body.scrollTop) < 150;
       var position = (this.options.alignRight ? '-right' : '-left') + (showOnTop ? 'top' : ' bottom');
-      $(this._scroller.el).show();
       $(this._scroller.el).alignTo(anchor, position, 0, 1);
+      $(this._scroller.el).show();
       $(this._scroller.el).autohide({
         ignoreKeys : [Backbone.UI.KEYS.KEY_UP, Backbone.UI.KEYS.KEY_DOWN], 
         ignoreInputs : true,
