@@ -389,7 +389,21 @@
       property : null,
       label : null,
       checked : false,
-      onClick : null
+      /** 
+       * A function that will be called with the new checked
+       * state after the checked state has been toggled.
+       */
+      onChanged : null,
+      /**
+       * Called with no arguments whenever the Checkbox is clicked
+       * regardless of the enabled state.
+       */
+      onClick : null,
+      /**
+       * If set to false, the Checkbox will not automatically toggle
+       * its state.
+       */
+      enabled : true
     },
 
     initialize : function() {
@@ -440,12 +454,21 @@
     },
 
     _onClick : function() {
+      if (this.options.onClick) {
+        this.options.onClick();
+      }
+      if (!this.options.enabled) {
+        return;
+      }
       this.checked = !this.checked;
       if(_(this.model).exists() && _(this.options.property).exists()) {
         _(this.model).setProperty(this.options.property, this.checked);
       }
       else {
         this.render();
+      }
+      if (this.options.onChanged) {
+        this.options.onChanged(this.checked);
       }
       return false;
     }
