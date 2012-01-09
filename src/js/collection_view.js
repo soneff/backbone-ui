@@ -12,6 +12,7 @@
         this.model.bind('change', _.bind(this._onItemChanged, this));
         this.model.bind('remove', _.bind(this._onItemRemoved, this));
         this.model.bind('refresh', _.bind(this.render, this));
+        this.model.bind('reset', _.bind(this.render, this));
       }
     },
 
