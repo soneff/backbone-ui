@@ -1157,7 +1157,13 @@
         content : list
       }).render();
       $(this._scroller.el).hide();
+      // Prevent scroll events from percolating out to the enclosing doc
+      $(this._scroller.el).bind('mousewheel', function(){return false;});
       $(this._scroller.el).addClass('pulldown_menu_scroller');
+      // Optionally decorate the menu with the owning pulldown's class name
+      if (this.options.className) {
+        $(this._scroller.el).addClass('pulldown_menu_scroller_for_' + this.options.className);
+      }
 
       document.body.appendChild(this._scroller.el);
       this._menuWidth = $(this._scroller.el).width() + 20;
