@@ -296,41 +296,35 @@
 
       $(this.el).addClass('button');
 
+      // if we're running in a mobile environment, the 'click' event 
+      // isn't quite translated correctly
       if(document.ontouchstart !== undefined || document.ontouchstart === null) {
-
         $(this.el).bind('touchstart', _(function(e) {
           $(this.el).addClass('active');
-        }).bind(this));
 
-        $(this.el).bind('touchend', _(function(e) {
-          $(this.el).removeClass('active');
-        }).bind(this));
+            Backbone.UI._activeButton = this;
+            var bodyUpListener = $(document.body).bind('touchend', function(event) {
+              if(Backbone.UI._activeButton) {
+                if(event.target === Backbone.UI._activeButton.el || $(event.target).closest('.button.active').length > 0) {
+                  if(Backbone.UI._activeButton.options.onClick) Backbone.UI._activeButton.options.onClick(event); 
+                }
+                $(Backbone.UI._activeButton.el).removeClass('active');
+              }
 
-        $(this.el).tap(_.bind(function(e) {
-          if(!this.options.active && !this.options.disabled) {
-            if(this.options.onClick) this.options.onClick(e); 
-          }
+              Backbone.UI._activeButton = null;
+              $(document.body).unbind('touchend', bodyUpListener);
+            });
+
           return false;
-        }, this));
+        }).bind(this));
       }
 
       else {
-        $(this.el).mousedown(_.bind(function(e) {
-          $(this.el).addClass('active');
-        }, this));
-
-        $(this.el).mouseup(_.bind(function(e) {
-          $(this.el).removeClass('active');
-        }, this));
-
-        $(this.el).click(_.bind(function(e) {
-          if(!this.options.active && !this.options.disabled) {
-            if(this.options.onClick) this.options.onClick(e); 
-          }
+        $(this.el).bind('click', _(function(e) {
+          if(this.options.onClick) this.options.onClick(event); 
           return false;
-        }, this));
+        }).bind(this));
       }
-
     },
 
     render : function() {
@@ -471,6 +465,7 @@
         this.model.bind('change', _.bind(this._onItemChanged, this));
         this.model.bind('remove', _.bind(this._onItemRemoved, this));
         this.model.bind('refresh', _.bind(this.render, this));
+        this.model.bind('reset', _.bind(this.render, this));
       }
     },
 
@@ -1083,8 +1078,8 @@
       var anchor = this.button.el;
       var showOnTop = $(window).height() - ($(anchor).offset().top - document.body.scrollTop) < 150;
       var position = (this.options.alignRight ? '-right' : '-left') + (showOnTop ? 'top' : ' bottom');
-      $(this._scroller.el).show();
       $(this._scroller.el).alignTo(anchor, position, 0, 1);
+      $(this._scroller.el).show();
       $(this._scroller.el).autohide({
         ignoreKeys : [Backbone.UI.KEYS.KEY_UP, Backbone.UI.KEYS.KEY_DOWN], 
         ignoreInputs : true,
@@ -1285,9 +1280,10 @@
       $(this.el).empty();
 
       var ul = $.el.ul();
+      var selectedValue = this._valueForItem(this.selectedItem);
       _.each(this.options.collection, function(item) {
 
-        var selected = this.selectedValue == this._valueForItem(item);
+        var selected = selectedValue == this._valueForItem(item);
 
         var label = _(item).resolveProperty(this.options.labelProperty);
         
