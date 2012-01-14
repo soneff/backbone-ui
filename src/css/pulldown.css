@@ -87,3 +87,10 @@
   right:4px;
 }
 
+.pulldown .button:link,
+.pulldown .button:active,
+.pulldown .button:hover,
+.pulldown .button:visited {
+  color:#333;
+}
+

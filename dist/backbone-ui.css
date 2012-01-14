@@ -1,10 +1,10 @@
-.button {
+a.button {
   position:relative;
   height:28px;
   text-decoration:underline;
-  color:#333;
   font-size:14px;
   font-family:Helvetica;
+  color:#333;
 
   /* inline-block with IE7 hack */
   display: inline-block;
@@ -243,6 +243,13 @@
 .pulldown_menu li .glyph.right {
   top:4px;
   right:4px;
+}
+
+.pulldown .button:link,
+.pulldown .button:active,
+.pulldown .button:hover,
+.pulldown .button:visited {
+  color:#333;
 }
 
 

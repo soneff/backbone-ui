@@ -303,10 +303,10 @@
           $(this.el).addClass('active');
 
             Backbone.UI._activeButton = this;
-            var bodyUpListener = $(document.body).bind('touchend', function(event) {
+            var bodyUpListener = $(document.body).bind('touchend', function(e) {
               if(Backbone.UI._activeButton) {
-                if(event.target === Backbone.UI._activeButton.el || $(event.target).closest('.button.active').length > 0) {
-                  if(Backbone.UI._activeButton.options.onClick) Backbone.UI._activeButton.options.onClick(event); 
+                if(e.target === Backbone.UI._activeButton.el || $(e.target).closest('.button.active').length > 0) {
+                  if(Backbone.UI._activeButton.options.onClick) Backbone.UI._activeButton.options.onClick(e); 
                 }
                 $(Backbone.UI._activeButton.el).removeClass('active');
               }
@@ -321,7 +321,7 @@
 
       else {
         $(this.el).bind('click', _(function(e) {
-          if(this.options.onClick) this.options.onClick(event); 
+          if(this.options.onClick) this.options.onClick(e); 
           return false;
         }).bind(this));
       }
