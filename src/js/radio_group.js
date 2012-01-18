@@ -37,7 +37,7 @@
     selectedItem : null,
 
     render : function() {
-      this.selectedItem = this._determineSelectedItem();
+      this.selectedItem = this._determineSelectedItem() || this.selectedItem;
 
       $(this.el).empty();
 
@@ -50,8 +50,9 @@
         var label = _(item).resolveProperty(this.options.labelProperty);
         
         var li = $.el.li(
-          $.el.a({className : 'choice', href : '#'},
-            $.el.div({className : 'mark'}, selected ? '\u25cf' : ''),
+          $.el.a({className : 'choice' + (selected ? ' selected' : '')},
+            $.el.div({className : 'mark' + (selected ? ' selected' : '')}, 
+              selected ? '\u25cf' : ''),
             $.el.div({className : 'label'}, label),
             $.el.br({style : 'clear:both'})), 
           $.el.br({style : 'clear:both'}));

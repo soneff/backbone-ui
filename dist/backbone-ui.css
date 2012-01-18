@@ -401,7 +401,7 @@ label {
   right:3px;
   top:3px;
   bottom:3px;
-  width:16px;
+  width:10px;
   background-color:#eee;
   border-radius: 8px;
   -webkit-border-radius: 8px;
@@ -415,7 +415,7 @@ label {
 .scroller .knob {
   position:absolute;
   right:1px;
-  width:14px;
+  width:8px;
   cursor:move;
 }
 

@@ -14,10 +14,35 @@
     <script src="../../test/vendor/prettify.js"></script>
     <script src="../../test/vendor/jsbeautify.js"></script>
 
-    <script src="../../dist/backbone-ui.js"></script>
+    <script src="../../src/js/backbone_ui.js"></script>
+    <script src="../../src/js/button.js"></script>
+    <script src="../../src/js/checkbox.js"></script>
+    <script src="../../src/js/collection_view.js"></script>
+    <script src="../../src/js/drag_session.js"></script>
+    <script src="../../src/js/has_collection_property.js"></script>
+    <script src="../../src/js/has_glyph.js"></script>
+    <script src="../../src/js/list.js"></script>
+    <script src="../../src/js/pulldown.js"></script>
+    <script src="../../src/js/radio_group.js"></script>
+    <script src="../../src/js/scroller.js"></script>
+    <script src="../../src/js/tab_set.js"></script>
+    <script src="../../src/js/table_view.js"></script>
+    <script src="../../src/js/text_area.js"></script>
+    <script src="../../src/js/text_field.js"></script>
 
     <link rel="stylesheet" href="../../test/vendor/prettify.css"> 
-    <link rel="stylesheet" href="../../dist/backbone-ui.css"> 
+    <link rel="stylesheet" href="../../src/css/button.css"> 
+    <link rel="stylesheet" href="../../src/css/checkbox.css"> 
+    <link rel="stylesheet" href="../../src/css/has_glyph.css"> 
+    <link rel="stylesheet" href="../../src/css/pulldown.css"> 
+    <link rel="stylesheet" href="../../src/css/radio_group.css"> 
+    <link rel="stylesheet" href="../../src/css/reset.css"> 
+    <link rel="stylesheet" href="../../src/css/scroller.css"> 
+    <link rel="stylesheet" href="../../src/css/tab_set.css"> 
+    <link rel="stylesheet" href="../../src/css/table_view.css"> 
+    <link rel="stylesheet" href="../../src/css/text_area.css"> 
+    <link rel="stylesheet" href="../../src/css/text_field.css"> 
+    <link rel="stylesheet" href="../../src/css/skins/perka.css">
 
     <style>
       html {
@@ -70,7 +95,6 @@
     </style>
 
     <script>
-      Backbone.UI.IMAGE_DIR_PATH = './images';
 
       var addExample = function(title, f) {
         dl.appendChild($.el.dt(title));
@@ -104,6 +128,7 @@
 
       $(window).bind('load', function() {
         Backbone.UI.IMAGE_DIR_PATH = './images';
+        Backbone.UI.setSkin('perka');
 
         dl = $.el.dl().appendTo(document.body);
 
