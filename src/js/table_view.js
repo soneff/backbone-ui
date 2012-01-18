@@ -27,6 +27,7 @@
 
     initialize : function() {
       Backbone.UI.CollectionView.prototype.initialize.call(this, arguments);
+      $(this.el).addClass('table_view');
     },
 
     render : function() {

@@ -22,6 +22,7 @@
 
     initialize : function() {
       Backbone.UI.CollectionView.prototype.initialize.call(this, arguments);
+      $(this.el).addClass('list');
     },
 
     render : function() {

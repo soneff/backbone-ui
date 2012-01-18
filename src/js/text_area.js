@@ -25,6 +25,7 @@
 
     initialize : function() {
       _.extend(this, Backbone.UI.HasGlyph);
+      $(this.el).addClass('text_area');
     },
 
     render : function() {

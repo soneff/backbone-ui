@@ -14,6 +14,7 @@
 
     initialize : function() {
       _.extend(this, Backbone.UI.HasGlyph);
+      $(this.el).addClass('tab_set');
     }, 
 
     render : function() {

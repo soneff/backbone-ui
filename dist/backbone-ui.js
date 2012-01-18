@@ -907,6 +907,7 @@
 
     initialize : function() {
       Backbone.UI.CollectionView.prototype.initialize.call(this, arguments);
+      $(this.el).addClass('list');
     },
 
     render : function() {
@@ -1594,6 +1595,7 @@
 
     initialize : function() {
       _.extend(this, Backbone.UI.HasGlyph);
+      $(this.el).addClass('tab_set');
     }, 
 
     render : function() {
@@ -1699,6 +1701,7 @@
 
     initialize : function() {
       Backbone.UI.CollectionView.prototype.initialize.call(this, arguments);
+      $(this.el).addClass('table_view');
     },
 
     render : function() {
@@ -1821,6 +1824,7 @@
 
     initialize : function() {
       _.extend(this, Backbone.UI.HasGlyph);
+      $(this.el).addClass('text_area');
     },
 
     render : function() {
@@ -1909,6 +1913,8 @@
     initialize : function() {
       _.extend(this, Backbone.UI.HasGlyph);
 
+      $(this.el).addClass('text_field');
+
       this.input = $.el.input();
 
       $(this.input).keyup(_.bind(function(e) {
@@ -1933,7 +1939,6 @@
         _(this.model).resolveProperty(this.options.property) : null;
 
       $(this.el).empty();
-      $(this.el).addClass('text_field');
 
       $(this.input).attr({
         type : this.options.type ? this.options.type : 'text',

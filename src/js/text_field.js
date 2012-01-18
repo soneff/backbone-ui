@@ -33,6 +33,8 @@
     initialize : function() {
       _.extend(this, Backbone.UI.HasGlyph);
 
+      $(this.el).addClass('text_field');
+
       this.input = $.el.input();
 
       $(this.input).keyup(_.bind(function(e) {
@@ -57,7 +59,6 @@
         _(this.model).resolveProperty(this.options.property) : null;
 
       $(this.el).empty();
-      $(this.el).addClass('text_field');
 
       $(this.input).attr({
         type : this.options.type ? this.options.type : 'text',
