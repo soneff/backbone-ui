@@ -47,7 +47,7 @@
       if(!!this.model && this.options.property) {
         this.model.bind('change:' + this.options.property, _.bind(function() {
           var newValue = this.model.get(this.options.property);
-          if(this.input && this.input.value != newValue) this.input.value = this.model.get(this.options.property);
+          if(this.input && this.input.value !== newValue) this.input.value = this.model.get(this.options.property);
         }, this));
       }
     },
@@ -92,7 +92,11 @@
 
     // sets the enabled state
     setEnabled : function(enabled) {
-      enabled ? $(this.el).removeClass('disabled') : $(this.el).addClass('disabled');
+      if(enabled) { 
+        $(this.el).removeClass('disabled');
+      } else {
+        $(this.el).addClass('disabled');
+      }
       this.input.disabled = !enabled;
     },
 
@@ -100,5 +104,5 @@
       _(this.model).setProperty(this.options.property, this.input.value);
     }
   });
-})();
+}());
 

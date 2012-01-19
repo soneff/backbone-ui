@@ -45,7 +45,7 @@
       var selectedValue = this._valueForItem(this.selectedItem);
       _.each(this.options.collection, function(item) {
 
-        var selected = selectedValue == this._valueForItem(item);
+        var selected = selectedValue === this._valueForItem(item);
 
         var label = _(item).resolveProperty(this.options.labelProperty);
         
@@ -74,4 +74,4 @@
       return false;
     }
   });
-})();
+}());

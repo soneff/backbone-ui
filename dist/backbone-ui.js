@@ -1,7 +1,7 @@
-!function(context) {
+(function(context) {
   // ensure backbone and jquery are available
-  typeof Backbone !== 'undefined' || alert('backbone environment not loaded') ;
-  typeof $ !== 'undefined' || alert('jquery environment not loaded');
+  if(typeof Backbone === 'undefined') alert('backbone environment not loaded') ;
+  if(typeof $ === 'undefined') alert('jquery environment not loaded');
 
   // define our Backbone.UI namespace
   Backbone.UI = Backbone.UI || {
@@ -103,15 +103,78 @@
     }
   });
 
+  var _alignCoords = function(el, anchor, pos, xFudge, yFudge) {
+    el = $(el);
+    anchor = $(anchor);
+    pos = pos || '';
+
+    // Get anchor bounds (document relative)
+    var bOffset = anchor.offset();
+    var bDim = {width : anchor.width(), height : anchor.height()};
+
+    // Get element dimensions
+    var elbOffset = el.offset();
+    var elbDim = {width : el.width(), height : el.height()};
+
+    // Determine align coords (document-relative)
+    var x,y;
+    if (pos.indexOf('-left') >= 0) {
+      x = bOffset.left;
+    } else if (pos.indexOf('left') >= 0) {
+      x = bOffset.left - elbDim.width;
+    } else if (pos.indexOf('-right') >= 0) {
+      x = (bOffset.left + bDim.width) - elbDim.width;
+    } else if (pos.indexOf('right') >= 0) {
+      x = bOffset.left + bDim.width;
+    } else { // Default = centered
+      x = bOffset.left + (bDim.width - elbDim.width)/2;
+    }
+
+    if (pos.indexOf('-top') >= 0) {
+      y = bOffset.top;
+    } else if (pos.indexOf('top') >= 0) {
+      y = bOffset.top - elbDim.height;
+    } else if (pos.indexOf('-bottom') >= 0) {
+      y = (bOffset.top + bDim.height) - elbDim.height;
+    } else if (pos.indexOf('bottom') >= 0) {
+      y = bOffset.top + bDim.height;
+    } else { // Default = centered
+      y = bOffset.top + (bDim.height - elbDim.height)/2;
+    }
+    
+    // Check for constrainment (default true)
+    var constraint = true;
+    if (pos.indexOf('no-constraint') >= 0) constraint = false;
+
+    // Add fudge factors
+    x += xFudge || 0;
+    y += yFudge || 0;
+
+    // Create bounds rect/constrain to viewport
+    //var nb = new zen.util.Rect(x,y,elb.width,elb.height);
+    //if (constraint) nb = nb.constrainTo(zen.util.Dom.getViewport());
+
+    // Convert to offsetParent coordinates
+    //if(el.offsetParent()) {
+      //var ob = $(el.offsetParent).getOffset();
+      //nb.translate(-ob.left, -ob.top);
+    //}
+
+    // Return rect, constrained to viewport
+    return {x : x, y : y};
+  };
+
+
   // Add some utility methods to JQuery
   _($.fn).extend({
     // aligns each element releative to the given anchor
     alignTo : function(anchor, pos, xFudge, yFudge, container) {
       _.each(this, function(el) {
+        var rehide = false;
         // in order for alignTo to work properly the element needs to be visible
         // if it's hidden show it off screen so it can be positioned
-        if(el.style.display == 'none') {
-          var rehide=true;
+        if(el.style.display === 'none') {
+          rehide=true;
           $(el).css({position:'absolute',top:'-10000px', left:'-10000px', display:'block'});
         }
 
@@ -181,7 +244,7 @@
   _($).extend({
     ui : function() {
       var args = arguments;
-      var constructor = Backbone.UI[args[0]];
+      var Constructor = Backbone.UI[args[0]];
 
       // process any formation options or element attributes
       var firstArg = args[1];
@@ -192,8 +255,9 @@
         attributes = firstArg;
       }
       args = Array.prototype.slice.call(arguments, startingIndex);
-      if(!!constructor && _(constructor).isFunction()) {
-        widget = new constructor(attributes || {});
+      var widget;
+      if(!!Constructor && _(Constructor).isFunction()) {
+        widget = new Constructor(attributes || {});
         _(args).each(function(child) {
           widget.el.appendChild(child);
         });
@@ -203,72 +267,11 @@
     }
   });
 
-  var _alignCoords = function(el, anchor, pos, xFudge, yFudge) {
-    el = $(el);
-    anchor = $(anchor);
-    pos = pos || '';
-
-    // Get anchor bounds (document relative)
-    var bOffset = anchor.offset();
-    var bDim = {width : anchor.width(), height : anchor.height()};
-
-    // Get element dimensions
-    var elbOffset = el.offset();
-    var elbDim = {width : el.width(), height : el.height()};
-
-    // Determine align coords (document-relative)
-    var x,y;
-    if (pos.indexOf('-left') >= 0) {
-      x = bOffset.left;
-    } else if (pos.indexOf('left') >= 0) {
-      x = bOffset.left - elbDim.width;
-    } else if (pos.indexOf('-right') >= 0) {
-      x = (bOffset.left + b.width) - elbDim.width;
-    } else if (pos.indexOf('right') >= 0) {
-      x = bOffset.left + bDim.width;
-    } else { // Default = centered
-      x = bOffset.left + (bDim.width - elbDim.width)/2;
-    }
-
-    if (pos.indexOf('-top') >= 0) {
-      y = bOffset.top;
-    } else if (pos.indexOf('top') >= 0) {
-      y = bOffset.top - elbDim.height;
-    } else if (pos.indexOf('-bottom') >= 0) {
-      y = (bOffset.top + bDim.height) - elbDim.height;
-    } else if (pos.indexOf('bottom') >= 0) {
-      y = bOffset.top + bDim.height;
-    } else { // Default = centered
-      y = bOffset.top + (bDim.height - elbDim.height)/2;
-    }
-    
-    // Check for constrainment (default true)
-    var constraint = true;
-    if (pos.indexOf('no-constraint') >= 0) constraint = false;
-
-    // Add fudge factors
-    x += xFudge || 0;
-    y += yFudge || 0;
-
-    // Create bounds rect/constrain to viewport
-    //var nb = new zen.util.Rect(x,y,elb.width,elb.height);
-    //if (constraint) nb = nb.constrainTo(zen.util.Dom.getViewport());
-
-    // Convert to offsetParent coordinates
-    //if(el.offsetParent()) {
-      //var ob = $(el.offsetParent).getOffset();
-      //nb.translate(-ob.left, -ob.top);
-    //}
-
-    // Return rect, constrained to viewport
-    return {x : x, y : y};
-  };
-
   $(document).ready(function() {
     $(document.body).addClass('skin_' + Backbone.UI.currentSkin);
   });
 
-}(this);
+}(this));
 (function(){
   window.Backbone.UI.Button = Backbone.View.extend({
     options : {
@@ -380,7 +383,11 @@
 
     // sets the enabled state of the button
     setEnabled : function(enabled) {
-      enabled ? this.el.href = '#' : this.el.removeAttribute('href');
+      if(enabled) {
+        this.el.href = '#';
+      } else { 
+        this.el.removeAttribute('href');
+      }
       this.options.disabled = !enabled;
       $(this.el)[enabled ? 'removeClass' : 'addClass']('disabled');
     },
@@ -391,7 +398,7 @@
       $(this.el)[active ? 'addClass' : 'removeClass']('active');
     }
   });
-})();
+}());
 
 (function(){
   window.Backbone.UI.Checkbox = Backbone.View.extend({
@@ -472,7 +479,7 @@
         this.options.onClick();
       }
       if (!this.options.enabled) {
-        return;
+        return false;
       }
       this.checked = !this.checked;
       if(_(this.model).exists() && _(this.options.property).exists()) {
@@ -487,7 +494,7 @@
       return false;
     }
   });
-})();
+}());
 (function(){
   window.Backbone.UI.CollectionView = Backbone.View.extend({
     itemViews : {},
@@ -523,7 +530,8 @@
 
       // insert it into the DOM position that matches it's position in the model
       var properIndex = list.indexOf(model);
-      this.collectionEl.insertBefore(el, this.collectionEl.childNodes[properIndex]);
+      var anchorNode = this.collectionEl.childNodes[properIndex];
+      this.collectionEl.insertBefore(el, _(anchorNode).isUndefined() ? null : anchorNode);
 
       // update the first / last class names
       this._updateClassNames();
@@ -566,7 +574,7 @@
       }
     }
   });
-})();
+}());
 
 (function() {
   Backbone.UI.DragSession = function(options) {
@@ -657,11 +665,12 @@
           // Get the allowable bounds to drag w/in
           // if (container) container = $(container);
           // var vp = container ? container.getBounds() : zen.util.Dom.getViewport(del.ownerDocument);
-          var vp = zen.util.Dom.getViewport(del.ownerDocument);
+          //var vp = zen.util.Dom.getViewport(del.ownerDocument);
           var elb = del.getBounds();
 
           //  Create a new drag session
-          var ds = new zen.util.DragSession({
+          var activeElement = document.activeElement;
+          var ds = new Backbone.UI.DragSession({
             dragEvent : e, 
             scope : del.ownerDocument, 
             onStart : function(ds) {
@@ -670,16 +679,15 @@
               $(del).addClass(Backbone.UI.DragSession.BASIC_DRAG_CLASSNAME);
             },
             onMove : function(ds) {
-              elb.moveTo(ds.pos.left + ds.dx, ds.pos.top + ds.dy).constrainTo(vp);
-              del.style.left = $px(elb.x);
-              del.style.top = $px(elb.y);
+              //elb.moveTo(ds.pos.left + ds.dx, ds.pos.top + ds.dy).constrainTo(vp);
+              del.style.left = elb.x + 'px';
+              del.style.top = elb.y + 'px';
             },
             onDone : function(ds) {
               if (activeElement && activeElement.focus) activeElement.focus();
               del.removeClassName(Backbone.UI.DragSession.BASIC_DRAG_CLASSNAME);
             }
           });
-          var activeElement = document.activeElement;
         }
       });
     }
@@ -714,7 +722,7 @@
       this.x = e.pageX;
       this.y = e.pageY;
 
-      if (e.type == 'mousedown') {
+      if (e.type === 'mousedown') {
         // Absolute X of initial mouse down*/
         this.xStart = this.x;
 
@@ -749,7 +757,7 @@
           //this._stop();
           break;
         case 'keyup':
-          if (e.keyCode != Event.KEY_ESC) return;
+          if (e.keyCode !== Backbone.UI.KEYS.KEY_ESC) return;
           this.abort();
           break;
         default:
@@ -774,7 +782,7 @@
       }
     }
   });
-})();
+}());
 
  // A mixin for dealing with glyphs in widgets 
 (function(){
@@ -797,7 +805,7 @@
         if(_(this.options.valueProperty).exists()) {
           var collection = this.options.collection.models || this.options.collection;
           var otherItem = _(collection).detect(function(collectionItem) {
-            return (collectionItem.attributes || collectionItem)[this.options.valueProperty] == item;
+            return (collectionItem.attributes || collectionItem)[this.options.valueProperty] === item;
           }, this);
           if(!_(otherItem).isUndefined()) item = otherItem;
         }
@@ -822,7 +830,7 @@
         item;
     }
   };
-})();
+}());
 
 // A mixin for dealing with glyphs in widgets 
 (function(){
@@ -846,7 +854,8 @@
       $(el).addClass(hasGlyphClassName);
 
       var className = 'glyph ' + name + (isRight ? ' right' : '');
-      if(name.length == 1) {
+      var image;
+      if(name.length === 1) {
         var span = $.el.span({
           className : className,
           style : 'margin: 0 8px 0 0'
@@ -855,7 +864,7 @@
       }
 
       else {
-        var image = new Image();
+        image = new Image();
         $(image).hide();
         image.onload = function() {
           // center the image inside a 28px square
@@ -882,7 +891,7 @@
       return image;
     }
   };
-})();
+}());
 (function(){
   window.Backbone.UI.List = Backbone.UI.CollectionView.extend({
     options : {
@@ -966,7 +975,7 @@
         content = this.resolveContent(null, model, this.options.labelProperty);
       }
 
-      item = $.el.li(content);
+      var item = $.el.li(content);
 
       // bind the item click callback if given
       if(this.options.onItemClick) {
@@ -976,7 +985,7 @@
       return item;
     }
   });
-})();
+}());
 
 (function(){
   window.Backbone.UI.Pulldown = Backbone.View.extend({
@@ -1270,7 +1279,11 @@
 
     //shows/hides the pulldown menu when the button is clicked
     _onPulldownClick : function(e) {
-      $(this._scroller.el).is(':visible') ? this.hideMenu(e) : this.showMenu(e); 
+      if($(this._scroller.el).is(':visible')) {
+        this.hideMenu(e);
+      } else {
+        this.showMenu(e); 
+      }
     },
 
     // notify of the menu hiding
@@ -1279,7 +1292,7 @@
       return true;
     }
   });
-})();
+}());
 (function(){
   window.Backbone.UI.RadioGroup = Backbone.View.extend({
 
@@ -1327,7 +1340,7 @@
       var selectedValue = this._valueForItem(this.selectedItem);
       _.each(this.options.collection, function(item) {
 
-        var selected = selectedValue == this._valueForItem(item);
+        var selected = selectedValue === this._valueForItem(item);
 
         var label = _(item).resolveProperty(this.options.labelProperty);
         
@@ -1356,7 +1369,7 @@
       return false;
     }
   });
-})();
+}());
 (function(){
 
   window.Backbone.UI.Scroller = Backbone.View.extend({
@@ -1471,7 +1484,7 @@
       var totalHeight = this._scrollContent.scrollHeight;
 
       // if either the offset or scroll height has changed
-      if(this._visibleHeight != visibleHeight || this._totalHeight != totalHeight) {
+      if(this._visibleHeight !== visibleHeight || this._totalHeight !== totalHeight) {
         this._disabled = totalHeight <= visibleHeight + 2;
         $(this.el).toggleClass('disabled', this._disabled);
         this._visibleHeight = visibleHeight;
@@ -1507,7 +1520,7 @@
     
     _onTrayClick: function(e) {
       e = e || event;
-      if(e.target == this._tray) {
+      if(e.target === this._tray) {
         var y = (e.layerY || e.y) - this._knob.offsetHeight/2;
         this.setScrollRatio(this._knobRatio(y));
       }
@@ -1575,7 +1588,7 @@
       e.preventDefault();
     }
   });
-})();
+}());
 
 
 
@@ -1670,7 +1683,7 @@
       this._callbacks[index]();
     }
   });
-})();
+}());
 
 (function(){
   window.Backbone.UI.TableView = Backbone.UI.CollectionView.extend({
@@ -1795,7 +1808,7 @@
       return row;
     }
   });
-})();
+}());
 
 (function(){
   window.Backbone.UI.TextArea = Backbone.View.extend({
@@ -1869,7 +1882,11 @@
 
     // sets the enabled state
     setEnabled : function(enabled) {
-      enabled ? $(this.el).removeClass('disabled') : $(this.el).addClass('disabled');
+      if(enabled) {
+        $(this.el).removeClass('disabled');
+      } else {
+        $(this.el).addClass('disabled');
+      }
       this.textArea.disabled = !enabled;
     },
 
@@ -1877,7 +1894,7 @@
       _(this.model).setProperty(this.options.property, this.textArea.value);
     }
   });
-})();
+}());
 (function(){
   window.Backbone.UI.TextField = Backbone.View.extend({
     options : {
@@ -1927,7 +1944,7 @@
       if(!!this.model && this.options.property) {
         this.model.bind('change:' + this.options.property, _.bind(function() {
           var newValue = this.model.get(this.options.property);
-          if(this.input && this.input.value != newValue) this.input.value = this.model.get(this.options.property);
+          if(this.input && this.input.value !== newValue) this.input.value = this.model.get(this.options.property);
         }, this));
       }
     },
@@ -1972,7 +1989,11 @@
 
     // sets the enabled state
     setEnabled : function(enabled) {
-      enabled ? $(this.el).removeClass('disabled') : $(this.el).addClass('disabled');
+      if(enabled) { 
+        $(this.el).removeClass('disabled');
+      } else {
+        $(this.el).addClass('disabled');
+      }
       this.input.disabled = !enabled;
     },
 
@@ -1980,5 +2001,5 @@
       _(this.model).setProperty(this.options.property, this.input.value);
     }
   });
-})();
+}());
 

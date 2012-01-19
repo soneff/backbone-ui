@@ -109,7 +109,11 @@
 
     // sets the enabled state of the button
     setEnabled : function(enabled) {
-      enabled ? this.el.href = '#' : this.el.removeAttribute('href');
+      if(enabled) {
+        this.el.href = '#';
+      } else { 
+        this.el.removeAttribute('href');
+      }
       this.options.disabled = !enabled;
       $(this.el)[enabled ? 'removeClass' : 'addClass']('disabled');
     },
@@ -120,5 +124,5 @@
       $(this.el)[active ? 'addClass' : 'removeClass']('active');
     }
   });
-})();
+}());
 

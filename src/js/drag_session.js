@@ -87,11 +87,12 @@
           // Get the allowable bounds to drag w/in
           // if (container) container = $(container);
           // var vp = container ? container.getBounds() : zen.util.Dom.getViewport(del.ownerDocument);
-          var vp = zen.util.Dom.getViewport(del.ownerDocument);
+          //var vp = zen.util.Dom.getViewport(del.ownerDocument);
           var elb = del.getBounds();
 
           //  Create a new drag session
-          var ds = new zen.util.DragSession({
+          var activeElement = document.activeElement;
+          var ds = new Backbone.UI.DragSession({
             dragEvent : e, 
             scope : del.ownerDocument, 
             onStart : function(ds) {
@@ -100,16 +101,15 @@
               $(del).addClass(Backbone.UI.DragSession.BASIC_DRAG_CLASSNAME);
             },
             onMove : function(ds) {
-              elb.moveTo(ds.pos.left + ds.dx, ds.pos.top + ds.dy).constrainTo(vp);
-              del.style.left = $px(elb.x);
-              del.style.top = $px(elb.y);
+              //elb.moveTo(ds.pos.left + ds.dx, ds.pos.top + ds.dy).constrainTo(vp);
+              del.style.left = elb.x + 'px';
+              del.style.top = elb.y + 'px';
             },
             onDone : function(ds) {
               if (activeElement && activeElement.focus) activeElement.focus();
               del.removeClassName(Backbone.UI.DragSession.BASIC_DRAG_CLASSNAME);
             }
           });
-          var activeElement = document.activeElement;
         }
       });
     }
@@ -144,7 +144,7 @@
       this.x = e.pageX;
       this.y = e.pageY;
 
-      if (e.type == 'mousedown') {
+      if (e.type === 'mousedown') {
         // Absolute X of initial mouse down*/
         this.xStart = this.x;
 
@@ -179,7 +179,7 @@
           //this._stop();
           break;
         case 'keyup':
-          if (e.keyCode != Event.KEY_ESC) return;
+          if (e.keyCode !== Backbone.UI.KEYS.KEY_ESC) return;
           this.abort();
           break;
         default:
@@ -204,5 +204,5 @@
       }
     }
   });
-})();
+}());
 

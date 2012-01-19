@@ -1,7 +1,7 @@
-!function(context) {
+(function(context) {
   // ensure backbone and jquery are available
-  typeof Backbone !== 'undefined' || alert('backbone environment not loaded') ;
-  typeof $ !== 'undefined' || alert('jquery environment not loaded');
+  if(typeof Backbone === 'undefined') alert('backbone environment not loaded') ;
+  if(typeof $ === 'undefined') alert('jquery environment not loaded');
 
   // define our Backbone.UI namespace
   Backbone.UI = Backbone.UI || {
@@ -103,15 +103,78 @@
     }
   });
 
+  var _alignCoords = function(el, anchor, pos, xFudge, yFudge) {
+    el = $(el);
+    anchor = $(anchor);
+    pos = pos || '';
+
+    // Get anchor bounds (document relative)
+    var bOffset = anchor.offset();
+    var bDim = {width : anchor.width(), height : anchor.height()};
+
+    // Get element dimensions
+    var elbOffset = el.offset();
+    var elbDim = {width : el.width(), height : el.height()};
+
+    // Determine align coords (document-relative)
+    var x,y;
+    if (pos.indexOf('-left') >= 0) {
+      x = bOffset.left;
+    } else if (pos.indexOf('left') >= 0) {
+      x = bOffset.left - elbDim.width;
+    } else if (pos.indexOf('-right') >= 0) {
+      x = (bOffset.left + bDim.width) - elbDim.width;
+    } else if (pos.indexOf('right') >= 0) {
+      x = bOffset.left + bDim.width;
+    } else { // Default = centered
+      x = bOffset.left + (bDim.width - elbDim.width)/2;
+    }
+
+    if (pos.indexOf('-top') >= 0) {
+      y = bOffset.top;
+    } else if (pos.indexOf('top') >= 0) {
+      y = bOffset.top - elbDim.height;
+    } else if (pos.indexOf('-bottom') >= 0) {
+      y = (bOffset.top + bDim.height) - elbDim.height;
+    } else if (pos.indexOf('bottom') >= 0) {
+      y = bOffset.top + bDim.height;
+    } else { // Default = centered
+      y = bOffset.top + (bDim.height - elbDim.height)/2;
+    }
+    
+    // Check for constrainment (default true)
+    var constraint = true;
+    if (pos.indexOf('no-constraint') >= 0) constraint = false;
+
+    // Add fudge factors
+    x += xFudge || 0;
+    y += yFudge || 0;
+
+    // Create bounds rect/constrain to viewport
+    //var nb = new zen.util.Rect(x,y,elb.width,elb.height);
+    //if (constraint) nb = nb.constrainTo(zen.util.Dom.getViewport());
+
+    // Convert to offsetParent coordinates
+    //if(el.offsetParent()) {
+      //var ob = $(el.offsetParent).getOffset();
+      //nb.translate(-ob.left, -ob.top);
+    //}
+
+    // Return rect, constrained to viewport
+    return {x : x, y : y};
+  };
+
+
   // Add some utility methods to JQuery
   _($.fn).extend({
     // aligns each element releative to the given anchor
     alignTo : function(anchor, pos, xFudge, yFudge, container) {
       _.each(this, function(el) {
+        var rehide = false;
         // in order for alignTo to work properly the element needs to be visible
         // if it's hidden show it off screen so it can be positioned
-        if(el.style.display == 'none') {
-          var rehide=true;
+        if(el.style.display === 'none') {
+          rehide=true;
           $(el).css({position:'absolute',top:'-10000px', left:'-10000px', display:'block'});
         }
 
@@ -181,7 +244,7 @@
   _($).extend({
     ui : function() {
       var args = arguments;
-      var constructor = Backbone.UI[args[0]];
+      var Constructor = Backbone.UI[args[0]];
 
       // process any formation options or element attributes
       var firstArg = args[1];
@@ -192,8 +255,9 @@
         attributes = firstArg;
       }
       args = Array.prototype.slice.call(arguments, startingIndex);
-      if(!!constructor && _(constructor).isFunction()) {
-        widget = new constructor(attributes || {});
+      var widget;
+      if(!!Constructor && _(Constructor).isFunction()) {
+        widget = new Constructor(attributes || {});
         _(args).each(function(child) {
           widget.el.appendChild(child);
         });
@@ -203,69 +267,8 @@
     }
   });
 
-  var _alignCoords = function(el, anchor, pos, xFudge, yFudge) {
-    el = $(el);
-    anchor = $(anchor);
-    pos = pos || '';
-
-    // Get anchor bounds (document relative)
-    var bOffset = anchor.offset();
-    var bDim = {width : anchor.width(), height : anchor.height()};
-
-    // Get element dimensions
-    var elbOffset = el.offset();
-    var elbDim = {width : el.width(), height : el.height()};
-
-    // Determine align coords (document-relative)
-    var x,y;
-    if (pos.indexOf('-left') >= 0) {
-      x = bOffset.left;
-    } else if (pos.indexOf('left') >= 0) {
-      x = bOffset.left - elbDim.width;
-    } else if (pos.indexOf('-right') >= 0) {
-      x = (bOffset.left + b.width) - elbDim.width;
-    } else if (pos.indexOf('right') >= 0) {
-      x = bOffset.left + bDim.width;
-    } else { // Default = centered
-      x = bOffset.left + (bDim.width - elbDim.width)/2;
-    }
-
-    if (pos.indexOf('-top') >= 0) {
-      y = bOffset.top;
-    } else if (pos.indexOf('top') >= 0) {
-      y = bOffset.top - elbDim.height;
-    } else if (pos.indexOf('-bottom') >= 0) {
-      y = (bOffset.top + bDim.height) - elbDim.height;
-    } else if (pos.indexOf('bottom') >= 0) {
-      y = bOffset.top + bDim.height;
-    } else { // Default = centered
-      y = bOffset.top + (bDim.height - elbDim.height)/2;
-    }
-    
-    // Check for constrainment (default true)
-    var constraint = true;
-    if (pos.indexOf('no-constraint') >= 0) constraint = false;
-
-    // Add fudge factors
-    x += xFudge || 0;
-    y += yFudge || 0;
-
-    // Create bounds rect/constrain to viewport
-    //var nb = new zen.util.Rect(x,y,elb.width,elb.height);
-    //if (constraint) nb = nb.constrainTo(zen.util.Dom.getViewport());
-
-    // Convert to offsetParent coordinates
-    //if(el.offsetParent()) {
-      //var ob = $(el.offsetParent).getOffset();
-      //nb.translate(-ob.left, -ob.top);
-    //}
-
-    // Return rect, constrained to viewport
-    return {x : x, y : y};
-  };
-
   $(document).ready(function() {
     $(document.body).addClass('skin_' + Backbone.UI.currentSkin);
   });
 
-}(this);
+}(this));

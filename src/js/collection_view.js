@@ -33,7 +33,8 @@
 
       // insert it into the DOM position that matches it's position in the model
       var properIndex = list.indexOf(model);
-      this.collectionEl.insertBefore(el, this.collectionEl.childNodes[properIndex]);
+      var anchorNode = this.collectionEl.childNodes[properIndex];
+      this.collectionEl.insertBefore(el, _(anchorNode).isUndefined() ? null : anchorNode);
 
       // update the first / last class names
       this._updateClassNames();
@@ -76,5 +77,5 @@
       }
     }
   });
-})();
+}());
 

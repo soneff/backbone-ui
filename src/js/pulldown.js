@@ -290,7 +290,11 @@
 
     //shows/hides the pulldown menu when the button is clicked
     _onPulldownClick : function(e) {
-      $(this._scroller.el).is(':visible') ? this.hideMenu(e) : this.showMenu(e); 
+      if($(this._scroller.el).is(':visible')) {
+        this.hideMenu(e);
+      } else {
+        this.showMenu(e); 
+      }
     },
 
     // notify of the menu hiding
@@ -299,4 +303,4 @@
       return true;
     }
   });
-})();
+}());

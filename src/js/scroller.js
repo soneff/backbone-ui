@@ -112,7 +112,7 @@
       var totalHeight = this._scrollContent.scrollHeight;
 
       // if either the offset or scroll height has changed
-      if(this._visibleHeight != visibleHeight || this._totalHeight != totalHeight) {
+      if(this._visibleHeight !== visibleHeight || this._totalHeight !== totalHeight) {
         this._disabled = totalHeight <= visibleHeight + 2;
         $(this.el).toggleClass('disabled', this._disabled);
         this._visibleHeight = visibleHeight;
@@ -148,7 +148,7 @@
     
     _onTrayClick: function(e) {
       e = e || event;
-      if(e.target == this._tray) {
+      if(e.target === this._tray) {
         var y = (e.layerY || e.y) - this._knob.offsetHeight/2;
         this.setScrollRatio(this._knobRatio(y));
       }
@@ -216,7 +216,7 @@
       e.preventDefault();
     }
   });
-})();
+}());
 
 
 

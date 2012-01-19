@@ -19,7 +19,7 @@
         if(_(this.options.valueProperty).exists()) {
           var collection = this.options.collection.models || this.options.collection;
           var otherItem = _(collection).detect(function(collectionItem) {
-            return (collectionItem.attributes || collectionItem)[this.options.valueProperty] == item;
+            return (collectionItem.attributes || collectionItem)[this.options.valueProperty] === item;
           }, this);
           if(!_(otherItem).isUndefined()) item = otherItem;
         }
@@ -44,5 +44,5 @@
         item;
     }
   };
-})();
+}());
 

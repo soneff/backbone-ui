@@ -77,7 +77,7 @@
         this.options.onClick();
       }
       if (!this.options.enabled) {
-        return;
+        return false;
       }
       this.checked = !this.checked;
       if(_(this.model).exists() && _(this.options.property).exists()) {
@@ -92,4 +92,4 @@
       return false;
     }
   });
-})();
+}());

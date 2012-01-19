@@ -20,7 +20,8 @@
       $(el).addClass(hasGlyphClassName);
 
       var className = 'glyph ' + name + (isRight ? ' right' : '');
-      if(name.length == 1) {
+      var image;
+      if(name.length === 1) {
         var span = $.el.span({
           className : className,
           style : 'margin: 0 8px 0 0'
@@ -29,7 +30,7 @@
       }
 
       else {
-        var image = new Image();
+        image = new Image();
         $(image).hide();
         image.onload = function() {
           // center the image inside a 28px square
@@ -56,4 +57,4 @@
       return image;
     }
   };
-})();
+}());

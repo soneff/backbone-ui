@@ -81,7 +81,7 @@
         content = this.resolveContent(null, model, this.options.labelProperty);
       }
 
-      item = $.el.li(content);
+      var item = $.el.li(content);
 
       // bind the item click callback if given
       if(this.options.onItemClick) {
@@ -91,5 +91,5 @@
       return item;
     }
   });
-})();
+}());
 
