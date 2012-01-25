@@ -74,8 +74,17 @@
   border-radius: 4px;
 }
 
+.pulldown_menu li a:hover span,
+.pulldown_menu li a:link span,
+.pulldown_menu li a:active span,
+.pulldown_menu li a:visited span{
+  text-decoration:none;
+  color:#222;
+}
+
 .pulldown_menu li a:hover {
   background-color:#ddd;
+  text-decoration:none;
 }
 
 .pulldown_menu li a.has_glyph {
@@ -92,5 +101,6 @@
 .pulldown .button:hover,
 .pulldown .button:visited {
   color:#333;
+  text-decoration:none;
 }
 
