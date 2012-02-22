@@ -24,6 +24,7 @@
     var args = Array.prototype.slice.call(arguments, 1);
     for(var i=0; i<args.length; i++) {
       var arg = args[i];
+      if(arg === null || arg === undefined) continue;
 
       // if the argument is a dom node, we simply append it
       if(arg.nodeType === 1) {
@@ -55,10 +56,13 @@
         for(var key in arg) {
           var value = arg[key];
           if(value !== null && value !== undefined) {
-            // IE classname nonsense
-            if(key.toLowerCase() === 'classname') {
+            // If we're setting a dom event, or the not-so-ie-supported classname
+            // attribuet, we add the value as a direct property of the element
+            if(key.substring(0, 2).toLowerCase() === 'on' || key.toLowerCase() === 'classname') {
               el[key] = value;
             }
+
+            // otherwise, we set the value as an attribute
             else {
               el.setAttribute(key, value);
             }
@@ -132,3 +136,5 @@
   }
   
 }(this);
+
+

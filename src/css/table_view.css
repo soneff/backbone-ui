@@ -1,13 +1,13 @@
 .table_view table.heading {
   border-width:1px;
+  border-style:solid;
+  border-color:#444;
 }
 
 .table_view table {
   text-align:left;
   width:100%;
   border-collapse:collapse;
-  border-style:solid;
-  border-color:#444;
 }
 
 .table_view table th {
@@ -34,8 +34,7 @@
 }
 
 .table_view .wrapper {
-  border-style:solid;
-  border-color:#444;
+  border:none;
   padding:5px;
 }
 
