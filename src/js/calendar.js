@@ -10,8 +10,8 @@
     return ((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0);
   };
 
-  var daysInMonth = function(year, month) {
-    return [31, (isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
+  var daysInMonth = function(date) {
+    return [31, (isLeapYear(date.getYear()) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][date.getMonth()];
   };
 
   window.Backbone.UI.Calendar = Backbone.View.extend({
@@ -42,6 +42,11 @@
       var lastMonth = new Date(date);
       lastMonth.setMonth(date.getMonth() - 1);
 
+      var daysInPreviousMonth = daysInMonth(lastMonth);
+      var daysInThisMonth = daysInMonth(date);
+      var monthStart = (new Date(date.getFullYear(), date.getMonth(), 1).getDay());
+      var weekOffset = this.options.weekStart - (monthStart < this.options.weekStart? 7 : 0);
+
       var daysRow = $.el.tr({className : 'row days'}); 
 
       var names = dayNames.slice(this.options.weekStart).concat(dayNames.slice(0, this.options.weekStart));
@@ -60,16 +65,21 @@
         tbody = $.el.tbody(
           daysRow));
 
-      for(var y=0; y-5; y++) {
+      var inactive = monthStart === 0, day = 0;
+      for(var y=0; y<6 ; y++) {
 
         var row = $.el.tr({
           className : 'row' + (y === 0 ? ' first' : y === 4 ? ' last' : '')
         });
 
         for(var x=0; x<7; x++) {
+          inactive = y === 0 && x < monthStart - 1 || day >= daysInThisMonth;
+          if(!inactive) day++;
+
+          //var isNextMonth = y
           $.el.td({
-            className : 'cell'
-          }).appendTo(row);
+            className : 'cell' + (inactive ? ' inactive' : '')
+          }, inactive ? '' : day).appendTo(row);
         }
 
         row.appendTo(tbody);

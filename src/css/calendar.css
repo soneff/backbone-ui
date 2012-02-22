@@ -3,3 +3,7 @@
   height:20px;
   border:1px solid red;
 }
+
+.calendar .cell.inactive {
+  background-color:#888;
+}
