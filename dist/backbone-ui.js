@@ -38,10 +38,12 @@
   _(Backbone.View.prototype).extend({
     // resolves the appropriate content from the given choices
     resolveContent : function(content, model, property) {
-      return _(property).exists() && _(model).exists() ? 
+      return _(property).exists() && _(model).exists() && _(model[property]).isFunction() ?
+      model[property]() :
+      _(property).exists() && _(model).exists() ?
         _(model).resolveProperty(property) :
-        _(content).exists() && _(content).isFunction() ? 
-        content(model) : 
+        _(content).exists() && _(content).isFunction() ?
+        content(model) :
         content;
     }
   });
@@ -1872,6 +1874,10 @@
       }, this));
 
       return this;
+    },
+
+    getValue : function() {
+      return this.textArea.value;
     },
 
     setValue : function(value) {

@@ -62,6 +62,10 @@
       return this;
     },
 
+    getValue : function() {
+      return this.textArea.value;
+    },
+
     setValue : function(value) {
       $(this.textArea).empty();
       this.textArea.value = value;
