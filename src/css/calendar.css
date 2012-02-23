@@ -1,14 +1,49 @@
+.calendar {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.calendar table {
+  border-collapse:collapse;
+}
+
+.calendar a {
+  display:block;
+  text-decoration:none;
+  color:#222;
+}
+
 .calendar td,
 .calendar th {
   text-align:center;
+  padding:0;
+  margin:0;
 }
 
 .calendar .cell {
   width:20px;
   height:20px;
-  border:1px solid red;
+  border:1px solid #444;
 }
 
 .calendar .cell.inactive {
-  background-color:#888;
+  background-color:#bbb;
+  color:#999;
+}
+
+.calendar .cell.selected, 
+.calendar .cell.selected a:hover {
+  background-color:red;
+}
+
+.calendar .cell.today {
+  font-weight:bold;
+}
+
+.calendar .cell a:hover {
+  background-color:#eee;
+}
+
+.calendar .cell .day {
+  padding:6px;
 }

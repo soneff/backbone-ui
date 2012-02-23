@@ -15,13 +15,20 @@
     return monthNames[date.getMonth()] + ' ' + date.getFullYear();
   };
 
+  var isSameMonth = function(date1, date2) {
+    return date1.getFullYear() === date2.getFullYear() && 
+      date1.getMonth() === date2.getMonth();
+  };
+
   window.Backbone.UI.Calendar = Backbone.View.extend({
     options : {
       // the selected calendar date
-      date : new Date(),
+      selectedDate : null, 
 
       // the day that weeks start on (0 is Sunday)
-      weekStart : 0
+      weekStart : 0,
+
+      onSelect : null
     },
 
     initialize : function() {
@@ -29,9 +36,17 @@
     },
 
     render : function() {
-      this._renderDate(new Date());
+      this._renderDate(!!this.options.selectedDate ? this.options.selectedDate : new Date());
 
       return this;
+    },
+
+    _selectDate : function(date) {
+      this.options.selectedDate = date;
+      this.render();
+      if(_(this.options.onSelect).isFunction()) {
+        this.options.onSelect(date);
+      }
     },
 
     _renderDate : function(date) {
@@ -42,6 +57,9 @@
       var monthStartDay = (new Date(date.getFullYear(), date.getMonth(), 1).getDay());
       var inactiveBeforeDays = monthStartDay - this.options.weekStart - 1;
       var daysInThisMonth = daysInMonth(date);
+      var today = new Date();
+      var inCurrentMonth = isSameMonth(today, date);
+      var inSelectedMonth = !!this.options.selectedDate && isSameMonth(this.options.selectedDate, date);
 
       var daysRow = $.el.tr({className : 'row days'}); 
       var names = dayNames.slice(this.options.weekStart).concat(
@@ -72,10 +90,18 @@
           var inactive = daysRendered <= inactiveBeforeDays || 
             daysRendered > inactiveBeforeDays + daysInThisMonth;
 
-          $.el.td({
-            className : 'cell' + (inactive ? ' inactive' : '') + 
-              (colIndex === 0 ? ' first' : colIndex === 6 ? ' last' : '')
-          }, day).appendTo(row);
+          var callback = _(this._selectDate).bind(
+            this, new Date(date.getFullYear(), date.getMonth(), day));
+
+          var className = 'cell' + (inactive ? ' inactive' : '') + 
+            (colIndex === 0 ? ' first' : colIndex === 6 ? ' last' : '') +
+            (inCurrentMonth && !inactive && day === today.getDate() ? ' today' : '') +
+            (inSelectedMonth && !inactive && day == this.options.selectedDate.getDate() ? ' selected' : '');
+
+          $.el.td({ className : className }, 
+            inactive ? 
+              $.el.div({ className : 'day' }, day) : 
+              $.el.a({ className : 'day', onClick : callback }, day)).appendTo(row);
 
           day = (rowIndex === 0 && colIndex == inactiveBeforeDays) || 
             (rowIndex > 0 && day == daysInThisMonth) ? 1 : day + 1;
