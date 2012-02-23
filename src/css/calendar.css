@@ -1,3 +1,8 @@
+.calendar td,
+.calendar th {
+  text-align:center;
+}
+
 .calendar .cell {
   width:20px;
   height:20px;
