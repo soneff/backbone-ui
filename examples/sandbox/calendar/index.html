@@ -27,6 +27,7 @@
     <script src="../../../src/js/text_area.js"></script>
     <script src="../../../src/js/text_field.js"></script>
     <script src="../../../src/js/calendar.js"></script>
+    <script src="../../../src/js/date_picker.js"></script>
 
     <link rel="stylesheet" href="../../../src/css/button.css"> 
     <link rel="stylesheet" href="../../../src/css/checkbox.css"> 
@@ -43,7 +44,7 @@
     <script>
 
       window.onload = function() {
-        var c = new Backbone.UI.Calendar().render();
+        var c = new Backbone.UI.DatePicker().render();
 
         document.body.appendChild(c.el);
       };

@@ -31,10 +31,6 @@
   color:#999;
 }
 
-.calendar .cell.selected, 
-.calendar .cell.selected a:hover {
-  background-color:red;
-}
 
 .calendar .cell.today {
   font-weight:bold;
@@ -42,6 +38,12 @@
 
 .calendar .cell a:hover {
   background-color:#eee;
+}
+
+.calendar .cell.selected, 
+.calendar .cell a:active,
+.calendar .cell.selected a:hover {
+  background-color:red;
 }
 
 .calendar .cell .day {
