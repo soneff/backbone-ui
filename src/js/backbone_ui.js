@@ -211,7 +211,10 @@
 
         if (!el._autohider) {
           el._autohider = _.bind(function(e) {
+
             var target = e.target;
+            if(!$(el).is(':visible')) return;
+
             if (options.ignoreInputs && (/input|textarea|select|option/i).test(target.nodeName)) return;
             //if (el._autoignore || (options.leaveOpen && Element.partOf(e.target, el)))
             if(el._autoignore) return;
@@ -220,11 +223,12 @@
             
             // allows you to provide an array of elements that should not trigger autohiding.
             // This is useful for doing thigns like a flyout menu from a pulldown
-            //if(options.leaveOpenTargets && options.leaveOpenTargets.detect(function(t) {
-              //return Element.partOf(e.element(), $(t));
-            //})) {
-              //return;
-            //}
+            if(options.leaveOpenTargets) {
+              var ancestor = _(options.leaveOpenTargets).find(function(t) {
+                return e.target == t || $(e.target).closest($(t)).length > 0;
+              });
+              if(!!ancestor) return;
+            }
             
             var proceed = (options.hideCallback) ? options.hideCallback(el) : true;
             if (!proceed) return;

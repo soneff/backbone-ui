@@ -17,6 +17,7 @@
 
     initialize : function() {
       Backbone.UI.DragSession.enableBasicDragSupport();
+      setInterval(_(this.update).bind(this), 40);
     },
 
     render : function () {
@@ -59,7 +60,6 @@
       // update our scroll bar on an interval to handle 
       // resizing and content changes
       $(this.el).addClass('disabled');
-      setInterval(_(this.update).bind(this), 40);
 
       return this;
     },
@@ -97,8 +97,10 @@
     },
 
     setScrollPosition: function(top) {
+      this.update();
       var h = this._totalHeight - this._visibleHeight;
       this.setScrollRatio(h ? top/h : 0);
+      this.update();
     },
 
     // Scrolls to the end of the content
@@ -125,6 +127,8 @@
           this.maxY = $(this._tray).height() - $(this._knob).height();
         }
       }
+      this._updateKnobPosition();
+      this._updateKnobSize();
     },
 
     // Set the position of the knob to reflect the current scroll position

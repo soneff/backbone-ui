@@ -1,0 +1,8 @@
+.date_picker .text_field {
+  width:100px;
+}
+
+.date_picker .calendar {
+  position:absolute;
+  z-index:1000;
+}

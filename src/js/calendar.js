@@ -47,9 +47,11 @@
       if(_(this.options.onSelect).isFunction()) {
         this.options.onSelect(date);
       }
+      return false;
     },
 
-    _renderDate : function(date) {
+    _renderDate : function(date, e) {
+      if(e) e.stopPropagation();
       $(this.el).empty();
 
       var nextMonth = new Date(date.getFullYear(), date.getMonth() + 1);
@@ -71,11 +73,11 @@
       var tbody, table = $.el.table(
         $.el.thead(
           $.el.th(
-            $.el.a({onclick : _(this._renderDate).bind(this, lastMonth)}, '\u2039')),
-          $.el.th({colspan : 5},
+            $.el.a({className : 'go_back', onclick : _(this._renderDate).bind(this, lastMonth)}, '\u2039')),
+          $.el.th({className : 'title', colspan : 5},
             $.el.div(formatDateHeading(date))),
           $.el.th(
-            $.el.a({onclick : _(this._renderDate).bind(this, nextMonth)}, '\u203a'))),
+            $.el.a({className : 'go_forward', onclick : _(this._renderDate).bind(this, nextMonth)}, '\u203a'))),
         tbody = $.el.tbody(daysRow));
 
       var day = inactiveBeforeDays >= 0 ? daysInMonth(lastMonth) - inactiveBeforeDays : 1;
@@ -113,6 +115,8 @@
       }
 
       this.el.appendChild(table);
+
+      return false;
     }
   });
 }());

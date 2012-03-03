@@ -5,7 +5,6 @@
     <title>Backbone UI</title>
 
     <script src="../../test/vendor/jquery-1.6.1.js"></script>
-    <script src="../../test/vendor/laconic.js"></script>
     <script src="../../test/vendor/formation.js"></script>
     <script src="../../test/vendor/json2.js"></script>
     <script src="../../test/vendor/underscore-1.1.7.js"></script>
@@ -13,6 +12,8 @@
     <script src="../../test/vendor/jquery-mousewheel-3.0.4.js"></script>
     <script src="../../test/vendor/prettify.js"></script>
     <script src="../../test/vendor/jsbeautify.js"></script>
+    <script src="../../test/vendor/moment-1.4.0.js"></script>
+    <script src="../../../laconic/src/laconic.js"></script>
 
     <script src="../../src/js/backbone_ui.js"></script>
     <script src="../../src/js/button.js"></script>
@@ -22,6 +23,7 @@
     <script src="../../src/js/has_collection_property.js"></script>
     <script src="../../src/js/has_glyph.js"></script>
     <script src="../../src/js/list.js"></script>
+    <script src="../../src/js/menu.js"></script>
     <script src="../../src/js/pulldown.js"></script>
     <script src="../../src/js/radio_group.js"></script>
     <script src="../../src/js/scroller.js"></script>
@@ -29,6 +31,8 @@
     <script src="../../src/js/table_view.js"></script>
     <script src="../../src/js/text_area.js"></script>
     <script src="../../src/js/text_field.js"></script>
+    <script src="../../src/js/calendar.js"></script>
+    <script src="../../src/js/date_picker.js"></script>
 
     <link rel="stylesheet" href="../../test/vendor/prettify.css"> 
     <link rel="stylesheet" href="../../src/css/button.css"> 
@@ -41,7 +45,9 @@
     <link rel="stylesheet" href="../../src/css/table_view.css"> 
     <link rel="stylesheet" href="../../src/css/text_area.css"> 
     <link rel="stylesheet" href="../../src/css/text_field.css"> 
-    <link rel="stylesheet" href="../../src/css/skins/perka.css">
+    <link rel="stylesheet" href="../../src/css/menu.css"> 
+    <link rel="stylesheet" href="../../src/css/calendar.css"> 
+    <link rel="stylesheet" href="../../src/css/date_picker.css"> 
 
     <style>
       html {
@@ -66,7 +72,7 @@
       }
 
       body > dl dd {
-        margin:-20px 0 0 180px;  
+        margin:0 0 0 180px;  
         padding:0 0 40px 0;
       }
 
@@ -135,7 +141,25 @@
         addExample('Button', function() {
           return new Backbone.UI.Button({
             label : 'Press Me',
-            isSubmit : true
+            isSubmit : true,
+            onClick : _(alert).bind(window, 'pressed')
+          }).render();
+        });
+
+        // Menu 
+        addExample('Menu', function() {
+          return new Backbone.UI.Menu({
+            emptyModel : {label : 'lack of selection'},
+            collection : [
+              {label : 'option one', value : 1},
+              {label : 'option two', value : 2},
+              {label : 'option three', value : 3},
+              {label : 'option four', value : 4},
+              {label : 'option five', value : 5},
+              {label : 'option six', value : 6},
+              {label : 'option seven', value : 7},
+              {label : 'option eight', value : 8}
+            ]
           }).render();
         });
 
@@ -153,6 +177,21 @@
               {label : 'option seven', value : 7},
               {label : 'option eight', value : 8}
             ]
+          }).render();
+        });
+
+        // Calendar
+        addExample('Calendar', function() {
+          return new Backbone.UI.Calendar({
+            onSelect : function(d) {
+              alert(d);
+            }
+          }).render();
+        });
+
+        // Date Picker
+        addExample('Date Picker', function() {
+          return new Backbone.UI.DatePicker({
           }).render();
         });
 
