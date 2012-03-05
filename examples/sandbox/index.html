@@ -33,6 +33,7 @@
     <script src="../../src/js/text_field.js"></script>
     <script src="../../src/js/calendar.js"></script>
     <script src="../../src/js/date_picker.js"></script>
+    <script src="../../src/js/time_picker.js"></script>
 
     <link rel="stylesheet" href="../../test/vendor/prettify.css"> 
     <link rel="stylesheet" href="../../src/css/button.css"> 
@@ -48,6 +49,7 @@
     <link rel="stylesheet" href="../../src/css/menu.css"> 
     <link rel="stylesheet" href="../../src/css/calendar.css"> 
     <link rel="stylesheet" href="../../src/css/date_picker.css"> 
+    <link rel="stylesheet" href="../../src/css/time_picker.css"> 
 
     <style>
       html {
@@ -192,6 +194,12 @@
         // Date Picker
         addExample('Date Picker', function() {
           return new Backbone.UI.DatePicker({
+          }).render();
+        });
+
+        // Time Picker
+        addExample('Time Picker', function() {
+          return new Backbone.UI.TimePicker({
           }).render();
         });
 

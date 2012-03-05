@@ -4,6 +4,7 @@
     options : {
       // The collection item property describing the label.
       labelProperty : 'label',
+
       onChange : null
     },
 
@@ -60,7 +61,6 @@
       if(!this._selectedAnchor) return;
 
       var pos = $(this._selectedAnchor.parentNode).position().top - 10;
-      console.log(pos);
       this.scroller.setScrollPosition(pos);
     },
 
