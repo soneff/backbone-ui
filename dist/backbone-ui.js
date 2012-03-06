@@ -211,7 +211,10 @@
 
         if (!el._autohider) {
           el._autohider = _.bind(function(e) {
+
             var target = e.target;
+            if(!$(el).is(':visible')) return;
+
             if (options.ignoreInputs && (/input|textarea|select|option/i).test(target.nodeName)) return;
             //if (el._autoignore || (options.leaveOpen && Element.partOf(e.target, el)))
             if(el._autoignore) return;
@@ -220,11 +223,12 @@
             
             // allows you to provide an array of elements that should not trigger autohiding.
             // This is useful for doing thigns like a flyout menu from a pulldown
-            //if(options.leaveOpenTargets && options.leaveOpenTargets.detect(function(t) {
-              //return Element.partOf(e.element(), $(t));
-            //})) {
-              //return;
-            //}
+            if(options.leaveOpenTargets) {
+              var ancestor = _(options.leaveOpenTargets).find(function(t) {
+                return e.target == t || $(e.target).closest($(t)).length > 0;
+              });
+              if(!!ancestor) return;
+            }
             
             var proceed = (options.hideCallback) ? options.hideCallback(el) : true;
             if (!proceed) return;
@@ -402,6 +406,128 @@
   });
 }());
 
+(function() {
+
+  var monthNames = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+  var dayNames   = ['s', 'm', 't', 'w', 't', 'f', 's'];
+
+  var isLeapYear = function(year) {
+    return ((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0);
+  };
+
+  var daysInMonth = function(date) {
+    return [31, (isLeapYear(date.getYear()) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][date.getMonth()];
+  };
+
+  var formatDateHeading = function(date) {
+    return monthNames[date.getMonth()] + ' ' + date.getFullYear();
+  };
+
+  var isSameMonth = function(date1, date2) {
+    return date1.getFullYear() === date2.getFullYear() && 
+      date1.getMonth() === date2.getMonth();
+  };
+
+  window.Backbone.UI.Calendar = Backbone.View.extend({
+    options : {
+      // the selected calendar date
+      selectedDate : null, 
+
+      // the day that weeks start on (0 is Sunday)
+      weekStart : 0,
+
+      onSelect : null
+    },
+
+    initialize : function() {
+      $(this.el).addClass('calendar');
+    },
+
+    render : function() {
+      this._renderDate(!!this.options.selectedDate ? this.options.selectedDate : new Date());
+
+      return this;
+    },
+
+    _selectDate : function(date) {
+      this.options.selectedDate = date;
+      this.render();
+      if(_(this.options.onSelect).isFunction()) {
+        this.options.onSelect(date);
+      }
+      return false;
+    },
+
+    _renderDate : function(date, e) {
+      if(e) e.stopPropagation();
+      $(this.el).empty();
+
+      var nextMonth = new Date(date.getFullYear(), date.getMonth() + 1);
+      var lastMonth = new Date(date.getFullYear(), date.getMonth() - 1);
+      var monthStartDay = (new Date(date.getFullYear(), date.getMonth(), 1).getDay());
+      var inactiveBeforeDays = monthStartDay - this.options.weekStart - 1;
+      var daysInThisMonth = daysInMonth(date);
+      var today = new Date();
+      var inCurrentMonth = isSameMonth(today, date);
+      var inSelectedMonth = !!this.options.selectedDate && isSameMonth(this.options.selectedDate, date);
+
+      var daysRow = $.el.tr({className : 'row days'}); 
+      var names = dayNames.slice(this.options.weekStart).concat(
+        dayNames.slice(0, this.options.weekStart));
+      for(var i=0; i<names.length; i++) {
+        $.el.td(names[i]).appendTo(daysRow);
+      }
+
+      var tbody, table = $.el.table(
+        $.el.thead(
+          $.el.th(
+            $.el.a({className : 'go_back', onclick : _(this._renderDate).bind(this, lastMonth)}, '\u2039')),
+          $.el.th({className : 'title', colspan : 5},
+            $.el.div(formatDateHeading(date))),
+          $.el.th(
+            $.el.a({className : 'go_forward', onclick : _(this._renderDate).bind(this, nextMonth)}, '\u203a'))),
+        tbody = $.el.tbody(daysRow));
+
+      var day = inactiveBeforeDays >= 0 ? daysInMonth(lastMonth) - inactiveBeforeDays : 1;
+      var daysRendered = 0;
+      for(var rowIndex=0; rowIndex<6 ; rowIndex++) {
+
+        var row = $.el.tr({
+          className : 'row' + (rowIndex === 0 ? ' first' : rowIndex === 4 ? ' last' : '')
+        });
+
+        for(var colIndex=0; colIndex<7; colIndex++) {
+          var inactive = daysRendered <= inactiveBeforeDays || 
+            daysRendered > inactiveBeforeDays + daysInThisMonth;
+
+          var callback = _(this._selectDate).bind(
+            this, new Date(date.getFullYear(), date.getMonth(), day));
+
+          var className = 'cell' + (inactive ? ' inactive' : '') + 
+            (colIndex === 0 ? ' first' : colIndex === 6 ? ' last' : '') +
+            (inCurrentMonth && !inactive && day === today.getDate() ? ' today' : '') +
+            (inSelectedMonth && !inactive && day == this.options.selectedDate.getDate() ? ' selected' : '');
+
+          $.el.td({ className : className }, 
+            inactive ? 
+              $.el.div({ className : 'day' }, day) : 
+              $.el.a({ className : 'day', onClick : callback }, day)).appendTo(row);
+
+          day = (rowIndex === 0 && colIndex == inactiveBeforeDays) || 
+            (rowIndex > 0 && day == daysInThisMonth) ? 1 : day + 1;
+
+          daysRendered++;
+        }
+
+        row.appendTo(tbody);
+      }
+
+      this.el.appendChild(table);
+
+      return false;
+    }
+  });
+}());
 (function(){
   window.Backbone.UI.Checkbox = Backbone.View.extend({
 
@@ -578,6 +704,101 @@
   });
 }());
 
+(function(){
+  window.Backbone.UI.DatePicker = Backbone.View.extend({
+
+    options : {
+      // a moment.js format : http://momentjs.com/docs/#/display/format
+      format : 'MM/DD/YYYY',
+      model : null,
+      property : null,
+      name : null
+    },
+
+    initialize : function() {
+      $(this.el).addClass('date_picker');
+
+      this._textField = new Backbone.UI.TextField({
+        name : this.options.name
+      }).render();
+
+      this._calendar = new Backbone.UI.Calendar({
+        onSelect : _(this._selectDate).bind(this)
+      });
+      $(this._calendar.el).hide();
+      document.body.appendChild(this._calendar.el);
+
+      $(this._textField.input).click(_(this._showCalendar).bind(this));
+      $(this._textField.input).keyup(_(this._dateEdited).bind(this));
+
+      $(this._calendar.el).autohide({
+        ignoreInputs : true,
+        leaveOpenTargets : [this._calendar.el]
+      });
+
+      // listen for model changes
+      if(!!this.model && this.options.property) {
+        this.model.bind('change:' + this.options.property, _(this.render).bind(this));
+      }
+    },
+
+    render : function() {
+      $(this.el).empty();
+
+      var date = (!!this.model && !!this.options.property) ? 
+        _(this.model).resolveProperty(this.options.property) : new Date();
+      this._calendar.options.selectedDate = date;
+      this._calendar.render();
+
+      this.el.appendChild(this._textField.el);
+      
+      return this;
+    },
+
+    _showCalendar : function() {
+      $(this._calendar.el).show();
+      $(this._calendar.el).alignTo(this._textField.el, 'bottom -left', 0, 2);
+    },
+
+    _hideCalendar : function() {
+      $(this._calendar.el).hide();
+    },
+
+    _selectDate : function(date) {
+      var month = date.getMonth() + 1;
+      if(month < 10) month = '0' + month;
+
+      var day = date.getDate();
+      if(day < 10) day = '0' + day;
+
+      var dateString = moment(date).format(this.options.format);
+      this._textField.setValue(dateString);
+      this._dateEdited();
+      this._hideCalendar();
+      return false;
+    },
+
+    _dateEdited : function(e) {
+      var newDate = moment(this._textField.getValue(), this.options.format);
+
+      // if the enter key was pressed or we've invoked this method manually, 
+      // we hide the calendar and re-format our date
+      if(!e || e.keyCode == Backbone.UI.KEYS.KEY_RETURN) {
+        console.log(newDate);
+        this._textField.setValue(moment(newDate).format(this.options.format));
+        this._hideCalendar();
+
+        // update our bound model (but only the date portion)
+        if(!!this.model && this.options.property) {
+          var boundDate = _(this.model).resolveProperty(this.options.property);
+          boundDate.setMonth(newDate.getMonth());
+          boundDate.setDate(newDate.getDate());
+          boundDate.setFullYear(newDate.getFullYear());
+        }
+      }
+    }
+  });
+}());
 (function() {
   Backbone.UI.DragSession = function(options) {
     this.options = _.extend({
@@ -990,6 +1211,111 @@
 }());
 
 (function(){
+  window.Backbone.UI.Menu = Backbone.View.extend({
+
+    options : {
+      // The collection item property describing the label.
+      labelProperty : 'label',
+
+      onChange : null
+    },
+
+    initialize : function() {
+      $(this.el).addClass('menu');
+      _(this).extend(Backbone.UI.HasCollectionProperty);
+
+      this._textField = new Backbone.UI.TextField({
+      }).render();
+    },
+
+    scroller : null,
+
+    render : function() {
+      $(this.el).empty();
+
+      // clear the existing menu
+      if(this.scroller) {
+        this.scroller.el.parentNode.removeChild(this.scroller.el);
+        $(this.scroller.el).css({width : 'auto'});
+      }
+      
+      // create a new list of items
+      var list = $.el.ul();
+
+      // add entry for the empty model if it exists
+      if(!!this.options.emptyModel) {
+        this._addItemToMenu(list, this.options.emptyModel);
+      }
+
+      var collection = _(this.options.collection).exists() ?
+        this.options.collection.models || this.options.collection : [];
+
+      _(collection).each(function(item) {
+        this._addItemToMenu(list, item);
+      }, this);
+
+      // wrap them up in a scroller 
+      this.scroller = new Backbone.UI.Scroller({
+        content : list
+      }).render();
+
+      // Prevent scroll events from percolating out to the enclosing doc
+      $(this.scroller.el).bind('mousewheel', function(){return false;});
+      $(this.scroller.el).addClass('menu_scroller');
+
+      this.el.appendChild(this.scroller.el);
+      this._menuWidth = $(this.scroller.el).width() + 20;
+      
+      return this;
+    },
+
+    scrollToSelectedItem : function() {
+      if(!this._selectedAnchor) return;
+
+      var pos = $(this._selectedAnchor.parentNode).position().top - 10;
+      this.scroller.setScrollPosition(pos);
+    },
+
+    // Adds the given item (creating a new li element) 
+    // to the given menu ul element
+    _addItemToMenu : function(menu, item) {
+      var anchor = $.el.a({href : '#'}, 
+        $.el.span(this._labelForItem(item) || '\u00a0'));
+
+      var glyph;
+      if(this.options.glyphProperty) {
+        glyph = _(item).resolveProperty(this.options.glyphProperty);
+        Backbone.UI.HasGlyph.insertGlyph(anchor, glyph);
+      }
+
+      if(this.options.glyphRightProperty) {
+        glyph = _(item).resolveProperty(this.options.glyphRightProperty);
+        Backbone.UI.HasGlyph.insertGlyphRight(anchor, glyph);
+      }
+
+      var liElement = $.el.li(anchor);
+
+      $(anchor).click(_.bind(function(e) {
+        if(!!this._selectedAnchor) $(this._selectedAnchor).removeClass('selected');
+
+        this._setSelectedItem(item === this.options.emptyModel ? null : item);
+        this._selectedAnchor = anchor;
+        $(anchor).addClass('selected');
+
+        if(this.options.onChange) this.options.onChange(item);
+        return false;
+      }, this));
+
+      menu.appendChild(liElement);
+    },
+
+    _labelForItem : function(item) {
+      return !_(item).exists() ? this.options.placeholder : 
+        _(item).resolveProperty(this.options.labelProperty);
+    }
+  });
+}());
+(function(){
   window.Backbone.UI.Pulldown = Backbone.View.extend({
     options : {
       className : 'pulldown',
@@ -1022,11 +1348,6 @@
       // is given, the actual collection item will be used.
       valueProperty : null,
 
-      // When given, an associated entry will be rendered at the 
-      // top of the pulldown allowing the user to enter a new 
-      // entry as a selection.
-      newModel : null,
-
       // This model represents an empty or default selection that
       // will be placed at the top of the pulldown
       emptyModel : null,
@@ -1055,44 +1376,53 @@
     initialize : function() {
       _(this).extend(Backbone.UI.HasGlyph);
       _(this).extend(Backbone.UI.HasCollectionProperty);
-      _(this).bindAll('render');
       $(this.el).addClass('pulldown');
-    },
 
-    // public accessors 
-    button : null,
-    menu : null,
-    selectedItem : null,
+      var menuOptions = _(this.options).extend({
+        onChange : _(this._onItemSelected).bind(this)
+      });
 
-    render : function() {
-      $(this.el).empty();
+      this._menu = new Backbone.UI.Menu(menuOptions).render();
+      $(this._menu.el).autohide({
+        ignoreKeys : [Backbone.UI.KEYS.KEY_UP, Backbone.UI.KEYS.KEY_DOWN], 
+        ignoreInputs : false,
+        hideCallback : _.bind(this._onAutoHide, this)
+      });
+      $(this._menu.el).hide();
+      document.body.appendChild(this._menu.el);
 
       // observe model changes
       if(_(this.model).exists() && _(this.model.bind).isFunction()) {
-        this.model.unbind('change', this.render);
+        this.model.unbind('change', _(this.render).bind(this));
         
         // observe model changes
         if(_(this.options.property).exists()) {
-          this.model.bind('change:' + this.options.property, this.render);
+          this.model.bind('change:' + this.options.property, _(this.render).bind(this));
         }
       }
 
       // observe collection changes
       if(_(this.options.collection).exists() && _(this.options.collection.bind).isFunction()) {
-        this.options.collection.unbind('all', this.render);
-        this.options.collection.bind('all', this.render);
+        this.options.collection.unbind('all', _(this.render).bind(this));
+        this.options.collection.bind('all', _(this.render).bind(this));
       }
+    },
 
-      this._renderMenu();
+    // public accessors 
+    button       : null,
+    selectedItem : null,
+
+    render : function() {
+      $(this.el).empty();
 
       this.selectedItem = this._determineSelectedItem() || this.options.selectedItem;
 
       this.button = new Backbone.UI.Button({
-        className : 'pulldown_button',
-        label : this._labelForItem(this.selectedItem),
-        glyph : _(this.selectedItem).resolveProperty(this.options.glyphProperty),
+        className  : 'pulldown_button',
+        label      : this._labelForItem(this.selectedItem),
+        glyph      : _(this.selectedItem).resolveProperty(this.options.glyphProperty),
         glyphRight : '\u25bc',
-        onClick : _.bind(this._onPulldownClick, this)
+        onClick    : _.bind(this.showMenu, this)
       }).render();
       this.el.appendChild(this.button.el);
 
@@ -1118,7 +1448,7 @@
 
     // Forces the menu to hide
     hideMenu : function(event) {
-      $(this._scroller.el).hide();
+      $(this._menu.el).hide();
       if(this.options.onMenuHide) this.options.onMenuHide(event);
     },
     
@@ -1127,165 +1457,19 @@
       var anchor = this.button.el;
       var showOnTop = $(window).height() - ($(anchor).offset().top - document.body.scrollTop) < 150;
       var position = (this.options.alignRight ? '-right' : '-left') + (showOnTop ? 'top' : ' bottom');
-      $(this._scroller.el).alignTo(anchor, position, 0, 1);
-      $(this._scroller.el).show();
-      $(this._scroller.el).autohide({
-        ignoreKeys : [Backbone.UI.KEYS.KEY_UP, Backbone.UI.KEYS.KEY_DOWN], 
-        ignoreInputs : true,
-        hideCallback : _.bind(this._onAutoHide, this)
-      });
-      $(this._scroller.el).css({width : Math.max($(this.button.el).innerWidth(), this._menuWidth)});
+      $(this._menu.el).alignTo(anchor, position, 0, 1);
+      $(this._menu.el).show();
+      $(this._menu.el).css({width : Math.max($(this.button.el).innerWidth(), this._menuWidth)});
       if(this.options.onMenuShow) this.options.onMenuShow(e);
-      this._scroller.setScrollRatio(0);
+      this._menu.scrollToSelectedItem();
     },
 
-    // Renders the menu entries based on the current options
-    _renderMenu : function() {
-      // clear the existing menu
-      if(this._scroller) {
-        this._scroller.el.parentNode.removeChild(this._scroller.el);
-        $(this._scroller.el).css({width : 'auto'});
-      }
-      
-      // create a new list of items
-      var list = $.el.ul({className : 'pulldown_menu'});
-
-      if(_(this.options.newModel).exists()) {
-        var newLabel = this._labelForItem(this.options.newModel) || "";
-        var newAnchor = $.el.a({href : '#'}, $.el.span(newLabel));
-        $(newAnchor).click(_(this._onAddNewItem).bind(this));
-        list.appendChild($.el.li({className : 'new_item'}, newAnchor));
-      }
-
-      var emptyModel = this.options.emptyModel;
-      if(_(emptyModel).exists()) {
-        var emptyLabel = this._labelForItem(emptyModel);
-        var emptyAnchor = $.el.a({href : '#'}, $.el.span(emptyLabel));
-        $(emptyAnchor).click(_.bind(function() {
-          this._setSelectedItem(null);
-          this.hideMenu();
-          this._updateButtonWithItem(emptyModel);
-          if(this.options.onChange) this.options.onChange(emptyModel);
-          return false;
-        }, this));
-        list.appendChild($.el.li({className : 'new_item'}, emptyAnchor));
-      }
-
-      var collection = _(this.options.collection).exists() ?
-        this.options.collection.models || this.options.collection : [];
-
-      _(collection).each(function(item) {
-        this._addItemToMenu(list, item);
-      }, this);
-
-      // wrap them up in a scroller that's added to the document body
-      this._scroller = new Backbone.UI.Scroller({
-        content : list
-      }).render();
-      $(this._scroller.el).hide();
-      // Prevent scroll events from percolating out to the enclosing doc
-      $(this._scroller.el).bind('mousewheel', function(){return false;});
-      $(this._scroller.el).addClass('pulldown_menu_scroller');
-      // Optionally decorate the menu with the owning pulldown's class name
-      if (this.options.className) {
-        $(this._scroller.el).addClass('pulldown_menu_scroller_for_' + this.options.className);
-      }
-
-      document.body.appendChild(this._scroller.el);
-      this._menuWidth = $(this._scroller.el).width() + 20;
-    },
-
-    // Adds the given pulldown item (creating a new li element) 
-    // to the given menu ul element
-    _addItemToMenu : function(menu, item) {
-      var anchor = $.el.a({href : '#'}, 
-        $.el.span(this._labelForItem(item) || '\u00a0'));
-
-      var glyph;
-      if(this.options.glyphProperty) {
-        glyph = _(item).resolveProperty(this.options.glyphProperty);
-        Backbone.UI.HasGlyph.insertGlyph(anchor, glyph);
-      }
-
-      if(this.options.glyphRightProperty) {
-        glyph = _(item).resolveProperty(this.options.glyphRightProperty);
-        Backbone.UI.HasGlyph.insertGlyphRight(anchor, glyph);
-      }
-
-      var liElement = $.el.li(anchor);
-
-      $(anchor).bind('click', _.bind(function(e) {
-        this.hideMenu();
-        this._setSelectedItem(item);
-        this._updateButtonWithItem(item);
-        if(this.options.onChange) this.options.onChange(item);
-        return false;
-      }, this));
-
-      menu.appendChild(liElement);
-    },
-
-    _updateButtonWithItem : function(item) {
+    _onItemSelected : function(item) {
       $(this.el).removeClass('placeholder');
       this.button.options.label = this._labelForItem(item);
       this.button.options.glyph = _(item).resolveProperty(this.options.glyphProperty);
       this.button.render();
-    },
-
-    _onAddNewItem : function(e) {
-      var newItem = this.options.newModel;
-      var oldValue = this._labelForItem(newItem);
-      _(newItem).setProperty(this.options.labelProperty, '');
-      this._setSelectedItem(newItem);
-      if(this.options.onChange) this.options.onChange(newItem);
-
       this.hideMenu();
-      $(this.el).removeClass('placeholder');
-
-      this._newItemText = $.ui('TextField', {
-        className : 'new_item_text',
-        model : newItem,
-        property : this.options.labelProperty
-      }).render();
-
-      this._cancelNewItemButton = $.ui('Button', {
-        className : 'new_item_cancel',
-        label : '\u2716',
-        onClick : _(this._onCancelNewItem).bind(this, oldValue)
-      }).render();
-
-      this.el.appendChild(this._newItemText.el);
-      this.el.appendChild(this._cancelNewItemButton.el);
-      this._newItemText.input.focus();
-
-      $(this.button.el).css({visibility : 'hidden'});
-
-      return false;
-    },
-
-    _onCancelNewItem : function(oldValue) {
-      _(this.options.newModel).setProperty(this.options.labelProperty, oldValue);
-      this._setSelectedItem(null);
-      var textEl = this._newItemText.el;
-      if(_(textEl).exists() && textEl.parentNode) {
-        textEl.parentNode.removeChild(textEl);
-      }
-
-      var cancelEl = this._cancelNewItemButton.el;
-      if(_(cancelEl).exists() && cancelEl.parentNode) {
-        cancelEl.parentNode.removeChild(cancelEl);
-      }
-      $(this.button.el).css({visibility : 'visible'});
-      this.render();
-    },
-
-    //shows/hides the pulldown menu when the button is clicked
-    _onPulldownClick : function(e) {
-      if($(this._scroller.el).is(':visible')) {
-        this.hideMenu(e);
-      } else {
-        this.showMenu(e); 
-      }
     },
 
     // notify of the menu hiding
@@ -1391,6 +1575,7 @@
 
     initialize : function() {
       Backbone.UI.DragSession.enableBasicDragSupport();
+      setInterval(_(this.update).bind(this), 40);
     },
 
     render : function () {
@@ -1433,7 +1618,6 @@
       // update our scroll bar on an interval to handle 
       // resizing and content changes
       $(this.el).addClass('disabled');
-      setInterval(_(this.update).bind(this), 40);
 
       return this;
     },
@@ -1471,8 +1655,10 @@
     },
 
     setScrollPosition: function(top) {
+      this.update();
       var h = this._totalHeight - this._visibleHeight;
       this.setScrollRatio(h ? top/h : 0);
+      this.update();
     },
 
     // Scrolls to the end of the content
@@ -1499,6 +1685,8 @@
           this.maxY = $(this._tray).height() - $(this._knob).height();
         }
       }
+      this._updateKnobPosition();
+      this._updateKnobSize();
     },
 
     // Set the position of the knob to reflect the current scroll position
@@ -2009,3 +2197,98 @@
   });
 }());
 
+(function(){
+  window.Backbone.UI.TimePicker = Backbone.View.extend({
+
+    options : {
+      // a moment.js format : http://momentjs.com/docs/#/display/format
+      format : 'hh:mm a',
+
+      // minute interval to use for pulldown menu
+      interval : 30
+    },
+
+    initialize : function() {
+      $(this.el).addClass('time_picker');
+
+      this._menu = new Backbone.UI.Menu({
+        onChange : _(this._onSelectTimeItem).bind(this)
+      });
+      $(this._menu.el).hide();
+      $(this._menu.el).autohide({
+        ignoreInputs : true
+      });
+      document.body.appendChild(this._menu.el);
+
+      this._textField = new Backbone.UI.TextField({}).render();
+      $(this._textField.input).click(_(this._showMenu).bind(this));
+      $(this._textField.input).keyup(_(this._timeEdited).bind(this));
+
+      // listen for model changes
+      if(!!this.model && this.options.property) {
+        this.model.bind('change:' + this.options.property, _(this.render).bind(this));
+      }
+    },
+
+    render : function() {
+      $(this.el).empty();
+      this.el.appendChild(this._textField.el);
+
+      this._menu.options.collection = this._collectTimes();
+      this._menu.render();
+      
+      return this;
+    },
+
+    _collectTimes : function() {
+      var collection = [];
+      var d = moment().sod();
+      var day = d.date();
+
+      while(d.date() === day) {
+        collection.push({
+          label : d.format(this.options.format),
+          value : new Date(d)
+        });
+
+        d.add('minutes', this.options.interval);
+      }
+
+      return collection;
+    },
+
+    _showMenu : function() {
+      $(this._menu.el).alignTo(this._textField.el, 'bottom -left', 0, 2);
+      $(this._menu.el).show();
+      this._menu.scrollToSelectedItem();
+    },
+
+    _hideMenu : function() {
+      $(this._menu.el).hide();
+    },
+
+    _onSelectTimeItem : function(item) {
+      this._hideMenu();
+      this._selectedTime = moment(item.value);
+      this._textField.setValue(this._selectedTime.format(this.options.format));
+    },
+
+    _timeEdited : function(e) {
+      var newDate = moment(this._textField.getValue(), this.options.format);
+
+      // if the enter key was pressed or we've invoked this method manually, 
+      // we hide the calendar and re-format our date
+      if(!e || e.keyCode == Backbone.UI.KEYS.KEY_RETURN) {
+        this._textField.setValue(moment(newDate).format(this.options.format));
+        this._hideMenu();
+
+        // update our bound model (but only the date portion)
+        if(!!this.model && this.options.property) {
+          var boundDate = _(this.model).resolveProperty(this.options.property);
+          boundDate.setHours(newDate.getHours());
+          boundDate.setMinutes(newDate.getMinutes());
+        }
+      }
+    }
+  });
+}());

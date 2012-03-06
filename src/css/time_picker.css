@@ -1,11 +1,12 @@
 .time_picker .text_field {
-  width:100px;
-}
-
-.time_picker .menu {
-  z-index:1000;
+  width:80px;
 }
 
 .time_picker .menu li {
   background-color:#fff;
 }
+
+.menu {
+  z-index:1000;
+}
+

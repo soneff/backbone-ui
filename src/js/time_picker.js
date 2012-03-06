@@ -19,9 +19,16 @@
       $(this._menu.el).autohide({
         ignoreInputs : true
       });
+      document.body.appendChild(this._menu.el);
 
       this._textField = new Backbone.UI.TextField({}).render();
       $(this._textField.input).click(_(this._showMenu).bind(this));
+      $(this._textField.input).keyup(_(this._timeEdited).bind(this));
+
+      // listen for model changes
+      if(!!this.model && this.options.property) {
+        this.model.bind('change:' + this.options.property, _(this.render).bind(this));
+      }
     },
 
     render : function() {
@@ -30,7 +37,6 @@
 
       this._menu.options.collection = this._collectTimes();
       this._menu.render();
-      this.el.appendChild(this._menu.el);
       
       return this;
     },
@@ -66,6 +72,24 @@
       this._hideMenu();
       this._selectedTime = moment(item.value);
       this._textField.setValue(this._selectedTime.format(this.options.format));
+    },
+
+    _timeEdited : function(e) {
+      var newDate = moment(this._textField.getValue(), this.options.format);
+
+      // if the enter key was pressed or we've invoked this method manually, 
+      // we hide the calendar and re-format our date
+      if(!e || e.keyCode == Backbone.UI.KEYS.KEY_RETURN) {
+        this._textField.setValue(moment(newDate).format(this.options.format));
+        this._hideMenu();
+
+        // update our bound model (but only the date portion)
+        if(!!this.model && this.options.property) {
+          var boundDate = _(this.model).resolveProperty(this.options.property);
+          boundDate.setHours(newDate.getHours());
+          boundDate.setMinutes(newDate.getMinutes());
+        }
+      }
     }
   });
 }());

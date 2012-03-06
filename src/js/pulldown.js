@@ -76,18 +76,18 @@
 
       // observe model changes
       if(_(this.model).exists() && _(this.model.bind).isFunction()) {
-        this.model.unbind('change', this.render);
+        this.model.unbind('change', _(this.render).bind(this));
         
         // observe model changes
         if(_(this.options.property).exists()) {
-          this.model.bind('change:' + this.options.property, this.render);
+          this.model.bind('change:' + this.options.property, _(this.render).bind(this));
         }
       }
 
       // observe collection changes
       if(_(this.options.collection).exists() && _(this.options.collection.bind).isFunction()) {
-        this.options.collection.unbind('all', this.render);
-        this.options.collection.bind('all', this.render);
+        this.options.collection.unbind('all', _(this.render).bind(this));
+        this.options.collection.bind('all', _(this.render).bind(this));
       }
     },
 

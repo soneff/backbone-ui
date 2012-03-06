@@ -82,6 +82,79 @@ a.button {
   left:-5px;
   cursor:pointer;
 }
+.calendar {
+  user-select: none;
+  -webkit-user-select: none;
+  text-transform:capitalize;
+}
+
+.calendar table {
+  border-collapse:collapse;
+  border:1px solid #444;
+}
+
+.calendar thead {
+  border-bottom:1px solid #444;
+  line-height:33px;
+  background-color:#eaeaea;
+}
+
+.calendar .go_forward,
+.calendar .title {
+  border-left:1px solid #444;
+}
+
+.calendar a {
+  display:block;
+  text-decoration:none;
+  color:#222;
+}
+
+.calendar td,
+.calendar th {
+  text-align:center;
+  padding:0;
+  margin:0;
+  font-size:14px;
+}
+
+.calendar .row.days td {
+  line-height:33px;
+  border-right:1px solid #444;
+  background-color:#eaeaea;
+}
+
+.calendar .cell {
+  border:1px solid #444;
+  background-color:#fff;
+}
+
+.calendar .cell.inactive {
+  background-color:#eaeaea;
+  color:#999;
+}
+
+.calendar .cell.today {
+  font-weight:bold;
+}
+
+.calendar .cell a,
+.calendar .cell .day {
+  width:33px;
+  line-height:33px;
+}
+
+.calendar .cell a:hover,
+.calendar .cell a:active {
+  background-color:#e9d4c7;
+}
+
+.calendar .cell.selected a, 
+.calendar .cell.selected a:hover {
+  background-color:#ae5317;
+  color:#fff;
+}
+
 .checkbox {
   text-decoration:none;
   height:30px;
@@ -140,6 +213,14 @@ a.button {
   *display: inline;
   vertical-align:top;
 }
+.date_picker .text_field {
+  width:100px;
+}
+
+.calendar {
+  position:absolute;
+  z-index:1000;
+}
 .glyph {
   position:absolute;
   top:3px;
@@ -156,6 +237,77 @@ a.button {
   right:3px;
 }
 
+.menu {
+  max-height:150px;
+  margin-right:3px;
+  position:relative;
+}
+
+.menu ul {
+  padding:5px;
+}
+
+.menu .menu_scroller {
+  border:1px solid #666;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  background-color:#fff;
+  -moz-box-shadow: 2px 2px 2px #666;
+  -webkit-box-shadow: 2px 2px 2px #666;
+  box-shadow: 2px 2px 2px #666;
+}
+
+.menu .menu_scroller .content {
+  margin:0;
+  max-height:150px;
+}
+
+.menu .menu_scroller.disabled .content {
+  margin-right:0;
+}
+
+.menu li {
+  position:relative;
+  font-size:14px;
+  white-space:nowrap;
+  margin:2px 0;
+}
+
+.menu li a {
+  text-decoration:none;
+  line-height:28px;
+  color:#222;
+  padding:0 5px;
+  display:block;  
+  position:relative;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+}
+
+.menu li a:hover span,
+.menu li a:link span,
+.menu li a:active span,
+.menu li a:visited span{
+  text-decoration:none;
+  color:#222;
+}
+
+.menu li a:hover,
+.menu li a.selected {
+  background-color:#e9d4c7;
+  text-decoration:none;
+}
+
+.menu li a.has_glyph {
+  padding-left:24px;
+}
+
+.menu li .glyph.right {
+  top:4px;
+  right:4px;
+}
 .pulldown {
   position:relative;
   height:30px;
@@ -167,91 +319,6 @@ a.button {
 
 .pulldown.placeholder {
   font-style:italic;
-}
-
-.pulldown .text_field.new_item_text {
-  position:absolute;
-  right:28px;
-  left:0;
-  width:auto;
-}
-
-.pulldown .new_item_cancel {
-  position:absolute;
-  right:0;
-}
-
-.pulldown_menu_scroller {
-  position:absolute;
-  border:1px solid #666;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
-  background-color:#fff;
-  -moz-box-shadow: 2px 2px 2px #666;
-  -webkit-box-shadow: 2px 2px 2px #666;
-  box-shadow: 2px 2px 2px #666;
-}
-
-.pulldown_menu_scroller .pulldown_menu.content {
-  margin-right:5px;
-}
-
-.pulldown_menu_scroller.disabled .pulldown_menu.content {
-  margin-right:0;
-}
-
-.pulldown_menu {
-  max-height:150px;
-  margin-right:3px;
-  padding:3px;
-  position:relative;
-}
-
-.pulldown_menu li {
-  position:relative;
-  line-height:28px;
-  font-size:14px;
-  white-space:nowrap;
-}
-
-.pulldown_menu li.new_item {
-  border-bottom:1px solid #222;
-  margin-bottom:3px;
-  padding-bottom:3px;
-}
-
-.pulldown_menu li a {
-  text-decoration:none;
-  color:#222;
-  padding:3px;
-  display:block;  
-  position:relative;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
-}
-
-.pulldown_menu li a:hover span,
-.pulldown_menu li a:link span,
-.pulldown_menu li a:active span,
-.pulldown_menu li a:visited span{
-  text-decoration:none;
-  color:#222;
-}
-
-.pulldown_menu li a:hover {
-  background-color:#ddd;
-  text-decoration:none;
-}
-
-.pulldown_menu li a.has_glyph {
-  padding-left:24px;
-}
-
-.pulldown_menu li .glyph.right {
-  top:4px;
-  right:4px;
 }
 
 .pulldown .button:link,
@@ -317,7 +384,7 @@ a.button {
 }
 
 .scroller .content_wrapper{
-  padding-right:15px;
+  padding-right:13px;
 }
 
 .scroller.disabled .content_wrapper{
@@ -437,14 +504,14 @@ a.button {
 }
 .table_view table.heading {
   border-width:1px;
+  border-style:solid;
+  border-color:#444;
 }
 
 .table_view table {
   text-align:left;
   width:100%;
   border-collapse:collapse;
-  border-style:solid;
-  border-color:#444;
 }
 
 .table_view table th {
@@ -471,8 +538,7 @@ a.button {
 }
 
 .table_view .wrapper {
-  border-style:solid;
-  border-color:#444;
+  border:none;
   padding:5px;
 }
 
@@ -549,3 +615,15 @@ a.button {
   outline:none;
   font-size:14px;
 }
+.time_picker .text_field {
+  width:80px;
+}
+
+.time_picker .menu li {
+  background-color:#fff;
+}
+
+.menu {
+  z-index:1000;
+}
+

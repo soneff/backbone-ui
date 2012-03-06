@@ -2,7 +2,7 @@
   width:100px;
 }
 
-.date_picker .calendar {
+.calendar {
   position:absolute;
   z-index:1000;
 }
