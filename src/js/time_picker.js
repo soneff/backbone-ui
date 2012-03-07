@@ -25,6 +25,7 @@
       $(this._textField.input).click(_(this._showMenu).bind(this));
       $(this._textField.input).keyup(_(this._timeEdited).bind(this));
 
+
       // listen for model changes
       if(!!this.model && this.options.property) {
         this.model.bind('change:' + this.options.property, _(this.render).bind(this));
@@ -35,7 +36,16 @@
       $(this.el).empty();
       this.el.appendChild(this._textField.el);
 
+      var date = (!!this.model && !!this.options.property) ? 
+        _(this.model).resolveProperty(this.options.property) : null;
+      
+      if(!!date) {
+        this._textField.setValue(moment(date).format(this.options.format));
+        this._selectedTime = date;
+      }
+
       this._menu.options.collection = this._collectTimes();
+      this._menu.options.selectedValue = date;
       this._menu.render();
       
       return this;

@@ -745,12 +745,17 @@
     render : function() {
       $(this.el).empty();
 
-      var date = (!!this.model && !!this.options.property) ? 
-        _(this.model).resolveProperty(this.options.property) : new Date();
-      this._calendar.options.selectedDate = date;
-      this._calendar.render();
-
       this.el.appendChild(this._textField.el);
+
+      var date = (!!this.model && !!this.options.property) ? 
+        _(this.model).resolveProperty(this.options.property) : null;
+      
+      if(!!date) {
+        this._calendar.options.selectedDate = date;
+        var dateString = moment(date).format(this.options.format);
+        this._textField.setValue(dateString);
+      }
+      this._calendar.render();
       
       return this;
     },
@@ -775,6 +780,7 @@
       this._textField.setValue(dateString);
       this._dateEdited();
       this._hideCalendar();
+
       return false;
     },
 
@@ -784,16 +790,15 @@
       // if the enter key was pressed or we've invoked this method manually, 
       // we hide the calendar and re-format our date
       if(!e || e.keyCode == Backbone.UI.KEYS.KEY_RETURN) {
-        console.log(newDate);
         this._textField.setValue(moment(newDate).format(this.options.format));
         this._hideCalendar();
 
         // update our bound model (but only the date portion)
         if(!!this.model && this.options.property) {
           var boundDate = _(this.model).resolveProperty(this.options.property);
-          boundDate.setMonth(newDate.getMonth());
-          boundDate.setDate(newDate.getDate());
-          boundDate.setFullYear(newDate.getFullYear());
+          boundDate.setMonth(newDate.month());
+          boundDate.setDate(newDate.date());
+          boundDate.setFullYear(newDate.year());
         }
       }
     }
@@ -1217,7 +1222,9 @@
       // The collection item property describing the label.
       labelProperty : 'label',
 
-      onChange : null
+      onChange : null,
+
+      selectedValue : null
     },
 
     initialize : function() {
@@ -1251,7 +1258,10 @@
         this.options.collection.models || this.options.collection : [];
 
       _(collection).each(function(item) {
-        this._addItemToMenu(list, item);
+        var select = !!this.options.selectedValue && 
+          _(item.value).isEqual(this.options.selectedValue);
+
+        this._addItemToMenu(list, item, select);
       }, this);
 
       // wrap them up in a scroller 
@@ -1278,7 +1288,7 @@
 
     // Adds the given item (creating a new li element) 
     // to the given menu ul element
-    _addItemToMenu : function(menu, item) {
+    _addItemToMenu : function(menu, item, select) {
       var anchor = $.el.a({href : '#'}, 
         $.el.span(this._labelForItem(item) || '\u00a0'));
 
@@ -1295,7 +1305,7 @@
 
       var liElement = $.el.li(anchor);
 
-      $(anchor).click(_.bind(function(e) {
+      var clickFunction = _.bind(function(e) {
         if(!!this._selectedAnchor) $(this._selectedAnchor).removeClass('selected');
 
         this._setSelectedItem(item === this.options.emptyModel ? null : item);
@@ -1304,7 +1314,11 @@
 
         if(this.options.onChange) this.options.onChange(item);
         return false;
-      }, this));
+      }, this);
+
+      $(anchor).click(clickFunction);
+
+      if(select) clickFunction();
 
       menu.appendChild(liElement);
     },
@@ -2224,6 +2238,7 @@
       $(this._textField.input).click(_(this._showMenu).bind(this));
       $(this._textField.input).keyup(_(this._timeEdited).bind(this));
 
+
       // listen for model changes
       if(!!this.model && this.options.property) {
         this.model.bind('change:' + this.options.property, _(this.render).bind(this));
@@ -2234,7 +2249,16 @@
       $(this.el).empty();
       this.el.appendChild(this._textField.el);
 
+      var date = (!!this.model && !!this.options.property) ? 
+        _(this.model).resolveProperty(this.options.property) : null;
+      
+      if(!!date) {
+        this._textField.setValue(moment(date).format(this.options.format));
+        this._selectedTime = date;
+      }
+
       this._menu.options.collection = this._collectTimes();
+      this._menu.options.selectedValue = date;
       this._menu.render();
       
       return this;

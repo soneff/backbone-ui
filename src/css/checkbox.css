@@ -17,14 +17,14 @@
   -moz-border-radius: 6px;
   -webkit-border-radius: 6px;
   border-radius: 6px;
-  color:#444;
+  color:#222;
   font-size:18px;
   background-color:#fff;
 }
 
 .checkbox:hover .checkmark {
   background-color:#eee;
-  border-color:#444;
+  border-color:#222;
 }
 
 .checkbox .checkmark_fill {
@@ -32,7 +32,7 @@
   width:14px;
   line-height:16px;
   position:absolute;
-  background-color:#444;
+  background-color:#222;
   top:3px;
   left:3px;
   -moz-border-radius: 4px;
@@ -44,7 +44,7 @@
   line-height:32px;
   padding:0 0 0 10px;
   text-decoration:none;
-  color:#444;
+  color:#222;
 }
 
 .checkbox,

@@ -59,7 +59,7 @@ a.button {
 
 .button.has_border:hover {
   background-color:#ddd;
-  border-color:#444;
+  border-color:#222;
 }
 
 .button.has_border.disabled:hover {
@@ -174,14 +174,14 @@ a.button {
   -moz-border-radius: 6px;
   -webkit-border-radius: 6px;
   border-radius: 6px;
-  color:#444;
+  color:#222;
   font-size:18px;
   background-color:#fff;
 }
 
 .checkbox:hover .checkmark {
   background-color:#eee;
-  border-color:#444;
+  border-color:#222;
 }
 
 .checkbox .checkmark_fill {
@@ -189,7 +189,7 @@ a.button {
   width:14px;
   line-height:16px;
   position:absolute;
-  background-color:#444;
+  background-color:#222;
   top:3px;
   left:3px;
   -moz-border-radius: 4px;
@@ -201,7 +201,7 @@ a.button {
   line-height:32px;
   padding:0 0 0 10px;
   text-decoration:none;
-  color:#444;
+  color:#222;
 }
 
 .checkbox,
@@ -343,14 +343,14 @@ a.button {
   -moz-border-radius: 11px;
   -webkit-border-radius: 11px;
   border-radius: 11px;
-  color:#444;
+  color:#222;
   font-family:Verdana;
   text-align:center;
   font-size:16px;
 }
 .radio_group .choice:hover .mark {
   background-color:#eee;
-  border-color:#444;
+  border-color:#222;
 }
 
 .radio_group li {
@@ -364,7 +364,7 @@ a.button {
 
 .radio_group .label {
   line-height:22px;
-  color:#444;
+  color:#222;
 }
 
 
@@ -468,7 +468,7 @@ a.button {
 .tab_set .tab {
   text-decoration:none;
   color:#222;
-  border:1px solid #444;
+  border:1px solid #222;
   padding:0 10px;
   margin:0 5px 0 0;
   height:28px;
@@ -505,7 +505,7 @@ a.button {
 .table_view table.heading {
   border-width:1px;
   border-style:solid;
-  border-color:#444;
+  border-color:#222;
 }
 
 .table_view table {
@@ -532,7 +532,7 @@ a.button {
 .table_view .content{
   background-color:#fff;
   border-width:0 1px 1px 1px;
-  border-color:#444;
+  border-color:#222;
   border-style:solid;
   padding:5px;
 }

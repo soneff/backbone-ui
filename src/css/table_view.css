@@ -1,7 +1,7 @@
 .table_view table.heading {
   border-width:1px;
   border-style:solid;
-  border-color:#444;
+  border-color:#222;
 }
 
 .table_view table {
@@ -28,7 +28,7 @@
 .table_view .content{
   background-color:#fff;
   border-width:0 1px 1px 1px;
-  border-color:#444;
+  border-color:#222;
   border-style:solid;
   padding:5px;
 }

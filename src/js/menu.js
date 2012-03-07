@@ -5,7 +5,9 @@
       // The collection item property describing the label.
       labelProperty : 'label',
 
-      onChange : null
+      onChange : null,
+
+      selectedValue : null
     },
 
     initialize : function() {
@@ -39,7 +41,10 @@
         this.options.collection.models || this.options.collection : [];
 
       _(collection).each(function(item) {
-        this._addItemToMenu(list, item);
+        var select = !!this.options.selectedValue && 
+          _(item.value).isEqual(this.options.selectedValue);
+
+        this._addItemToMenu(list, item, select);
       }, this);
 
       // wrap them up in a scroller 
@@ -66,7 +71,7 @@
 
     // Adds the given item (creating a new li element) 
     // to the given menu ul element
-    _addItemToMenu : function(menu, item) {
+    _addItemToMenu : function(menu, item, select) {
       var anchor = $.el.a({href : '#'}, 
         $.el.span(this._labelForItem(item) || '\u00a0'));
 
@@ -83,7 +88,7 @@
 
       var liElement = $.el.li(anchor);
 
-      $(anchor).click(_.bind(function(e) {
+      var clickFunction = _.bind(function(e) {
         if(!!this._selectedAnchor) $(this._selectedAnchor).removeClass('selected');
 
         this._setSelectedItem(item === this.options.emptyModel ? null : item);
@@ -92,7 +97,11 @@
 
         if(this.options.onChange) this.options.onChange(item);
         return false;
-      }, this));
+      }, this);
+
+      $(anchor).click(clickFunction);
+
+      if(select) clickFunction();
 
       menu.appendChild(liElement);
     },

@@ -59,7 +59,7 @@ a.button {
 
 .button.has_border:hover {
   background-color:#ddd;
-  border-color:#444;
+  border-color:#222;
 }
 
 .button.has_border.disabled:hover {

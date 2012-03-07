@@ -39,12 +39,17 @@
     render : function() {
       $(this.el).empty();
 
-      var date = (!!this.model && !!this.options.property) ? 
-        _(this.model).resolveProperty(this.options.property) : new Date();
-      this._calendar.options.selectedDate = date;
-      this._calendar.render();
-
       this.el.appendChild(this._textField.el);
+
+      var date = (!!this.model && !!this.options.property) ? 
+        _(this.model).resolveProperty(this.options.property) : null;
+      
+      if(!!date) {
+        this._calendar.options.selectedDate = date;
+        var dateString = moment(date).format(this.options.format);
+        this._textField.setValue(dateString);
+      }
+      this._calendar.render();
       
       return this;
     },
@@ -69,6 +74,7 @@
       this._textField.setValue(dateString);
       this._dateEdited();
       this._hideCalendar();
+
       return false;
     },
 
@@ -78,16 +84,15 @@
       // if the enter key was pressed or we've invoked this method manually, 
       // we hide the calendar and re-format our date
       if(!e || e.keyCode == Backbone.UI.KEYS.KEY_RETURN) {
-        console.log(newDate);
         this._textField.setValue(moment(newDate).format(this.options.format));
         this._hideCalendar();
 
         // update our bound model (but only the date portion)
         if(!!this.model && this.options.property) {
           var boundDate = _(this.model).resolveProperty(this.options.property);
-          boundDate.setMonth(newDate.getMonth());
-          boundDate.setDate(newDate.getDate());
-          boundDate.setFullYear(newDate.getFullYear());
+          boundDate.setMonth(newDate.month());
+          boundDate.setDate(newDate.date());
+          boundDate.setFullYear(newDate.year());
         }
       }
     }
