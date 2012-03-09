@@ -21,10 +21,6 @@
       });
       document.body.appendChild(this._menu.el);
 
-      this._textField = new Backbone.UI.TextField({}).render();
-      $(this._textField.input).click(_(this._showMenu).bind(this));
-      $(this._textField.input).keyup(_(this._timeEdited).bind(this));
-
 
       // listen for model changes
       if(!!this.model && this.options.property) {
@@ -34,6 +30,10 @@
 
     render : function() {
       $(this.el).empty();
+
+      this._textField = new Backbone.UI.TextField({}).render();
+      $(this._textField.input).click(_(this._showMenu).bind(this));
+      $(this._textField.input).keyup(_(this._timeEdited).bind(this));
       this.el.appendChild(this._textField.el);
 
       var date = (!!this.model && !!this.options.property) ? 
@@ -49,6 +49,10 @@
       this._menu.render();
       
       return this;
+    },
+
+    setEnabled : function(enabled) {
+      this._textField.setEnabled(enabled);
     },
 
     _collectTimes : function() {
@@ -82,6 +86,7 @@
       this._hideMenu();
       this._selectedTime = moment(item.value);
       this._textField.setValue(this._selectedTime.format(this.options.format));
+      this._timeEdited();
     },
 
     _timeEdited : function(e) {
@@ -96,8 +101,8 @@
         // update our bound model (but only the date portion)
         if(!!this.model && this.options.property) {
           var boundDate = _(this.model).resolveProperty(this.options.property);
-          boundDate.setHours(newDate.getHours());
-          boundDate.setMinutes(newDate.getMinutes());
+          boundDate.setHours(newDate.hours());
+          boundDate.setMinutes(newDate.minutes());
         }
       }
     }

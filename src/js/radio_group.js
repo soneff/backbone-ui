@@ -37,7 +37,7 @@
     selectedItem : null,
 
     render : function() {
-      this.selectedItem = this._determineSelectedItem() || this.selectedItem;
+      this.selectedItem = this.selectedItem || this._determineSelectedItem();
 
       $(this.el).empty();
 

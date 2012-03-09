@@ -23,12 +23,6 @@
     render : function() {
       $(this.el).empty();
 
-      // clear the existing menu
-      if(this.scroller) {
-        this.scroller.el.parentNode.removeChild(this.scroller.el);
-        $(this.scroller.el).css({width : 'auto'});
-      }
-      
       // create a new list of items
       var list = $.el.ul();
 

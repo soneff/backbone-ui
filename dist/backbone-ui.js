@@ -718,18 +718,11 @@
     initialize : function() {
       $(this.el).addClass('date_picker');
 
-      this._textField = new Backbone.UI.TextField({
-        name : this.options.name
-      }).render();
-
       this._calendar = new Backbone.UI.Calendar({
         onSelect : _(this._selectDate).bind(this)
       });
       $(this._calendar.el).hide();
       document.body.appendChild(this._calendar.el);
-
-      $(this._textField.input).click(_(this._showCalendar).bind(this));
-      $(this._textField.input).keyup(_(this._dateEdited).bind(this));
 
       $(this._calendar.el).autohide({
         ignoreInputs : true,
@@ -745,6 +738,13 @@
     render : function() {
       $(this.el).empty();
 
+      this._textField = new Backbone.UI.TextField({
+        name : this.options.name
+      }).render();
+
+      $(this._textField.input).click(_(this._showCalendar).bind(this));
+      $(this._textField.input).keyup(_(this._dateEdited).bind(this));
+
       this.el.appendChild(this._textField.el);
 
       var date = (!!this.model && !!this.options.property) ? 
@@ -758,6 +758,10 @@
       this._calendar.render();
       
       return this;
+    },
+
+    setEnabled : function(enabled) {
+      this._textField.setEnabled(enabled);
     },
 
     _showCalendar : function() {
@@ -1240,12 +1244,6 @@
     render : function() {
       $(this.el).empty();
 
-      // clear the existing menu
-      if(this.scroller) {
-        this.scroller.el.parentNode.removeChild(this.scroller.el);
-        $(this.scroller.el).css({width : 'auto'});
-      }
-      
       // create a new list of items
       var list = $.el.ul();
 
@@ -1532,7 +1530,7 @@
     selectedItem : null,
 
     render : function() {
-      this.selectedItem = this._determineSelectedItem() || this.selectedItem;
+      this.selectedItem = this.selectedItem || this._determineSelectedItem();
 
       $(this.el).empty();
 
@@ -2234,10 +2232,6 @@
       });
       document.body.appendChild(this._menu.el);
 
-      this._textField = new Backbone.UI.TextField({}).render();
-      $(this._textField.input).click(_(this._showMenu).bind(this));
-      $(this._textField.input).keyup(_(this._timeEdited).bind(this));
-
 
       // listen for model changes
       if(!!this.model && this.options.property) {
@@ -2247,6 +2241,10 @@
 
     render : function() {
       $(this.el).empty();
+
+      this._textField = new Backbone.UI.TextField({}).render();
+      $(this._textField.input).click(_(this._showMenu).bind(this));
+      $(this._textField.input).keyup(_(this._timeEdited).bind(this));
       this.el.appendChild(this._textField.el);
 
       var date = (!!this.model && !!this.options.property) ? 
@@ -2262,6 +2260,10 @@
       this._menu.render();
       
       return this;
+    },
+
+    setEnabled : function(enabled) {
+      this._textField.setEnabled(enabled);
     },
 
     _collectTimes : function() {
@@ -2295,6 +2297,7 @@
       this._hideMenu();
       this._selectedTime = moment(item.value);
       this._textField.setValue(this._selectedTime.format(this.options.format));
+      this._timeEdited();
     },
 
     _timeEdited : function(e) {
@@ -2309,8 +2312,8 @@
         // update our bound model (but only the date portion)
         if(!!this.model && this.options.property) {
           var boundDate = _(this.model).resolveProperty(this.options.property);
-          boundDate.setHours(newDate.getHours());
-          boundDate.setMinutes(newDate.getMinutes());
+          boundDate.setHours(newDate.hours());
+          boundDate.setMinutes(newDate.minutes());
         }
       }
     }

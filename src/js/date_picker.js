@@ -12,18 +12,11 @@
     initialize : function() {
       $(this.el).addClass('date_picker');
 
-      this._textField = new Backbone.UI.TextField({
-        name : this.options.name
-      }).render();
-
       this._calendar = new Backbone.UI.Calendar({
         onSelect : _(this._selectDate).bind(this)
       });
       $(this._calendar.el).hide();
       document.body.appendChild(this._calendar.el);
-
-      $(this._textField.input).click(_(this._showCalendar).bind(this));
-      $(this._textField.input).keyup(_(this._dateEdited).bind(this));
 
       $(this._calendar.el).autohide({
         ignoreInputs : true,
@@ -39,6 +32,13 @@
     render : function() {
       $(this.el).empty();
 
+      this._textField = new Backbone.UI.TextField({
+        name : this.options.name
+      }).render();
+
+      $(this._textField.input).click(_(this._showCalendar).bind(this));
+      $(this._textField.input).keyup(_(this._dateEdited).bind(this));
+
       this.el.appendChild(this._textField.el);
 
       var date = (!!this.model && !!this.options.property) ? 
@@ -52,6 +52,10 @@
       this._calendar.render();
       
       return this;
+    },
+
+    setEnabled : function(enabled) {
+      this._textField.setEnabled(enabled);
     },
 
     _showCalendar : function() {
