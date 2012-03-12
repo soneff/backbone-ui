@@ -23,7 +23,6 @@
       });
       document.body.appendChild(this._menu.el);
 
-
       // listen for model changes
       if(!!this.model && this.options.property) {
         this.model.bind('change:' + this.options.property, _(this.render).bind(this));
@@ -53,6 +52,20 @@
       this._menu.render();
       
       return this;
+    },
+
+    getValue : function() {
+      return this._selectedTime;
+    },
+
+    setValue : function(time) {
+      this._selectedTime = time;
+      var timeString = moment(time).format(this.options.format);
+      this._textField.setValue(timeString);
+      this._timeEdited();
+
+      this._menu.options.selectedValue = time;
+      this._menu.render();
     },
 
     setEnabled : function(enabled) {
@@ -88,8 +101,8 @@
 
     _onSelectTimeItem : function(item) {
       this._hideMenu();
-      this._selectedTime = moment(item.value);
-      this._textField.setValue(this._selectedTime.format(this.options.format));
+      this._selectedTime = item.value;
+      this._textField.setValue(moment(this._selectedTime).format(this.options.format));
       this._timeEdited();
     },
 
@@ -99,7 +112,8 @@
       // if the enter key was pressed or we've invoked this method manually, 
       // we hide the calendar and re-format our date
       if(!e || e.keyCode == Backbone.UI.KEYS.KEY_RETURN) {
-        this._textField.setValue(moment(newDate).format(this.options.format));
+        var newValue = moment(newDate).format(this.options.format);
+        this._textField.setValue(newValue);
         this._hideMenu();
 
         // update our bound model (but only the date portion)
@@ -107,6 +121,10 @@
           var boundDate = _(this.model).resolveProperty(this.options.property);
           boundDate.setHours(newDate.hours());
           boundDate.setMinutes(newDate.minutes());
+        }
+
+        if(_(this.options.onChange).isFunction()) {
+          this.options.onChange(newValue);
         }
       }
     }

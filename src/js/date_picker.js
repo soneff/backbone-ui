@@ -6,7 +6,8 @@
       format : 'MM/DD/YYYY',
       model : null,
       property : null,
-      name : null
+      name : null,
+      onChange : null
     },
 
     initialize : function() {
@@ -41,12 +42,12 @@
 
       this.el.appendChild(this._textField.el);
 
-      var date = (!!this.model && !!this.options.property) ? 
+      this._selectedDate = (!!this.model && !!this.options.property) ? 
         _(this.model).resolveProperty(this.options.property) : null;
       
-      if(!!date) {
-        this._calendar.options.selectedDate = date;
-        var dateString = moment(date).format(this.options.format);
+      if(!!this._selectedDate) {
+        this._calendar.options.selectedDate = this._selectedDate;
+        var dateString = moment(this._selectedDate).format(this.options.format);
         this._textField.setValue(dateString);
       }
       this._calendar.render();
@@ -56,6 +57,17 @@
 
     setEnabled : function(enabled) {
       this._textField.setEnabled(enabled);
+    },
+
+    getValue : function() {
+      return this._selectedDate;
+    },
+
+    setValue : function(date) {
+      this._selectedDate = date;
+      var dateString = moment(date).format(this.options.format);
+      this._textField.setValue(dateString);
+      this._dateEdited();
     },
 
     _showCalendar : function() {
@@ -84,11 +96,13 @@
 
     _dateEdited : function(e) {
       var newDate = moment(this._textField.getValue(), this.options.format);
+      this._selectedDate = newDate.toDate();
 
       // if the enter key was pressed or we've invoked this method manually, 
       // we hide the calendar and re-format our date
       if(!e || e.keyCode == Backbone.UI.KEYS.KEY_RETURN) {
-        this._textField.setValue(moment(newDate).format(this.options.format));
+        var newValue = moment(newDate).format(this.options.format);
+        this._textField.setValue(newValue);
         this._hideCalendar();
 
         // update our bound model (but only the date portion)
@@ -97,6 +111,10 @@
           boundDate.setMonth(newDate.month());
           boundDate.setDate(newDate.date());
           boundDate.setFullYear(newDate.year());
+        }
+
+        if(_(this.options.onChange).isFunction()) {
+          this.options.onChange(newValue);
         }
       }
     }
