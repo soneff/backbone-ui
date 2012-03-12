@@ -6,7 +6,9 @@
       format : 'hh:mm a',
 
       // minute interval to use for pulldown menu
-      interval : 30
+      interval : 30,
+
+      name : null
     },
 
     initialize : function() {
@@ -31,7 +33,9 @@
     render : function() {
       $(this.el).empty();
 
-      this._textField = new Backbone.UI.TextField({}).render();
+      this._textField = new Backbone.UI.TextField({
+        name : this.options.name 
+      }).render();
       $(this._textField.input).click(_(this._showMenu).bind(this));
       $(this._textField.input).keyup(_(this._timeEdited).bind(this));
       this.el.appendChild(this._textField.el);
