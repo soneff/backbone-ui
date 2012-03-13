@@ -712,6 +712,7 @@
       format : 'MM/DD/YYYY',
       model : null,
       property : null,
+      date : null,
       name : null,
       onChange : null
     },
@@ -749,7 +750,7 @@
       this.el.appendChild(this._textField.el);
 
       this._selectedDate = (!!this.model && !!this.options.property) ? 
-        _(this.model).resolveProperty(this.options.property) : null;
+        _(this.model).resolveProperty(this.options.property) : this.options.date;
       
       if(!!this._selectedDate) {
         this._calendar.options.selectedDate = this._selectedDate;
@@ -2252,7 +2253,6 @@
       });
       document.body.appendChild(this._menu.el);
 
-
       // listen for model changes
       if(!!this.model && this.options.property) {
         this.model.bind('change:' + this.options.property, _(this.render).bind(this));
@@ -2293,6 +2293,9 @@
       var timeString = moment(time).format(this.options.format);
       this._textField.setValue(timeString);
       this._timeEdited();
+
+      this._menu.options.selectedValue = time;
+      this._menu.render();
     },
 
     setEnabled : function(enabled) {

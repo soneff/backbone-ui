@@ -6,6 +6,7 @@
       format : 'MM/DD/YYYY',
       model : null,
       property : null,
+      date : null,
       name : null,
       onChange : null
     },
@@ -43,7 +44,7 @@
       this.el.appendChild(this._textField.el);
 
       this._selectedDate = (!!this.model && !!this.options.property) ? 
-        _(this.model).resolveProperty(this.options.property) : null;
+        _(this.model).resolveProperty(this.options.property) : this.options.date;
       
       if(!!this._selectedDate) {
         this._calendar.options.selectedDate = this._selectedDate;
