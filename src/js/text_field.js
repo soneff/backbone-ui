@@ -24,7 +24,10 @@
 
       tabIndex : null,
 
-      onKeyPress : Backbone.UI.noop
+      onKeyPress : Backbone.UI.noop,
+
+      // if given, the text field will limit it's character count
+      maxLength : null
     },
 
     // public accessors
@@ -35,12 +38,12 @@
 
       $(this.el).addClass('text_field');
 
-      this.input = $.el.input();
+      this.input = $.el.input({maxLength : this.options.maxLength});
 
       $(this.input).keyup(_.bind(function(e) {
         _.defer(_(this._updateModel).bind(this));
         if(_(this.options.onKeyPress).exists() && _(this.options.onKeyPress).isFunction()) {
-          this.options.onKeyPress(e);
+          this.options.onKeyPress(e, this);
         }
       }, this));
 

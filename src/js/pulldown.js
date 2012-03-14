@@ -61,8 +61,13 @@
       _(this).extend(Backbone.UI.HasCollectionProperty);
       $(this.el).addClass('pulldown');
 
+      var onChange = this.options.onChange;
+      delete(this.options.onChange);
       var menuOptions = _(this.options).extend({
-        onChange : _(this._onItemSelected).bind(this)
+        onChange : _(function(item){
+          this._onItemSelected(item);
+          if(_(onChange).isFunction()) onChange(item);
+        }).bind(this)
       });
 
       this._menu = new Backbone.UI.Menu(menuOptions).render();
@@ -153,6 +158,7 @@
       this.button.options.glyph = _(item).resolveProperty(this.options.glyphProperty);
       this.button.render();
       this.hideMenu();
+      this.setSelectedItem(item);
     },
 
     // notify of the menu hiding

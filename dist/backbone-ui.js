@@ -1329,7 +1329,7 @@
         this._selectedAnchor = anchor;
         $(anchor).addClass('selected');
 
-        if(this.options.onChange) this.options.onChange(item);
+        if(_(this.options.onChange).isFunction()) this.options.onChange(item);
         return false;
       }, this);
 
@@ -1409,8 +1409,13 @@
       _(this).extend(Backbone.UI.HasCollectionProperty);
       $(this.el).addClass('pulldown');
 
+      var onChange = this.options.onChange;
+      delete(this.options.onChange);
       var menuOptions = _(this.options).extend({
-        onChange : _(this._onItemSelected).bind(this)
+        onChange : _(function(item){
+          this._onItemSelected(item);
+          if(_(onChange).isFunction()) onChange(item);
+        }).bind(this)
       });
 
       this._menu = new Backbone.UI.Menu(menuOptions).render();
@@ -1501,6 +1506,7 @@
       this.button.options.glyph = _(item).resolveProperty(this.options.glyphProperty);
       this.button.render();
       this.hideMenu();
+      this.setSelectedItem(item);
     },
 
     // notify of the menu hiding
@@ -2146,7 +2152,10 @@
 
       tabIndex : null,
 
-      onKeyPress : Backbone.UI.noop
+      onKeyPress : Backbone.UI.noop,
+
+      // if given, the text field will limit it's character count
+      maxLength : null
     },
 
     // public accessors
@@ -2157,12 +2166,12 @@
 
       $(this.el).addClass('text_field');
 
-      this.input = $.el.input();
+      this.input = $.el.input({maxLength : this.options.maxLength});
 
       $(this.input).keyup(_.bind(function(e) {
         _.defer(_(this._updateModel).bind(this));
         if(_(this.options.onKeyPress).exists() && _(this.options.onKeyPress).isFunction()) {
-          this.options.onKeyPress(e);
+          this.options.onKeyPress(e, this);
         }
       }, this));
 

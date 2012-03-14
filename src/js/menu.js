@@ -89,7 +89,7 @@
         this._selectedAnchor = anchor;
         $(anchor).addClass('selected');
 
-        if(this.options.onChange) this.options.onChange(item);
+        if(_(this.options.onChange).isFunction()) this.options.onChange(item);
         return false;
       }, this);
 
