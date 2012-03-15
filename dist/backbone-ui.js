@@ -431,7 +431,7 @@
   window.Backbone.UI.Calendar = Backbone.View.extend({
     options : {
       // the selected calendar date
-      selectedDate : null, 
+      date : null, 
 
       // the day that weeks start on (0 is Sunday)
       weekStart : 0,
@@ -439,18 +439,39 @@
       onSelect : null
     },
 
+    date : null, 
+
     initialize : function() {
       $(this.el).addClass('calendar');
+      _(this).bindAll('render');
     },
 
     render : function() {
-      this._renderDate(!!this.options.selectedDate ? this.options.selectedDate : new Date());
+    console.log('rendering');
+
+      if(_(this.model).exists() && _(this.options.property).exists()) {
+        this.date = _(this.model).resolveProperty(this.options.property);
+        var key = 'change:' + this.options.property;
+        this.model.unbind(key, this.render);
+        this.model.bind(key, this.render);
+      }
+
+      else {
+        this.date = this.date || this.options.date || new Date();
+      }
+
+      this._renderDate(this.date);
 
       return this;
     },
 
     _selectDate : function(date) {
-      this.options.selectedDate = date;
+      this.date = date;
+      if(_(this.model).exists() && _(this.options.property).exists()) {
+        var values = {};
+        values[this.options.property] = date;
+        this.model.set(values);
+      }
       this.render();
       if(_(this.options.onSelect).isFunction()) {
         this.options.onSelect(date);
@@ -469,7 +490,7 @@
       var daysInThisMonth = daysInMonth(date);
       var today = new Date();
       var inCurrentMonth = isSameMonth(today, date);
-      var inSelectedMonth = !!this.options.selectedDate && isSameMonth(this.options.selectedDate, date);
+      var inSelectedMonth = !!this.date && isSameMonth(this.date, date);
 
       var daysRow = $.el.tr({className : 'row days'}); 
       var names = dayNames.slice(this.options.weekStart).concat(
@@ -506,7 +527,7 @@
           var className = 'cell' + (inactive ? ' inactive' : '') + 
             (colIndex === 0 ? ' first' : colIndex === 6 ? ' last' : '') +
             (inCurrentMonth && !inactive && day === today.getDate() ? ' today' : '') +
-            (inSelectedMonth && !inactive && day == this.options.selectedDate.getDate() ? ' selected' : '');
+            (inSelectedMonth && !inactive && day == this.date.getDate() ? ' selected' : '');
 
           $.el.td({ className : className }, 
             inactive ? 
@@ -721,6 +742,7 @@
       $(this.el).addClass('date_picker');
 
       this._calendar = new Backbone.UI.Calendar({
+        className : 'date_picker_calendar',
         onSelect : _(this._selectDate).bind(this)
       });
       $(this._calendar.el).hide();
@@ -1571,9 +1593,7 @@
           $.el.a({className : 'choice' + (selected ? ' selected' : '')},
             $.el.div({className : 'mark' + (selected ? ' selected' : '')}, 
               selected ? '\u25cf' : ''),
-            $.el.div({className : 'label'}, label),
-            $.el.br({style : 'clear:both'})), 
-          $.el.br({style : 'clear:both'}));
+            $.el.div({className : 'label'}, label)));
         ul.appendChild(li);
 
         $(li).bind('click', _.bind(this._onChange, this, item));

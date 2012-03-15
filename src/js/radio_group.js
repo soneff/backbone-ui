@@ -53,9 +53,7 @@
           $.el.a({className : 'choice' + (selected ? ' selected' : '')},
             $.el.div({className : 'mark' + (selected ? ' selected' : '')}, 
               selected ? '\u25cf' : ''),
-            $.el.div({className : 'label'}, label),
-            $.el.br({style : 'clear:both'})), 
-          $.el.br({style : 'clear:both'}));
+            $.el.div({className : 'label'}, label)));
         ul.appendChild(li);
 
         $(li).bind('click', _.bind(this._onChange, this, item));

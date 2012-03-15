@@ -1,0 +1,17 @@
+<section id="date_picker" class="example">
+  <header>
+    <h1>Date Picker</h1>
+  </header>
+
+  <script type="text/javascript">
+    $(window).load(function() {
+      window.addExample('#date_picker', function() {
+        var picker = new Backbone.UI.DatePicker({
+          model : coffees.at(1),
+          property : 'roastedOn'
+        }).render();
+        return picker;
+      });
+    });
+  </script>
+</section>

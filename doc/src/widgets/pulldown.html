@@ -1,0 +1,20 @@
+<section id="pulldown" class="example">
+  <header>
+    <h1>Pulldown</h1>
+  </header>
+
+  <script type="text/javascript">
+    $(window).load(function() {
+
+      window.addExample('#pulldown', function() {
+        var pulldown = new Backbone.UI.Pulldown({
+          collection : regions,
+          model : coffees.at(1),
+          property : 'region',
+          labelProperty  : 'name'
+        }).render();
+        return pulldown;
+      });
+    });
+  </script>
+</section>

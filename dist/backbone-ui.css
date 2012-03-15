@@ -217,7 +217,7 @@ a.button {
   width:100px;
 }
 
-.calendar {
+.date_picker_calendar {
   position:absolute;
   z-index:1000;
 }
@@ -353,8 +353,13 @@ a.button {
   border-color:#222;
 }
 
+.radio_group ul {
+  margin:0;
+  padding:0;
+}
+
 .radio_group li {
-  margin:0 10px 0 0;
+  margin-left:10px;
 }
 
 .radio_group li a {
@@ -366,7 +371,6 @@ a.button {
   line-height:22px;
   color:#222;
 }
-
 
 .radio_group .mark,
 .radio_group li,

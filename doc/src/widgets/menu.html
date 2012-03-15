@@ -1,0 +1,20 @@
+<section id="menu" class="example">
+  <header>
+    <h1>Menu</h1>
+  </header>
+
+  <script type="text/javascript">
+    $(window).load(function() {
+
+      window.addExample('#menu', function() {
+        var menu = new Backbone.UI.Menu({
+          collection : regions,
+          model : coffees.at(0),
+          property : 'region',
+          labelProperty  : 'name'
+        }).render();
+        return menu;
+      });
+    });
+  </script>
+</section>

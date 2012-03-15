@@ -15,6 +15,7 @@
       $(this.el).addClass('date_picker');
 
       this._calendar = new Backbone.UI.Calendar({
+        className : 'date_picker_calendar',
         onSelect : _(this._selectDate).bind(this)
       });
       $(this._calendar.el).hide();

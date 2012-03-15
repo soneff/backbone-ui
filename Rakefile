@@ -64,4 +64,5 @@ task :doc do
   `cp -r lib doc/dist/`
   `cp -r src doc/dist/`
   `cp -r doc/lib doc/dist/`
+  `cp -r doc/src/images doc/dist/`
 end

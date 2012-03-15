@@ -1,0 +1,16 @@
+<section id="text_field" class="example">
+  <header>
+    <h1>Text Field</h1>
+  </header>
+
+  <script type="text/javascript">
+    $(window).load(function() {
+      window.addExample('#text_field', function() {
+        var field = new Backbone.UI.TextField({
+          placeholder : 'enter a value'
+        }).render();
+        return field;
+      });
+    });
+  </script>
+</section>
