@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <title>Backbone UI</title>
+
+    <!-- LIB_JS -->
+    <!-- LOCAL_JS -->
+    <!-- LIB_CSS -->
+    <!-- LOCAL_CSS -->
+
+    <script type="text/javascript" src="lib/jsbeautify.js"></script>
+    <script type="text/javascript" src="lib/prettify.js"></script>
+
+    <link rel="stylesheet" href="lib/prettify.css">
+
+    <script>
+      window.addExample = function(container, func) {
+        // strip off setup code
+        var code = func.toString();
+
+        code = js_beautify(code.substring(code.indexOf('new Back'), code.length -1));
+        var pre = $.el.pre({className : 'prettyprint'}, code);
+
+        // create a container for the code and the expand link
+        var codeContainer = $.el.div({className : 'code_container'}, pre);
+
+        $.el.div(
+          func().el,
+          codeContainer).appendTo($(container)[0]);
+      };
+    </script>
+  </head>
+
+  <body>
+    <div class="section widgets">
+      <!-- WIDGETS -->
+    </div>
+  </body>
+</html>

@@ -1,46 +1,67 @@
 require 'rubygems'
-require 'yui/compressor'
 
 desc "build the backbone-ui-min.js file for distribution"
-task :build do
-  begin
-    require 'closure-compiler'
-  rescue LoadError
-    puts "closure-compiler not found.\nInstall it by running 'gem install closure-compiler"
-    exit
-  end
+task :build => [:doc] do
+  puts 'generating distribution'
 
   css_source_files = Dir.entries("./src/css").find_all do |source_file|
     source_file.match /\.css$/
   end
-  css_compressor = YUI::CssCompressor.new
   File.open('dist/backbone-ui.css', 'w+') do |dev_file|
-    #File.open('dist/backbone-ui-min.css', 'w+') do |min_file|
-      css_source_files.each do |source_file|
-        source = File.read './src/css/' + source_file
-        #min_file.write css_compressor.compress(source)
-        dev_file.write source
-      end
-    #end
+    css_source_files.each do |source_file|
+      source = File.read './src/css/' + source_file
+      dev_file.write source
+    end
   end
 
   js_source_files = Dir.entries("./src/js").find_all do |source_file|
     source_file.match /\.js$/
   end
-  closure = Closure::Compiler.new
 
   File.open('dist/backbone-ui.js', 'w+') do |dev_file|
-    #File.open('dist/backbone-ui-min.js', 'w+') do |min_file|
-      js_source_files.each do |source_file|
-        source = File.read './src/js/' + source_file
-        #min_file.write closure.compress(source)
-        dev_file.write source
-      end
-    #end
+    js_source_files.each do |source_file|
+      source = File.read './src/js/' + source_file
+      dev_file.write source
+    end
   end
 end
 
-desc "run JavaScriptLint on the source"
-task :lint do
-  system "jsl -nofilelisting -nologo -conf docs/jsl.conf -process backbone.js"
+desc "generate the documentation in doc/dist"
+task :doc do 
+  puts 'generating documentation'
+  `rm -rf doc/dist/*`
+
+  src = File.read('doc/src/index.html')
+
+  lib_js = (Dir.glob('lib/required/**/*.js') +  Dir.glob('lib/optional/**/*.js')).map do |file|
+    "<script src='#{file}'></script>"
+  end
+  src.gsub!('<!-- LIB_JS -->', lib_js.join("\n"))
+
+  local_js = Dir.glob('src/**/*.js').map do |file|
+    "<script src='#{file}'></script>"
+  end
+  src.gsub!('<!-- LOCAL_JS -->', local_js.join("\n"))
+
+  lib_css = Dir.glob('lib/**/*.css').map do |file|
+    "<link rel='stylesheet' href='#{file}'>"
+  end
+  src.gsub!('<!-- LIB_CSS -->', lib_css.join("\n"))
+
+  local_css = Dir.glob('src/**/*.css').map do |file|
+    "<link rel='stylesheet' href='#{file}'>"
+  end
+  src.gsub!('<!-- LOCAL_CSS -->', local_css.join("\n"))
+
+  widgets = local_css = Dir.glob('doc/src/widgets/**/*.html').map do |file|
+    File.read(file)
+  end
+  src.gsub!('<!-- WIDGETS -->', widgets.join("\n"))
+
+  index = File.open('doc/dist/index.html', 'w') {|file| file.puts(src)}
+
+  # copy src and lib directories over to documentation root
+  `cp -r lib doc/dist/`
+  `cp -r src doc/dist/`
+  `cp -r doc/lib doc/dist/`
 end
