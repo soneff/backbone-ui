@@ -2,27 +2,6 @@
   window.Backbone.UI.RadioGroup = Backbone.View.extend({
 
     options : {
-      className : 'radio_group',
-
-      // each item can contain :
-      collection : [],
-
-      model : null,
-
-      property : null,
-
-      // A property of the collection item that describes the label.
-      labelProperty : 'label',
-
-      // The name of a collection item property describing the value to be
-      // stored in the model's bound property.  If no valueProperty
-      // is given, the actual collection item will be used.
-      valueProperty : null,
-
-      // The initially selected item.  This option is ignored when a 
-      // model and property are given
-      selectedItem : null,
-
       // A callback to invoke with the selected item whenever the selection changes
       onChange : Backbone.UI.noop
     },
@@ -43,7 +22,7 @@
 
       var ul = $.el.ul();
       var selectedValue = this._valueForItem(this.selectedItem);
-      _.each(this.options.collection, function(item) {
+      _(this._collectionArray()).each(function(item) {
 
         var selected = selectedValue === this._valueForItem(item);
 

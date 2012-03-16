@@ -37,14 +37,10 @@
 
   _(Backbone.View.prototype).extend({
     // resolves the appropriate content from the given choices
-    resolveContent : function(content, model, property) {
-      return _(property).exists() && _(model).exists() && _(model[property]).isFunction() ?
-      model[property]() :
-      _(property).exists() && _(model).exists() ?
-        _(model).resolveProperty(property) :
-        _(content).exists() && _(content).isFunction() ?
-        content(model) :
-        content;
+    resolveContent : function(model, property) {
+      var hasModelProperty = _(property).exists() && _(model).exists();
+      return hasModelProperty && _(model[property]).isFunction() ? model[property]() : 
+        hasModelProperty ?  _(model).resolveProperty(property) : null;
     }
   });
 
@@ -468,9 +464,7 @@
     _selectDate : function(date) {
       this.date = date;
       if(_(this.model).exists() && _(this.options.property).exists()) {
-        var values = {};
-        values[this.options.property] = date;
-        this.model.set(values);
+        _(this.model).setProperty(this.options.property, date);
       }
       this.render();
       if(_(this.options.onSelect).isFunction()) {
@@ -731,8 +725,6 @@
     options : {
       // a moment.js format : http://momentjs.com/docs/#/display/format
       format : 'MM/DD/YYYY',
-      model : null,
-      property : null,
       date : null,
       name : null,
       onChange : null
@@ -837,9 +829,11 @@
         // update our bound model (but only the date portion)
         if(!!this.model && this.options.property) {
           var boundDate = _(this.model).resolveProperty(this.options.property);
-          boundDate.setMonth(newDate.month());
-          boundDate.setDate(newDate.date());
-          boundDate.setFullYear(newDate.year());
+          var updatedDate = new Date(boundDate);
+          updatedDate.setMonth(newDate.month());
+          updatedDate.setDate(newDate.date());
+          updatedDate.setFullYear(newDate.year());
+          _(this.model).setProperty(this.options.property, updatedDate);
         }
 
         if(_(this.options.onChange).isFunction()) {
@@ -1059,13 +1053,13 @@
 
  // A mixin for dealing with glyphs in widgets 
 (function(){
+  // options added by this mixin:
+
+  // collection
+  // labelProperty
+  // valueProperty
+
   Backbone.UI.HasCollectionProperty = {
-
-    collection : [],
-
-    selectedItem : null,
-
-    selectedValue : null,
 
     _determineSelectedItem : function() {
       var item;
@@ -1101,7 +1095,13 @@
       return _(this.options.valueProperty).exists() ? 
         _(item).resolveProperty(this.options.valueProperty) :
         item;
+    },
+
+    _collectionArray : function() {
+      return _(this.options.collection).exists() ?
+        this.options.collection.models || this.options.collection : [];
     }
+
   };
 }());
 
@@ -1245,7 +1245,7 @@
         content = view.el;
       }
       else {
-        content = this.resolveContent(null, model, this.options.labelProperty);
+        content = this.resolveContent(model, this.options.labelProperty);
       }
 
       var item = $.el.li(content);
@@ -1264,12 +1264,7 @@
   window.Backbone.UI.Menu = Backbone.View.extend({
 
     options : {
-      // The collection item property describing the label.
-      labelProperty : 'label',
-
-      onChange : null,
-
-      selectedValue : null
+      emptyItem : null
     },
 
     initialize : function() {
@@ -1289,18 +1284,17 @@
       var list = $.el.ul();
 
       // add entry for the empty model if it exists
-      if(!!this.options.emptyModel) {
-        this._addItemToMenu(list, this.options.emptyModel);
+      if(!!this.options.emptyItem) {
+        this._addItemToMenu(list, this.options.emptyItem);
       }
 
-      var collection = _(this.options.collection).exists() ?
-        this.options.collection.models || this.options.collection : [];
+      var selectedItem = this._determineSelectedItem();
 
-      _(collection).each(function(item) {
-        var select = !!this.options.selectedValue && 
-          _(item.value).isEqual(this.options.selectedValue);
-
-        this._addItemToMenu(list, item, select);
+console.log(this._collectionArray());
+      _(this._collectionArray()).each(function(item) {
+        var selectedValue = this._valueForItem(selectedItem);
+        var itemValue = this._valueForItem(item);
+        this._addItemToMenu(list, item, _(selectedValue).isEqual(itemValue));
       }, this);
 
       // wrap them up in a scroller 
@@ -1347,7 +1341,7 @@
       var clickFunction = _.bind(function(e) {
         if(!!this._selectedAnchor) $(this._selectedAnchor).removeClass('selected');
 
-        this._setSelectedItem(item === this.options.emptyModel ? null : item);
+        this._setSelectedItem(_(item).isEqual(this.options.emptyItem) ? null : item);
         this._selectedAnchor = anchor;
         $(anchor).addClass('selected');
 
@@ -1371,8 +1365,6 @@
 (function(){
   window.Backbone.UI.Pulldown = Backbone.View.extend({
     options : {
-      className : 'pulldown',
-
       // text to place in the pulldown button before a
       // selection has been made
       placeholder : 'Select...',
@@ -1380,30 +1372,6 @@
       model : null,
 
       property : null,
-
-      // The initially selected item.  This option is ignored when a 
-      // model and property are given.
-      selectedItem : null,
-
-      // the collection of objects this pulldown will choose from.
-      // Use the 'labelProperty' option to declare which property
-      // of each object should be used as the label.  Similary, 
-      // use the 'glyphProperty' and 'glyphRightProperty' to 
-      // declare which properties should be used as the right
-      // and left glyph.
-      collection : [],
-
-      // The collection item property describing the label.
-      labelProperty : 'label',
-
-      // The collection item property describing the value to be
-      // stored in the model's bound property.  If no valueProperty
-      // is given, the actual collection item will be used.
-      valueProperty : null,
-
-      // This model represents an empty or default selection that
-      // will be placed at the top of the pulldown
-      emptyModel : null,
 
       glyphProperty : null,
 
@@ -1428,7 +1396,6 @@
 
     initialize : function() {
       _(this).extend(Backbone.UI.HasGlyph);
-      _(this).extend(Backbone.UI.HasCollectionProperty);
       $(this.el).addClass('pulldown');
 
       var onChange = this.options.onChange;
@@ -1467,18 +1434,16 @@
     },
 
     // public accessors 
-    button       : null,
-    selectedItem : null,
+    button : null,
 
     render : function() {
       $(this.el).empty();
 
-      this.selectedItem = this._determineSelectedItem() || this.options.selectedItem;
-
+      var item = this._menu.selectedItem;
       this.button = new Backbone.UI.Button({
         className  : 'pulldown_button',
-        label      : this._labelForItem(this.selectedItem),
-        glyph      : _(this.selectedItem).resolveProperty(this.options.glyphProperty),
+        label      : this._labelForItem(item),
+        glyph      : _(item).resolveProperty(this.options.glyphProperty),
         glyphRight : '\u25bc',
         onClick    : _.bind(this.showMenu, this)
       }).render();
@@ -1523,12 +1488,13 @@
     },
 
     _onItemSelected : function(item) {
-      $(this.el).removeClass('placeholder');
-      this.button.options.label = this._labelForItem(item);
-      this.button.options.glyph = _(item).resolveProperty(this.options.glyphProperty);
-      this.button.render();
-      this.hideMenu();
-      this.setSelectedItem(item);
+      if(!!this.button) {
+        $(this.el).removeClass('placeholder');
+        this.button.options.label = this._labelForItem(item);
+        this.button.options.glyph = _(item).resolveProperty(this.options.glyphProperty);
+        this.button.render();
+        this.hideMenu();
+      }
     },
 
     // notify of the menu hiding
@@ -1542,27 +1508,6 @@
   window.Backbone.UI.RadioGroup = Backbone.View.extend({
 
     options : {
-      className : 'radio_group',
-
-      // each item can contain :
-      collection : [],
-
-      model : null,
-
-      property : null,
-
-      // A property of the collection item that describes the label.
-      labelProperty : 'label',
-
-      // The name of a collection item property describing the value to be
-      // stored in the model's bound property.  If no valueProperty
-      // is given, the actual collection item will be used.
-      valueProperty : null,
-
-      // The initially selected item.  This option is ignored when a 
-      // model and property are given
-      selectedItem : null,
-
       // A callback to invoke with the selected item whenever the selection changes
       onChange : Backbone.UI.noop
     },
@@ -1583,7 +1528,7 @@
 
       var ul = $.el.ul();
       var selectedValue = this._valueForItem(this.selectedItem);
-      _.each(this.options.collection, function(item) {
+      _(this._collectionArray()).each(function(item) {
 
         var selected = selectedValue === this._valueForItem(item);
 
@@ -1940,10 +1885,6 @@
       // each column should contain:
       //   label   : a string, element, or function describing the column's heading.
       //   width   : the width of the column in pixels.
-      //   content : a string, element, or function describing the content
-      //             that should be inserted in the column.  When a function
-      //             is given, the function will be invoked with the row's model
-      //             as the sole parameter.
       //   property : the name of the property the column's content should be bound
       //              to.  This option is mutually exclusive with the content option.
       columns : [],
@@ -2040,7 +1981,7 @@
       _(this.options.columns).each(function(column, index, list) {
         var width = !!column.width ? parseInt(column.width, 10) + 5 : null;
         var style = width ? 'width:' + width + 'px; max-width:' + width + 'px': null;
-        var content = this.resolveContent(column.content, model, column.property);
+        var content = this.resolveContent(model, column.property);
         row.appendChild($.el.td(
           {className : _(list).nameForIndex(index), style : style}, 
           $.el.div({className : 'wrapper', style : style}, content)));
@@ -2274,7 +2215,9 @@
       $(this.el).addClass('time_picker');
 
       this._menu = new Backbone.UI.Menu({
-        onChange : _(this._onSelectTimeItem).bind(this)
+        onChange : _(this._onSelectTimeItem).bind(this),
+        labelProperty : 'label',
+        valueProperty : 'value'
       });
       $(this._menu.el).hide();
       $(this._menu.el).autohide({
@@ -2307,7 +2250,6 @@
       }
 
       this._menu.options.collection = this._collectTimes();
-      this._menu.options.selectedValue = date;
       this._menu.render();
       
       return this;
@@ -2378,8 +2320,10 @@
         // update our bound model (but only the date portion)
         if(!!this.model && this.options.property) {
           var boundDate = _(this.model).resolveProperty(this.options.property);
-          boundDate.setHours(newDate.hours());
-          boundDate.setMinutes(newDate.minutes());
+          var updatedDate = new Date(boundDate);
+          updatedDate.setHours(newDate.hours());
+          updatedDate.setMinutes(newDate.minutes());
+          _(this.model).setProperty(this.options.property, updatedDate);
         }
 
         if(_(this.options.onChange).isFunction()) {

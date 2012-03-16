@@ -8,10 +8,10 @@
     $(window).load(function() {
       window.addExample('#radio_group', function() {
         var group = new Backbone.UI.RadioGroup({
-          collection : [
-            {label : 'Option 1', value : 0},
-            {label : 'Option 2', value : 1}
-          ]
+          collection : regions,
+          model : coffees.at(0),
+          property : 'region',
+          labelProperty  : 'name'
         }).render();
         return group;
       });

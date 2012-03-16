@@ -15,7 +15,9 @@
       $(this.el).addClass('time_picker');
 
       this._menu = new Backbone.UI.Menu({
-        onChange : _(this._onSelectTimeItem).bind(this)
+        onChange : _(this._onSelectTimeItem).bind(this),
+        labelProperty : 'label',
+        valueProperty : 'value'
       });
       $(this._menu.el).hide();
       $(this._menu.el).autohide({
@@ -48,7 +50,6 @@
       }
 
       this._menu.options.collection = this._collectTimes();
-      this._menu.options.selectedValue = date;
       this._menu.render();
       
       return this;
@@ -119,8 +120,10 @@
         // update our bound model (but only the date portion)
         if(!!this.model && this.options.property) {
           var boundDate = _(this.model).resolveProperty(this.options.property);
-          boundDate.setHours(newDate.hours());
-          boundDate.setMinutes(newDate.minutes());
+          var updatedDate = new Date(boundDate);
+          updatedDate.setHours(newDate.hours());
+          updatedDate.setMinutes(newDate.minutes());
+          _(this.model).setProperty(this.options.property, updatedDate);
         }
 
         if(_(this.options.onChange).isFunction()) {

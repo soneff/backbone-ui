@@ -1,8 +1,6 @@
 (function(){
   window.Backbone.UI.Pulldown = Backbone.View.extend({
     options : {
-      className : 'pulldown',
-
       // text to place in the pulldown button before a
       // selection has been made
       placeholder : 'Select...',
@@ -10,30 +8,6 @@
       model : null,
 
       property : null,
-
-      // The initially selected item.  This option is ignored when a 
-      // model and property are given.
-      selectedItem : null,
-
-      // the collection of objects this pulldown will choose from.
-      // Use the 'labelProperty' option to declare which property
-      // of each object should be used as the label.  Similary, 
-      // use the 'glyphProperty' and 'glyphRightProperty' to 
-      // declare which properties should be used as the right
-      // and left glyph.
-      collection : [],
-
-      // The collection item property describing the label.
-      labelProperty : 'label',
-
-      // The collection item property describing the value to be
-      // stored in the model's bound property.  If no valueProperty
-      // is given, the actual collection item will be used.
-      valueProperty : null,
-
-      // This model represents an empty or default selection that
-      // will be placed at the top of the pulldown
-      emptyModel : null,
 
       glyphProperty : null,
 
@@ -58,7 +32,6 @@
 
     initialize : function() {
       _(this).extend(Backbone.UI.HasGlyph);
-      _(this).extend(Backbone.UI.HasCollectionProperty);
       $(this.el).addClass('pulldown');
 
       var onChange = this.options.onChange;
@@ -97,18 +70,16 @@
     },
 
     // public accessors 
-    button       : null,
-    selectedItem : null,
+    button : null,
 
     render : function() {
       $(this.el).empty();
 
-      this.selectedItem = this._determineSelectedItem() || this.options.selectedItem;
-
+      var item = this._menu.selectedItem;
       this.button = new Backbone.UI.Button({
         className  : 'pulldown_button',
-        label      : this._labelForItem(this.selectedItem),
-        glyph      : _(this.selectedItem).resolveProperty(this.options.glyphProperty),
+        label      : this._labelForItem(item),
+        glyph      : _(item).resolveProperty(this.options.glyphProperty),
         glyphRight : '\u25bc',
         onClick    : _.bind(this.showMenu, this)
       }).render();
@@ -153,12 +124,13 @@
     },
 
     _onItemSelected : function(item) {
-      $(this.el).removeClass('placeholder');
-      this.button.options.label = this._labelForItem(item);
-      this.button.options.glyph = _(item).resolveProperty(this.options.glyphProperty);
-      this.button.render();
-      this.hideMenu();
-      this.setSelectedItem(item);
+      if(!!this.button) {
+        $(this.el).removeClass('placeholder');
+        this.button.options.label = this._labelForItem(item);
+        this.button.options.glyph = _(item).resolveProperty(this.options.glyphProperty);
+        this.button.render();
+        this.hideMenu();
+      }
     },
 
     // notify of the menu hiding

@@ -1,0 +1,29 @@
+<section id="table_view" class="example">
+  <header>
+    <h1>Table View</h1>
+  </header>
+
+  <script type="text/javascript">
+    $(window).load(function() {
+      window.addExample('#table_view', function() {
+        var table = new Backbone.UI.TableView({
+          model : coffees,
+          onItemClick : function(model) {
+            alert(model.get('name'));
+          },
+          columns : [{
+            label : 'Name',
+            property : 'name'
+          }, {
+            label : 'Roaster',
+            width : 100,
+            property : 'roaster'
+          }]
+        }).render();
+
+        return table;
+      });
+    });
+  </script>
+</section>
+

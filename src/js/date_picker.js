@@ -4,8 +4,6 @@
     options : {
       // a moment.js format : http://momentjs.com/docs/#/display/format
       format : 'MM/DD/YYYY',
-      model : null,
-      property : null,
       date : null,
       name : null,
       onChange : null
@@ -110,9 +108,11 @@
         // update our bound model (but only the date portion)
         if(!!this.model && this.options.property) {
           var boundDate = _(this.model).resolveProperty(this.options.property);
-          boundDate.setMonth(newDate.month());
-          boundDate.setDate(newDate.date());
-          boundDate.setFullYear(newDate.year());
+          var updatedDate = new Date(boundDate);
+          updatedDate.setMonth(newDate.month());
+          updatedDate.setDate(newDate.date());
+          updatedDate.setFullYear(newDate.year());
+          _(this.model).setProperty(this.options.property, updatedDate);
         }
 
         if(_(this.options.onChange).isFunction()) {

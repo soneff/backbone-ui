@@ -78,7 +78,7 @@
         content = view.el;
       }
       else {
-        content = this.resolveContent(null, model, this.options.labelProperty);
+        content = this.resolveContent(model, this.options.labelProperty);
       }
 
       var item = $.el.li(content);

@@ -7,7 +7,8 @@
     $(window).load(function() {
       window.addExample('#text_field', function() {
         var field = new Backbone.UI.TextField({
-          placeholder : 'enter a value'
+          model : coffees.at(0),
+          property : 'roaster'
         }).render();
         return field;
       });

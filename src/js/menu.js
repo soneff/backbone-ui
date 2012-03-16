@@ -2,12 +2,7 @@
   window.Backbone.UI.Menu = Backbone.View.extend({
 
     options : {
-      // The collection item property describing the label.
-      labelProperty : 'label',
-
-      onChange : null,
-
-      selectedValue : null
+      emptyItem : null
     },
 
     initialize : function() {
@@ -27,18 +22,17 @@
       var list = $.el.ul();
 
       // add entry for the empty model if it exists
-      if(!!this.options.emptyModel) {
-        this._addItemToMenu(list, this.options.emptyModel);
+      if(!!this.options.emptyItem) {
+        this._addItemToMenu(list, this.options.emptyItem);
       }
 
-      var collection = _(this.options.collection).exists() ?
-        this.options.collection.models || this.options.collection : [];
+      var selectedItem = this._determineSelectedItem();
 
-      _(collection).each(function(item) {
-        var select = !!this.options.selectedValue && 
-          _(item.value).isEqual(this.options.selectedValue);
-
-        this._addItemToMenu(list, item, select);
+console.log(this._collectionArray());
+      _(this._collectionArray()).each(function(item) {
+        var selectedValue = this._valueForItem(selectedItem);
+        var itemValue = this._valueForItem(item);
+        this._addItemToMenu(list, item, _(selectedValue).isEqual(itemValue));
       }, this);
 
       // wrap them up in a scroller 
@@ -85,7 +79,7 @@
       var clickFunction = _.bind(function(e) {
         if(!!this._selectedAnchor) $(this._selectedAnchor).removeClass('selected');
 
-        this._setSelectedItem(item === this.options.emptyModel ? null : item);
+        this._setSelectedItem(_(item).isEqual(this.options.emptyItem) ? null : item);
         this._selectedAnchor = anchor;
         $(anchor).addClass('selected');
 

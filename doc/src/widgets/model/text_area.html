@@ -1,0 +1,17 @@
+<section id="text_area" class="example">
+  <header>
+    <h1>Textarea</h1>
+  </header>
+
+  <script type="text/javascript">
+    $(window).load(function() {
+      window.addExample('#text_area', function() {
+        var area = new Backbone.UI.TextArea({
+          model : regions.at(0),
+          property : 'name'
+        }).render();
+        return area;
+      });
+    });
+  </script>
+</section>

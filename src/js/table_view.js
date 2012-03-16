@@ -6,10 +6,6 @@
       // each column should contain:
       //   label   : a string, element, or function describing the column's heading.
       //   width   : the width of the column in pixels.
-      //   content : a string, element, or function describing the content
-      //             that should be inserted in the column.  When a function
-      //             is given, the function will be invoked with the row's model
-      //             as the sole parameter.
       //   property : the name of the property the column's content should be bound
       //              to.  This option is mutually exclusive with the content option.
       columns : [],
@@ -106,7 +102,7 @@
       _(this.options.columns).each(function(column, index, list) {
         var width = !!column.width ? parseInt(column.width, 10) + 5 : null;
         var style = width ? 'width:' + width + 'px; max-width:' + width + 'px': null;
-        var content = this.resolveContent(column.content, model, column.property);
+        var content = this.resolveContent(model, column.property);
         row.appendChild($.el.td(
           {className : _(list).nameForIndex(index), style : style}, 
           $.el.div({className : 'wrapper', style : style}, content)));

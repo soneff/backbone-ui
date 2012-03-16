@@ -1,12 +1,12 @@
  // A mixin for dealing with glyphs in widgets 
 (function(){
+  // options added by this mixin:
+
+  // collection
+  // labelProperty
+  // valueProperty
+
   Backbone.UI.HasCollectionProperty = {
-
-    collection : [],
-
-    selectedItem : null,
-
-    selectedValue : null,
 
     _determineSelectedItem : function() {
       var item;
@@ -42,7 +42,13 @@
       return _(this.options.valueProperty).exists() ? 
         _(item).resolveProperty(this.options.valueProperty) :
         item;
+    },
+
+    _collectionArray : function() {
+      return _(this.options.collection).exists() ?
+        this.options.collection.models || this.options.collection : [];
     }
+
   };
 }());
 

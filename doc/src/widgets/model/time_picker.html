@@ -7,7 +7,8 @@
     $(window).load(function() {
       window.addExample('#time_picker', function() {
         var picker = new Backbone.UI.TimePicker({
-
+          model : coffees.at(0),
+          property : 'roastedOn'
         }).render();
         return picker;
       });

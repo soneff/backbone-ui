@@ -60,9 +60,7 @@
     _selectDate : function(date) {
       this.date = date;
       if(_(this.model).exists() && _(this.options.property).exists()) {
-        var values = {};
-        values[this.options.property] = date;
-        this.model.set(values);
+        _(this.model).setProperty(this.options.property, date);
       }
       this.render();
       if(_(this.options.onSelect).isFunction()) {
