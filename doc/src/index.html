@@ -41,6 +41,26 @@
         list-style-type:square;  
       }
 
+      .component_type {
+        padding-left:20px;
+      }
+
+      .model_bound {
+        border-left:2px solid #a88e7d;
+      }
+
+      .model_bound_with_collection {
+        border-left:2px solid #aa7b5d;
+      }
+
+      .collection_bound {
+        border-left:2px solid #ab673a;
+      }
+
+      .non_bound {
+        border-left:2px solid #ae5317;
+      }
+
       a {
         color:#ae5317;
         text-decoration:none;
@@ -63,6 +83,10 @@
       .backbone_heading .container {
         background-color:#fff;
         height:80px;
+      }
+      
+      .components {
+        padding-left:20px;
       }
 
       .components .result {
@@ -109,6 +133,28 @@
 
       #example_state {
         margin-top:-20px;
+      }
+
+      section .options ul {
+        list-style-type:none;
+      }
+
+      section .options li {
+        margin-bottom:10px;
+      }
+
+      .options .key {
+        width:150px;
+        text-align:right;
+        float:left;
+      }
+
+      .options .value {
+        margin-left:160px;
+      }
+
+      .options li {
+        clear:both;
       }
     </style>
 
@@ -247,8 +293,17 @@
         <p>
         All components inherit from Backbone.View, and each render method will return a reference to the view itself.  Feel free to pass any standard <a href='http://documentcloud.github.com/backbone/#View-constructor'>Backbone.View option</a> when creating these components.
         As a convenience, the underscored version of the component's class name will be added to each component's element.  
-        
         </p>
+
+        <p>
+        Components can be broken down into four categories:
+        </p>
+        <ul>
+          <li>Model Bound</li>
+          <li>Collection Bound</li>
+          <li>Model Bound with Collection Property</li>
+          <li>Non-Bound</li>
+        </ul>
 
         <p>
         The following data will be used throughout the examples:
@@ -267,8 +322,38 @@
       <div id="example_state"></div>
     </div>
 
-    <div class="section components">
-      <!-- WIDGETS -->
-    </div>
+    <section class="component_type model_bound">
+      <h1>Model-Bound</h1>
+
+      <p>
+      Model-Bound components are those that interact directly with one or more properties of a single model.
+      <div class="options">
+      </div>
+      </p>
+      <div class="components">
+        <!-- MODEL_BOUND -->
+      </div>
+    </section>
+
+    <section class="component_type model_bound_with_collection">
+      <h1>Model-Bound with Collection Property</h1>
+      <div class="components">
+        <!-- MODEL_BOUND_WITH_COLLECTION -->
+      </div>
+    </section>
+
+    <section class="component_type collection_bound">
+      <h1>Collection-Bound</h1>
+      <div class="components">
+        <!-- COLLECTION_BOUND -->
+      </div>
+    </section>
+
+    <section class="component_type non_bound">
+      <h1>Non-Bound</h1>
+      <div class="components">
+        <!-- NON_BOUND -->
+      </div>
+    </section>
   </body>
 </html>

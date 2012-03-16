@@ -1,8 +1,10 @@
 (function(){
   window.Backbone.UI.Button = Backbone.View.extend({
     options : {
+      // bar
       tagName : 'a',
 
+      // bar
       className : 'button',
 
       // the text displayed on the button
@@ -22,11 +24,13 @@
       // glyph to display to the right of the label
       glyphRight : null,
 
+      // foo
       hasBorder : true,
 
       // A callback to invoke when the button is clicked
       onClick : null,
 
+      // bar
       isSubmit : false
     },
 

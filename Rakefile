@@ -64,16 +64,37 @@ task :doc do
     options = {}
     comments = []
     options_node.each do |node|
+      node.comments.each { |comment| comments << comment.value.gsub(/^\/\//, '') }
       if node.kind_of? RKelly::Nodes::PropertyNode
         if comments.length > 0
-          options[node.name] = comments.flatten.join
+          options[node.name.to_sym] = comments.join
           comments = []
         end
       end
-      comments << node.comments.map { |comment| comment.value.gsub(/^\/\//, '') }
     end
 
     options
+  end
+
+  def build_components(dir)
+    Dir.glob("#{dir}/**/*.html").map do |file|
+
+      name = file[(file.rindex('/') + 1)..-1]
+      name = name[0..(name.rindex '.') -1]
+      name = "src/js/#{name}.js"
+
+      map = collect_option_comments(File.read(name))
+
+      options_markup = map.keys.map do |key|
+        "<li><div class='key'>#{key}</div><div class='value'>#{map[key]}</div></li>"
+      end
+      options_markup = "<div class='options'><h2>Options</h2><ul>#{options_markup.join}</ul></div>"
+
+      content = File.read(file)
+      content.gsub!('<!-- OPTIONS -->', options_markup)
+
+      content
+    end.join("\n")
   end
 
   src = File.read('doc/src/index.html')
@@ -83,26 +104,10 @@ task :doc do
   src.gsub!('<!-- CSS -->', build_css_tags(['lib', 'src/css']).join("\n"))
 
   # insert widgets and their associated option comments
-  widgets = Dir.glob('doc/src/widgets/**/*.html').map do |file|
-
-    name = file[(file.rindex('/') + 1)..-1]
-    name = name[0..(name.rindex '.') -1]
-    name = "src/js/#{name}.js"
-
-    map = collect_option_comments(File.read(name))
-    map.keys.sort
-
-    options_markup = map.keys.sort.map do |key|
-      "<li>#{key}:#{map[key]}</li>"
-    end
-    options_markup = "<div class='options'><h2>Options</h2><ul>#{options_markup.join}</ul></div>"
-
-    content = File.read(file)
-    content.gsub!('<!-- OPTIONS -->', options_markup)
-
-    content
-  end
-  src.gsub!('<!-- WIDGETS -->', widgets.join("\n"))
+  src.gsub!('<!-- MODEL_BOUND -->', build_components('doc/src/widgets/model'))
+  src.gsub!('<!-- MODEL_BOUND_WITH_COLLECTION -->', build_components('doc/src/widgets/model_with_collection'))
+  src.gsub!('<!-- COLLECTION_BOUND -->', build_components('doc/src/widgets/collection'))
+  src.gsub!('<!-- NON_BOUND -->', build_components('doc/src/widgets/non_bound'))
 
   index = File.open('doc/dist/index.html', 'w') {|file| file.puts(src)}
 
