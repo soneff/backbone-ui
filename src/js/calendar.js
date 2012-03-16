@@ -60,7 +60,15 @@
     _selectDate : function(date) {
       this.date = date;
       if(_(this.model).exists() && _(this.options.property).exists()) {
-        _(this.model).setProperty(this.options.property, date);
+
+        // we only want to set the bound property's date portion
+        var boundDate = _(this.model).resolveProperty(this.options.property);
+        var updatedDate = new Date(boundDate.getTime());
+        updatedDate.setMonth(date.getMonth());
+        updatedDate.setDate(date.getDate());
+        updatedDate.setFullYear(date.getFullYear());
+
+        _(this.model).setProperty(this.options.property, updatedDate);
       }
       this.render();
       if(_(this.options.onSelect).isFunction()) {

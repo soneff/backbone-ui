@@ -7,7 +7,7 @@
     $(window).load(function() {
       window.addExample('#checkbox', function() {
         var checkbox = new Backbone.UI.Checkbox({
-          model : coffees.at(0),
+          model : coffee,
           property : 'acidic',
           labelProperty : 'roaster'
         }).render();

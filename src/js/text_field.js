@@ -34,7 +34,9 @@
     input : null,
 
     initialize : function() {
+      _.extend(this, Backbone.UI.HasModel);
       _.extend(this, Backbone.UI.HasGlyph);
+      _(this).bindAll('_refreshValue');
 
       $(this.el).addClass('text_field');
 
@@ -47,12 +49,7 @@
         }
       }, this));
 
-      if(!!this.model && this.options.property) {
-        this.model.bind('change:' + this.options.property, _.bind(function() {
-          var newValue = this.model.get(this.options.property);
-          if(this.input && this.input.value !== newValue) this.input.value = this.model.get(this.options.property);
-        }, this));
-      }
+      this._observeModel(this._refreshValue);
     },
 
     render : function() {
@@ -105,6 +102,13 @@
 
     _updateModel : function() {
       _(this.model).setProperty(this.options.property, this.input.value);
+    },
+
+    _refreshValue : function() {
+      var newValue = this.model.get(this.options.property);
+      if(this.input && this.input.value !== newValue) {
+        this.input.value = this.model.get(this.options.property);
+      }
     }
   });
 }());

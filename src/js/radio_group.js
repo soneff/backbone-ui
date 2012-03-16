@@ -7,8 +7,10 @@
     },
 
     initialize : function() {
-      _.extend(this, Backbone.UI.HasCollectionProperty);
-      _.extend(this, Backbone.UI.HasGlyph);
+      _(this).extend(Backbone.UI.HasModel);
+      _(this).extend(Backbone.UI.HasGlyph);
+      _(this).extend(Backbone.UI.HasCollectionProperty);
+      _(this).bindAll('render');
       $(this.el).addClass('radio_group');
     },
 
@@ -16,9 +18,13 @@
     selectedItem : null,
 
     render : function() {
-      this.selectedItem = this.selectedItem || this._determineSelectedItem();
 
       $(this.el).empty();
+
+      this._observeModel(this.render);
+      this._observeCollection(this.render);
+
+      this.selectedItem = this._determineSelectedItem();
 
       var ul = $.el.ul();
       var selectedValue = this._valueForItem(this.selectedItem);

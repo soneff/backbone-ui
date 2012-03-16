@@ -7,7 +7,7 @@
     $(window).load(function() {
       window.addExample('#date_picker', function() {
         var picker = new Backbone.UI.DatePicker({
-          model : coffees.at(1),
+          model : coffee,
           property : 'roastedOn'
         }).render();
         return picker;

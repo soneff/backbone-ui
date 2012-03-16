@@ -31,9 +31,9 @@
     },
 
     initialize : function() {
-      _.extend(this, Backbone.UI.HasGlyph);
-
-      _.bindAll(this, 'render');
+      _(this).extend(Backbone.UI.HasModel);
+      _(this).extend(Backbone.UI.HasGlyph);
+      _(this).bindAll('render');
 
       $(this.el).addClass('button');
 
@@ -71,14 +71,9 @@
     },
 
     render : function() {
-      var labelText = this.options.label;
+      var labelText = _(this.model).resolveProperty(this.options.property) || this.options.label;
 
-      if(_(this.model).exists() && _(this.options.property).exists()) {
-        var key = 'change:' + this.options.property;
-        this.model.unbind(key, this.render);
-        this.model.bind(key, this.render);
-        labelText = _(this.model).resolveProperty(this.options.property);
-      }
+      this._observeModel(this.render);
 
       $(this.el).empty();
       $(this.el).toggleClass('has_border', this.options.hasBorder);

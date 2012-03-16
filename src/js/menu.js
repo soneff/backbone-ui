@@ -6,17 +6,22 @@
     },
 
     initialize : function() {
-      $(this.el).addClass('menu');
+      _(this).extend(Backbone.UI.HasModel);
       _(this).extend(Backbone.UI.HasCollectionProperty);
+      _(this).bindAll('render');
 
-      this._textField = new Backbone.UI.TextField({
-      }).render();
+      $(this.el).addClass('menu');
+
+      this._textField = new Backbone.UI.TextField().render();
     },
 
     scroller : null,
 
     render : function() {
       $(this.el).empty();
+
+      this._observeModel(this.render);
+      this._observeCollection(this.render);
 
       // create a new list of items
       var list = $.el.ul();
@@ -28,7 +33,6 @@
 
       var selectedItem = this._determineSelectedItem();
 
-console.log(this._collectionArray());
       _(this._collectionArray()).each(function(item) {
         var selectedValue = this._valueForItem(selectedItem);
         var itemValue = this._valueForItem(item);

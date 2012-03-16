@@ -45,7 +45,16 @@
 
     _onItemChanged : function(model) {
       var view = this.itemViews[model.cid];
-      if(!!view && view.el && view.el.parentNode) view.render();
+      // re-render the individual item view if it's a backbone view
+      if(!!view && view.el && view.el.parentNode) {
+        view.render();
+      }
+
+      // otherwise, we re-render the entire collection
+      // TODO this is terribly inefficient
+      else {
+        this.render();
+      }
       if(this.options.onChange) this.options.onChange();
 
       // TODO this may require re-sorting

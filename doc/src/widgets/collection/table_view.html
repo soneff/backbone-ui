@@ -7,7 +7,7 @@
     $(window).load(function() {
       window.addExample('#table_view', function() {
         var table = new Backbone.UI.TableView({
-          model : coffees,
+          model : regions,
           onItemClick : function(model) {
             alert(model.get('name'));
           },
@@ -15,9 +15,9 @@
             label : 'Name',
             property : 'name'
           }, {
-            label : 'Roaster',
+            label : 'Notes',
             width : 100,
-            property : 'roaster'
+            property : 'notes'
           }]
         }).render();
 

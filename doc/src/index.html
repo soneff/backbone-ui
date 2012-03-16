@@ -23,7 +23,7 @@
 
       section {
         margin-bottom:40px;
-        width:674px;
+        width:800px;
       }
 
       section h1 {
@@ -64,28 +64,48 @@
 
       .components .result {
         width:240px;
-        background-color:#f8f8f8;
-        padding:20px;
       }
 
       .components .code {
         float:right;
-        width:370px;
+        width:500px;
       }
 
       .code {
         padding:0 0 0 20px;
-        background-color:#e3e3e3;
+        background-color:#f3f3f3;
         border-left:4px solid #666;
       }
 
-      .example_data {
-        border:1px solid #222;
-        height:400px;
-        width:340px;
+      #example_data {
+        height:175px;
+        width:350px;
         position:fixed;
-        left:740px;
+        left:490px;
         top:120px;
+        border-radius:8px;
+        background-color:#222;
+        opacity:0.85;
+        color:#fff;
+      }
+
+      #example_data .title {
+        line-height:32px;
+        text-align:center;
+        font-style:italic;
+        font-size:14px;
+      }
+
+      #close_example {
+        float:right;
+        margin-right:15px;
+        color:#fff;
+        font-size:24px;
+        line-height:24px;
+      }
+
+      #example_state {
+        margin-top:-20px;
       }
     </style>
 
@@ -122,24 +142,20 @@
 
         var func = function() {
           window.regions = new Backbone.Collection([{
-            name : 'Guatemala'
+            name : 'Americas',
+            notes : 'Bright'
           }, {
-            name : 'Hawaii'
+            name : 'Africa',
+            notes : 'Fruity'
           }]);
 
-          window.coffees = new Backbone.Collection([{
+          window.coffee = new Backbone.Model({
             roaster: 'Counter Culture',
             name: 'Baroida',
-            roastedOn: new Date(2012, 2, 28),
+            roastedOn: new Date(2012, 2, 28, 6, 30),
             acidic : true,
             region : regions.at(0)
-          }, {
-            roaster: 'Ritual',
-            name: 'Sweet Tooth',
-            roastedOn: new Date(2012, 3, 12),
-            acidic : false,
-            region : regions.at(1)
-          }]);
+          });
 
           return;
         };
@@ -149,17 +165,28 @@
         $.el.pre(beautify(func)).appendTo($('#setup_code')[0]);
 
         // keep example state display data updated
+        var dataEl = $('#example_data')[0];
+        $(dataEl).hide();
         var stateEl = $('#example_state')[0];
         var renderState = function() {
           $(stateEl).empty();
-          coffees.each(function(coffee) {
-            var json = (JSON.stringify(coffee.attributes, null, 2));
-            json = json.substring(json.indexOf('\n')).substring(0, json.lastIndexOf('\n'));
-            $.el.pre(json).appendTo(stateEl);
-          });
+          var json = (JSON.stringify(coffee.attributes, null, 2));
+          json = json.substring(json.indexOf('\n')).substring(0, json.lastIndexOf('\n'));
+          $.el.pre(json).appendTo(stateEl);
+
+          if(!$(dataEl).is(":visible")) {
+            $(dataEl).fadeIn();
+          }
         };
-        renderState();
-        coffees.bind('change', renderState);
+
+        var closeLink = $('#close_example')[0];
+        $(closeLink).click(function() {
+          $(dataEl).fadeOut();
+          return false;
+        });
+
+        coffee.bind('change', renderState);
+        regions.bind('change', renderState);
       });
     </script>
   </head>
@@ -229,9 +256,9 @@
 
     </div>
 
-    <div class="example_data">
-      <em>State of example data.</em>
-
+    <div id="example_data" style="display:none">
+      <a href="#" id="close_example">&times;</a>
+      <div class="title">Coffee Model State</div>
       <div id="example_state"></div>
     </div>
 

@@ -9,7 +9,7 @@
       window.addExample('#button', function() {
 
         var button = new Backbone.UI.Button({
-          model : coffees.at(0),
+          model : coffee,
           property : 'roaster',
           onClick : _(alert).bind(window, 'pressed')
         }).render();

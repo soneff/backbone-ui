@@ -14,6 +14,8 @@
 
       this._calendar = new Backbone.UI.Calendar({
         className : 'date_picker_calendar',
+        model : this.model,
+        property : this.options.property,
         onSelect : _(this._selectDate).bind(this)
       });
       $(this._calendar.el).hide();
@@ -108,7 +110,7 @@
         // update our bound model (but only the date portion)
         if(!!this.model && this.options.property) {
           var boundDate = _(this.model).resolveProperty(this.options.property);
-          var updatedDate = new Date(boundDate);
+          var updatedDate = new Date(boundDate.getTime());
           updatedDate.setMonth(newDate.month());
           updatedDate.setDate(newDate.date());
           updatedDate.setFullYear(newDate.year());

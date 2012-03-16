@@ -17,8 +17,7 @@
 
         // if a value property is given, we further resolve our selected item
         if(_(this.options.valueProperty).exists()) {
-          var collection = this.options.collection.models || this.options.collection;
-          var otherItem = _(collection).detect(function(collectionItem) {
+          var otherItem = _(this._collectionArray()).detect(function(collectionItem) {
             return (collectionItem.attributes || collectionItem)[this.options.valueProperty] === item;
           }, this);
           if(!_(otherItem).isUndefined()) item = otherItem;
@@ -47,8 +46,15 @@
     _collectionArray : function() {
       return _(this.options.collection).exists() ?
         this.options.collection.models || this.options.collection : [];
-    }
+    },
 
+    _observeCollection : function(callback) {
+      if(_(this.options.collection).exists() && _(this.options.collection.bind).exists()) {
+        var key = 'change';
+        this.options.collection.unbind(key, callback);
+        this.options.collection.bind(key, callback);
+      }
+    }
   };
 }());
 

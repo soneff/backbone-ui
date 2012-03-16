@@ -7,7 +7,7 @@
     $(window).load(function() {
       window.addExample('#calendar', function() {
         var calendar = new Backbone.UI.Calendar({
-          model : coffees.at(0),
+          model : coffee,
           property : 'roastedOn'
         }).render();
 

@@ -14,10 +14,13 @@
     initialize : function() {
       $(this.el).addClass('time_picker');
 
+      this._timeModel = {};
       this._menu = new Backbone.UI.Menu({
-        onChange : _(this._onSelectTimeItem).bind(this),
+        model : this._timeModel,
         labelProperty : 'label',
-        valueProperty : 'value'
+        valueProperty : 'label',
+        property : 'value',
+        onChange : _(this._onSelectTimeItem).bind(this)
       });
       $(this._menu.el).hide();
       $(this._menu.el).autohide({
@@ -45,11 +48,14 @@
         _(this.model).resolveProperty(this.options.property) : null;
       
       if(!!date) {
-        this._textField.setValue(moment(date).format(this.options.format));
+        var value = moment(date).format(this.options.format);
+        this._textField.setValue(value);
+        this._timeModel.value = value;
         this._selectedTime = date;
       }
 
       this._menu.options.collection = this._collectTimes();
+      this._menu.options.model = this._timeModel;
       this._menu.render();
       
       return this;

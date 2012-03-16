@@ -307,9 +307,9 @@
     },
 
     initialize : function() {
-      _.extend(this, Backbone.UI.HasGlyph);
-
-      _.bindAll(this, 'render');
+      _(this).extend(Backbone.UI.HasModel);
+      _(this).extend(Backbone.UI.HasGlyph);
+      _(this).bindAll('render');
 
       $(this.el).addClass('button');
 
@@ -347,14 +347,9 @@
     },
 
     render : function() {
-      var labelText = this.options.label;
+      var labelText = _(this.model).resolveProperty(this.options.property) || this.options.label;
 
-      if(_(this.model).exists() && _(this.options.property).exists()) {
-        var key = 'change:' + this.options.property;
-        this.model.unbind(key, this.render);
-        this.model.bind(key, this.render);
-        labelText = _(this.model).resolveProperty(this.options.property);
-      }
+      this._observeModel(this.render);
 
       $(this.el).empty();
       $(this.el).toggleClass('has_border', this.options.hasBorder);
@@ -464,7 +459,15 @@
     _selectDate : function(date) {
       this.date = date;
       if(_(this.model).exists() && _(this.options.property).exists()) {
-        _(this.model).setProperty(this.options.property, date);
+
+        // we only want to set the bound property's date portion
+        var boundDate = _(this.model).resolveProperty(this.options.property);
+        var updatedDate = new Date(boundDate.getTime());
+        updatedDate.setMonth(date.getMonth());
+        updatedDate.setDate(date.getDate());
+        updatedDate.setFullYear(date.getFullYear());
+
+        _(this.model).setProperty(this.options.property, updatedDate);
       }
       this.render();
       if(_(this.options.onSelect).isFunction()) {
@@ -548,9 +551,6 @@
 
     options : {
       tagName : 'a',
-      className : 'checkbox',
-      model : null,
-      property : null,
       label : null,
       checked : false,
       /** 
@@ -571,43 +571,27 @@
     },
 
     initialize : function() {
-      _.bindAll(this, 'render');
+      _(this).extend(Backbone.UI.HasModel);
+      _(this).bindAll('render');
+
       $(this.el).click(_(this._onClick).bind(this));
       $(this.el).attr({href : '#'});
       $(this.el).addClass('checkbox');
     },
 
     render : function() {
-      this.checked = 
-        _(this.checked).exists() ? this.checked : 
-        _(this.options.checked).exists() ? this.options.checked : false;
-      var labelText = this.options.label;
 
-      // observe property changes
-      if(_(this.model).exists() && _(this.options.property).exists()) {
-        // TODO this key should be based on the last set property, not the new one.
-        // This will leak an observer if we dont keep track of previously bound keys 
-        var key = 'change:' + this.options.property;
-        this.model.unbind(key, this.render);
-        this.model.bind(key, this.render);
-        this.checked = _(this.model).resolveProperty(this.options.property);
-      }
-
-      // observe label property changes
-      if(_(this.model).exists() && _(this.options.labelProperty).exists()) {
-        var labelKey = 'change:' + this.options.labelProperty;
-        this.model.unbind(labelKey, this.render);
-        this.model.bind(labelKey, this.render);
-        labelText = _(this.model).resolveProperty(this.options.labelProperty);
-      }
+      this._observeModel(this.render);
 
       $(this.el).empty();
 
+      this.checked = this.checked || _(this.model).resolveProperty(this.options.property);
       var mark = $.el.div({className : 'checkmark'});
       if(this.checked) {
         mark.appendChild($.el.div({className : 'checkmark_fill'}));
       }
 
+      var labelText = _(this.model).resolveProperty(this.options.labelProperty);
       this._label = $.el.div({className : 'label'}, labelText);
 
       this.el.appendChild(mark);
@@ -685,7 +669,16 @@
 
     _onItemChanged : function(model) {
       var view = this.itemViews[model.cid];
-      if(!!view && view.el && view.el.parentNode) view.render();
+      // re-render the individual item view if it's a backbone view
+      if(!!view && view.el && view.el.parentNode) {
+        view.render();
+      }
+
+      // otherwise, we re-render the entire collection
+      // TODO this is terribly inefficient
+      else {
+        this.render();
+      }
       if(this.options.onChange) this.options.onChange();
 
       // TODO this may require re-sorting
@@ -735,6 +728,8 @@
 
       this._calendar = new Backbone.UI.Calendar({
         className : 'date_picker_calendar',
+        model : this.model,
+        property : this.options.property,
         onSelect : _(this._selectDate).bind(this)
       });
       $(this._calendar.el).hide();
@@ -829,7 +824,7 @@
         // update our bound model (but only the date portion)
         if(!!this.model && this.options.property) {
           var boundDate = _(this.model).resolveProperty(this.options.property);
-          var updatedDate = new Date(boundDate);
+          var updatedDate = new Date(boundDate.getTime());
           updatedDate.setMonth(newDate.month());
           updatedDate.setDate(newDate.date());
           updatedDate.setFullYear(newDate.year());
@@ -1070,8 +1065,7 @@
 
         // if a value property is given, we further resolve our selected item
         if(_(this.options.valueProperty).exists()) {
-          var collection = this.options.collection.models || this.options.collection;
-          var otherItem = _(collection).detect(function(collectionItem) {
+          var otherItem = _(this._collectionArray()).detect(function(collectionItem) {
             return (collectionItem.attributes || collectionItem)[this.options.valueProperty] === item;
           }, this);
           if(!_(otherItem).isUndefined()) item = otherItem;
@@ -1100,8 +1094,15 @@
     _collectionArray : function() {
       return _(this.options.collection).exists() ?
         this.options.collection.models || this.options.collection : [];
-    }
+    },
 
+    _observeCollection : function(callback) {
+      if(_(this.options.collection).exists() && _(this.options.collection.bind).exists()) {
+        var key = 'change';
+        this.options.collection.unbind(key, callback);
+        this.options.collection.bind(key, callback);
+      }
+    }
   };
 }());
 
@@ -1165,6 +1166,26 @@
     }
   };
 }());
+ // A mixin for those views that are model bound
+(function(){
+
+  Backbone.UI.HasModel = {
+
+    _observeModel : function(callback) {
+      if(_(this.model).exists() && _(this.model.unbind).isFunction()) {
+        _(['property', 'labelProperty', 'valueProperty']).each(function(prop) {
+          var key = this.options[prop];
+          if(_(key).exists()) {
+            key = 'change:' + key;
+            this.model.unbind(key, callback);
+            this.model.bind(key, callback);
+          }
+        }, this);
+      }
+    }
+  };
+}());
+
 (function(){
   window.Backbone.UI.List = Backbone.UI.CollectionView.extend({
     options : {
@@ -1268,17 +1289,22 @@
     },
 
     initialize : function() {
-      $(this.el).addClass('menu');
+      _(this).extend(Backbone.UI.HasModel);
       _(this).extend(Backbone.UI.HasCollectionProperty);
+      _(this).bindAll('render');
 
-      this._textField = new Backbone.UI.TextField({
-      }).render();
+      $(this.el).addClass('menu');
+
+      this._textField = new Backbone.UI.TextField().render();
     },
 
     scroller : null,
 
     render : function() {
       $(this.el).empty();
+
+      this._observeModel(this.render);
+      this._observeCollection(this.render);
 
       // create a new list of items
       var list = $.el.ul();
@@ -1290,7 +1316,6 @@
 
       var selectedItem = this._determineSelectedItem();
 
-console.log(this._collectionArray());
       _(this._collectionArray()).each(function(item) {
         var selectedValue = this._valueForItem(selectedItem);
         var itemValue = this._valueForItem(item);
@@ -1513,8 +1538,10 @@ console.log(this._collectionArray());
     },
 
     initialize : function() {
-      _.extend(this, Backbone.UI.HasCollectionProperty);
-      _.extend(this, Backbone.UI.HasGlyph);
+      _(this).extend(Backbone.UI.HasModel);
+      _(this).extend(Backbone.UI.HasGlyph);
+      _(this).extend(Backbone.UI.HasCollectionProperty);
+      _(this).bindAll('render');
       $(this.el).addClass('radio_group');
     },
 
@@ -1522,9 +1549,13 @@ console.log(this._collectionArray());
     selectedItem : null,
 
     render : function() {
-      this.selectedItem = this.selectedItem || this._determineSelectedItem();
 
       $(this.el).empty();
+
+      this._observeModel(this.render);
+      this._observeCollection(this.render);
+
+      this.selectedItem = this._determineSelectedItem();
 
       var ul = $.el.ul();
       var selectedValue = this._valueForItem(this.selectedItem);
@@ -2123,7 +2154,9 @@ console.log(this._collectionArray());
     input : null,
 
     initialize : function() {
+      _.extend(this, Backbone.UI.HasModel);
       _.extend(this, Backbone.UI.HasGlyph);
+      _(this).bindAll('_refreshValue');
 
       $(this.el).addClass('text_field');
 
@@ -2136,12 +2169,7 @@ console.log(this._collectionArray());
         }
       }, this));
 
-      if(!!this.model && this.options.property) {
-        this.model.bind('change:' + this.options.property, _.bind(function() {
-          var newValue = this.model.get(this.options.property);
-          if(this.input && this.input.value !== newValue) this.input.value = this.model.get(this.options.property);
-        }, this));
-      }
+      this._observeModel(this._refreshValue);
     },
 
     render : function() {
@@ -2194,6 +2222,13 @@ console.log(this._collectionArray());
 
     _updateModel : function() {
       _(this.model).setProperty(this.options.property, this.input.value);
+    },
+
+    _refreshValue : function() {
+      var newValue = this.model.get(this.options.property);
+      if(this.input && this.input.value !== newValue) {
+        this.input.value = this.model.get(this.options.property);
+      }
     }
   });
 }());
@@ -2214,10 +2249,13 @@ console.log(this._collectionArray());
     initialize : function() {
       $(this.el).addClass('time_picker');
 
+      this._timeModel = {};
       this._menu = new Backbone.UI.Menu({
-        onChange : _(this._onSelectTimeItem).bind(this),
+        model : this._timeModel,
         labelProperty : 'label',
-        valueProperty : 'value'
+        valueProperty : 'label',
+        property : 'value',
+        onChange : _(this._onSelectTimeItem).bind(this)
       });
       $(this._menu.el).hide();
       $(this._menu.el).autohide({
@@ -2245,11 +2283,14 @@ console.log(this._collectionArray());
         _(this.model).resolveProperty(this.options.property) : null;
       
       if(!!date) {
-        this._textField.setValue(moment(date).format(this.options.format));
+        var value = moment(date).format(this.options.format);
+        this._textField.setValue(value);
+        this._timeModel.value = value;
         this._selectedTime = date;
       }
 
       this._menu.options.collection = this._collectTimes();
+      this._menu.options.model = this._timeModel;
       this._menu.render();
       
       return this;
