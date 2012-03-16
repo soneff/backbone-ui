@@ -1,4 +1,5 @@
 require 'rubygems'
+require 'rkelly'
 
 desc "build the backbone-ui-min.js file for distribution"
 task :build => [:doc] do
@@ -26,35 +27,80 @@ task :build => [:doc] do
   end
 end
 
+
 desc "generate the documentation in doc/dist"
 task :doc do 
   puts 'generating documentation'
   `rm -rf doc/dist/*`
 
+  def build_script_tags(dirs)
+    dirs.map do |dir|
+      (Dir.glob("#{dir}/**/*.js")).map do |file|
+        "<script src='./#{file}' type='text/javascript''></script>"
+      end
+    end
+  end
+
+  def build_css_tags(dirs)
+    dirs.map do |dir|
+      (Dir.glob("#{dir}/**/*.css")).map do |file|
+        "<link rel='stylesheet' type='text/css' href='./#{file}'>"
+      end
+    end
+  end
+
+  def collect_option_comments(js)
+    parser = RKelly::Parser.new
+    ast = parser.parse(js);
+
+    options_node = nil
+    ast.each do |node|
+      if node.kind_of? RKelly::Nodes::PropertyNode and node.name == 'options'
+        options_node = node.value
+        break
+      end
+    end
+
+    options = {}
+    comments = []
+    options_node.each do |node|
+      if node.kind_of? RKelly::Nodes::PropertyNode
+        if comments.length > 0
+          options[node.name] = comments.flatten.join
+          comments = []
+        end
+      end
+      comments << node.comments.map { |comment| comment.value.gsub(/^\/\//, '') }
+    end
+
+    options
+  end
+
   src = File.read('doc/src/index.html')
 
-  lib_js = (Dir.glob('lib/required/**/*.js') +  Dir.glob('lib/optional/**/*.js')).map do |file|
-    "<script src='#{file}'></script>"
-  end
-  src.gsub!('<!-- LIB_JS -->', lib_js.join("\n"))
+  # insert script and style tags
+  src.gsub!('<!-- JS -->', build_script_tags(['lib/required', 'lib/optional', 'src/js']).join("\n"))
+  src.gsub!('<!-- CSS -->', build_css_tags(['lib', 'src/css']).join("\n"))
 
-  local_js = Dir.glob('src/**/*.js').map do |file|
-    "<script src='#{file}'></script>"
-  end
-  src.gsub!('<!-- LOCAL_JS -->', local_js.join("\n"))
+  # insert widgets and their associated option comments
+  widgets = Dir.glob('doc/src/widgets/**/*.html').map do |file|
 
-  lib_css = Dir.glob('lib/**/*.css').map do |file|
-    "<link rel='stylesheet' href='#{file}'>"
-  end
-  src.gsub!('<!-- LIB_CSS -->', lib_css.join("\n"))
+    name = file[(file.rindex('/') + 1)..-1]
+    name = name[0..(name.rindex '.') -1]
+    name = "src/js/#{name}.js"
 
-  local_css = Dir.glob('src/**/*.css').map do |file|
-    "<link rel='stylesheet' href='#{file}'>"
-  end
-  src.gsub!('<!-- LOCAL_CSS -->', local_css.join("\n"))
+    map = collect_option_comments(File.read(name))
+    map.keys.sort
 
-  widgets = local_css = Dir.glob('doc/src/widgets/**/*.html').map do |file|
-    File.read(file)
+    options_markup = map.keys.sort.map do |key|
+      "<li>#{key}:#{map[key]}</li>"
+    end
+    options_markup = "<div class='options'><h2>Options</h2><ul>#{options_markup.join}</ul></div>"
+
+    content = File.read(file)
+    content.gsub!('<!-- OPTIONS -->', options_markup)
+
+    content
   end
   src.gsub!('<!-- WIDGETS -->', widgets.join("\n"))
 
@@ -65,4 +111,8 @@ task :doc do
   `cp -r src doc/dist/`
   `cp -r doc/lib doc/dist/`
   `cp -r doc/src/images doc/dist/`
+end
+
+task :insert_scripts do
+
 end

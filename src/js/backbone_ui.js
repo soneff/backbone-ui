@@ -269,8 +269,4 @@
     }
   });
 
-  $(document).ready(function() {
-    $(document.body).addClass('skin_' + Backbone.UI.currentSkin);
-  });
-
 }(this));

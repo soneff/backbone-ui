@@ -269,10 +269,6 @@
     }
   });
 
-  $(document).ready(function() {
-    $(document.body).addClass('skin_' + Backbone.UI.currentSkin);
-  });
-
 }(this));
 (function(){
   window.Backbone.UI.Button = Backbone.View.extend({
