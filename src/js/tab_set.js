@@ -1,14 +1,9 @@
 (function(){
   Backbone.UI.TabSet = Backbone.View.extend({
     options : {
-      className : 'tab_set',
-
-      // Tabs to initially add to this tab set.  Each entry may contain:
-      //   label 
-      //   glyph
-      //   glypRight
-      //   content
-      //   onActivate : a callback to invoke when this tab is activated.
+      // Tabs to initially add to this tab set.  Each entry may contain
+      // a <code>label</label>, <code>content</code>, and <code>onActivate</code>
+      // option.
       tabs : []
     },
 

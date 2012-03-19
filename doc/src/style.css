@@ -4,7 +4,7 @@ body {
 }
 
 section {
-  margin-bottom:80px;
+  margin:40px 0 60px 0;
   width:800px;
 }
 
@@ -117,6 +117,8 @@ a {
 
 section .options ul {
   list-style-type:none;
+  padding:0;
+  margin:0;
 }
 
 section .options li {
@@ -124,13 +126,16 @@ section .options li {
 }
 
 .options .key {
-  width:150px;
+  width:110px;
+  padding:5px 10px 5px 0;
   text-align:right;
   float:left;
+  background-color:#f3f3f3;
 }
 
 .options .value {
-  margin-left:160px;
+  margin-left:130px;
+  line-height:30px;
 }
 
 .options li {

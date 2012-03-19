@@ -3,23 +3,16 @@
 
     options : {
       tagName : 'a',
-      label : null,
-      checked : false,
-      /** 
-       * A function that will be called with the new checked
-       * state after the checked state has been toggled.
-       */
-      onChanged : null,
-      /**
-       * Called with no arguments whenever the Checkbox is clicked
-       * regardless of the enabled state.
-       */
-      onClick : null,
-      /**
-       * If set to false, the Checkbox will not automatically toggle
-       * its state.
-       */
-      enabled : true
+
+      // The property of the model describing the label that 
+      // should be placed next to the checkbox
+      labelProperty : null,
+
+      // A callback to invoke when a change is made 
+      onChange : null,
+
+      // enables / disables the checkbox
+      disabled : false
     },
 
     initialize : function() {
@@ -54,21 +47,21 @@
     },
 
     _onClick : function() {
-      if (this.options.onClick) {
-        this.options.onClick();
-      }
-      if (!this.options.enabled) {
+      if (this.options.disabled) {
         return false;
       }
+
       this.checked = !this.checked;
       if(_(this.model).exists() && _(this.options.property).exists()) {
         _(this.model).setProperty(this.options.property, this.checked);
       }
+
       else {
         this.render();
       }
-      if (this.options.onChanged) {
-        this.options.onChanged(this.checked);
+
+      if (_(this.options.onChange).isFunction()) {
+        this.options.onChange(this.checked);
       }
       return false;
     }

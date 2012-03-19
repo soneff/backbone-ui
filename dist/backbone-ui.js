@@ -283,14 +283,7 @@
 (function(){
   window.Backbone.UI.Button = Backbone.View.extend({
     options : {
-      // bar
       tagName : 'a',
-
-      // bar
-      className : 'button',
-
-      // the text displayed on the button
-      label : null,
 
       // true will disable the button
       // (muted non-clickable) 
@@ -300,19 +293,12 @@
       // (depressed and non-clickable)
       active : false,
 
-      // glyph to display to the left of the label
-      glyph : null,
-
-      // glyph to display to the right of the label
-      glyphRight : null,
-
-      // foo
       hasBorder : true,
 
       // A callback to invoke when the button is clicked
       onClick : null,
 
-      // bar
+      // renders this button as an input type=submit element as opposed to an anchor.
       isSubmit : false
     },
 
@@ -357,7 +343,7 @@
     },
 
     render : function() {
-      var labelText = _(this.model).resolveProperty(this.options.property) || this.options.label;
+      var labelText = _(this.model).resolveProperty(this.options.property);
 
       this._observeModel(this.render);
 
@@ -381,7 +367,6 @@
       this.insertGlyphRight(this.el, this.options.glyphRight);
 
       // add appropriate class names
-      $(this.el).toggleClass('no_label', !this.options.label);
       this.setEnabled(!this.options.disabled);
       this.setActive(this.options.active);
 
@@ -434,9 +419,11 @@
       // the selected calendar date
       date : null, 
 
-      // the day that weeks start on (0 is Sunday)
+      // the week's start day (0 = Sunday, 1 = Monday, etc.)
       weekStart : 0,
 
+      // a callback to invoke when a new date selection is made.  The selected date
+      // will be passed in as the first argument
       onSelect : null
     },
 
@@ -559,23 +546,16 @@
 
     options : {
       tagName : 'a',
-      label : null,
-      checked : false,
-      /** 
-       * A function that will be called with the new checked
-       * state after the checked state has been toggled.
-       */
-      onChanged : null,
-      /**
-       * Called with no arguments whenever the Checkbox is clicked
-       * regardless of the enabled state.
-       */
-      onClick : null,
-      /**
-       * If set to false, the Checkbox will not automatically toggle
-       * its state.
-       */
-      enabled : true
+
+      // The property of the model describing the label that 
+      // should be placed next to the checkbox
+      labelProperty : null,
+
+      // A callback to invoke when a change is made 
+      onChange : null,
+
+      // enables / disables the checkbox
+      disabled : false
     },
 
     initialize : function() {
@@ -610,21 +590,21 @@
     },
 
     _onClick : function() {
-      if (this.options.onClick) {
-        this.options.onClick();
-      }
-      if (!this.options.enabled) {
+      if (this.options.disabled) {
         return false;
       }
+
       this.checked = !this.checked;
       if(_(this.model).exists() && _(this.options.property).exists()) {
         _(this.model).setProperty(this.options.property, this.checked);
       }
+
       else {
         this.render();
       }
-      if (this.options.onChanged) {
-        this.options.onChanged(this.checked);
+
+      if (_(this.options.onChange).isFunction()) {
+        this.options.onChange(this.checked);
       }
       return false;
     }
@@ -632,7 +612,25 @@
 }());
 (function(){
   window.Backbone.UI.CollectionView = Backbone.View.extend({
+    options : {
+      // The Backbone.Collection instance the view is bound to
+      model : null,
+
+      // A string, element, or function describing what should be displayed
+      // when the list is empty.
+      emptyContent : null,
+
+      // A callback to invoke when a row is clicked.  The associated model will be
+      // passed as the first argument.
+      onItemClick : Backbone.UI.noop,
+
+      // The maximum height in pixels that this table show grow to.  If the
+      // content exceeds this height, it will become scrollable.
+      maxHeight : null
+    },
+
     itemViews : {},
+
     _emptyContent : null,
 
     // must be over-ridden to describe how an item is rendered
@@ -1054,19 +1052,19 @@
   });
 }());
 
- // A mixin for dealing with glyphs in widgets 
+ // A mixin for dealing with collection alternatives
 (function(){
-  // options added by this mixin:
-
-
-  Backbone.UI.HasCollectionProperty = {
+  Backbone.UI.HasAlternativeProperty = {
     options : {
-      // The collection of items representing the alternative choice
-      collection : null,
+      // The collection of items representing alternative choices
+      alternatives : null,
 
       // The property of the individual choice represent the the label to be displayed
       labelProperty : null,
 
+      // The property of the individual choice that represents the value to be stored
+      // in the bound model's property.  Omit this option if you'd like the choice 
+      // object itself to represent the value.
       valueProperty : null
     },
 
@@ -1106,15 +1104,15 @@
     },
 
     _collectionArray : function() {
-      return _(this.options.collection).exists() ?
-        this.options.collection.models || this.options.collection : [];
+      return _(this.options.alternatives).exists() ?
+        this.options.alternatives.models || this.options.alternatives : [];
     },
 
     _observeCollection : function(callback) {
-      if(_(this.options.collection).exists() && _(this.options.collection.bind).exists()) {
+      if(_(this.options.alternatives).exists() && _(this.options.alternatives.bind).exists()) {
         var key = 'change';
-        this.options.collection.unbind(key, callback);
-        this.options.collection.bind(key, callback);
+        this.options.alternatives.unbind(key, callback);
+        this.options.alternatives.bind(key, callback);
       }
     }
   };
@@ -1189,7 +1187,7 @@
   Backbone.UI.HasModel = {
     
     options : {
-      // The model this view is bound to
+      // The Backbone.Model instance the view is bound to
       model : null,
 
       // The property of the bound model this component should render / update
@@ -1214,23 +1212,10 @@
 (function(){
   window.Backbone.UI.List = Backbone.UI.CollectionView.extend({
     options : {
-      className : 'list',
-
-      labelProperty : null,
-
-      // exclusive of the labelProperty
-      itemView : null,
-
-      // A string, element, or function describing what should be displayed
-      // when the list is empty.
-      emptyContent : null,
-
-      // If true, the contents will be placed inside of a UI.Scroller
-      enableScrolling : false, 
-
-      // A callback to invoke when a row is clicked.  If this callback
-      // is present, the rows will highlight on hover.
-      onItemClick : Backbone.UI.noop
+      // A Backbone.View implementation describing how to render a particular 
+      // item in the collection.  For simple use cases, you can pass a String 
+      // instead which will be interpreted as the property of the model to display.
+      itemView : null
     },
 
     initialize : function() {
@@ -1264,9 +1249,10 @@
       }
 
       // wrap the list in a scroller
-      if(this.options.enableScrolling) {
+      if(_(this.options.maxHeight).exists()) {
+        var style = 'max-height:' + this.options.maxHeight + 'px';
         var scroller = new Backbone.UI.Scroller({
-          content : $.el.div(this.collectionEl) 
+          content : $.el.div({style : style}, this.collectionEl) 
         }).render();
 
         this.el.appendChild(scroller.el);
@@ -1284,14 +1270,19 @@
     _renderItem : function(model, index) {
       var content;
       if(_(this.options.itemView).exists()) {
-        var view = new this.options.itemView({
-          model : model
-        }).render();
-        this.itemViews[model.cid] = view;
-        content = view.el;
-      }
-      else {
-        content = this.resolveContent(model, this.options.labelProperty);
+
+        if(_(this.options.itemView).isString()) {
+          content = this.resolveContent(model, this.options.itemView);
+        }
+
+        else {
+          var view = new this.options.itemView({
+            model : model
+          });
+          view.render();
+          this.itemViews[model.cid] = view;
+          content = view.el;
+        }
       }
 
       var item = $.el.li(content);
@@ -1310,11 +1301,13 @@
   window.Backbone.UI.Menu = Backbone.View.extend({
 
     options : {
+      // an additional item to render at the top of the menu to 
+      // denote the lack of a selection
       emptyItem : null
     },
 
     initialize : function() {
-      this.mixin([Backbone.UI.HasModel, Backbone.UI.HasCollectionProperty]);
+      this.mixin([Backbone.UI.HasModel, Backbone.UI.HasAlternativeProperty]);
 
       _(this).bindAll('render');
 
@@ -1419,14 +1412,6 @@
       // selection has been made
       placeholder : 'Select...',
 
-      model : null,
-
-      property : null,
-
-      glyphProperty : null,
-
-      glyphRightProperty : null,
-
       // If true, the menu will be aligned to the right side
       alignRight : false,
 
@@ -1477,9 +1462,9 @@
       }
 
       // observe collection changes
-      if(_(this.options.collection).exists() && _(this.options.collection.bind).isFunction()) {
-        this.options.collection.unbind('all', _(this.render).bind(this));
-        this.options.collection.bind('all', _(this.render).bind(this));
+      if(_(this.options.alternatives).exists() && _(this.options.alternatives.bind).isFunction()) {
+        this.options.alternatives.unbind('all', _(this.render).bind(this));
+        this.options.alternatives.bind('all', _(this.render).bind(this));
       }
     },
 
@@ -1492,7 +1477,8 @@
       var item = this._menu.selectedItem;
       this.button = new Backbone.UI.Button({
         className  : 'pulldown_button',
-        label      : this._labelForItem(item),
+        model      : {label : this._labelForItem(item)},
+        property   : 'label',
         glyph      : _(item).resolveProperty(this.options.glyphProperty),
         glyphRight : '\u25bc',
         onClick    : _.bind(this.showMenu, this)
@@ -1563,7 +1549,7 @@
     },
 
     initialize : function() {
-      this.mixin([Backbone.UI.HasGlyph, Backbone.UI.HasModel, Backbone.UI.HasCollectionProperty]);
+      this.mixin([Backbone.UI.HasGlyph, Backbone.UI.HasModel, Backbone.UI.HasAlternativeProperty]);
       _(this).bindAll('render');
       $(this.el).addClass('radio_group');
     },
@@ -1934,13 +1920,11 @@
 (function(){
   window.Backbone.UI.TableView = Backbone.UI.CollectionView.extend({
     options : {
-      className : 'table_view',
-
-      // each column should contain:
-      //   label   : a string, element, or function describing the column's heading.
-      //   width   : the width of the column in pixels.
-      //   property : the name of the property the column's content should be bound
-      //              to.  This option is mutually exclusive with the content option.
+      // Each column should contain a <code>label</code> property to 
+      // describe the column's heading, a <code>property</code> property to
+      // declare which property the cell is bound to, and an optional 
+      // <code>width</code> property to declare the width of the column
+      // in pixels.
       columns : [],
 
       // A string, element, or function describing what should be displayed
@@ -1949,9 +1933,7 @@
 
       // A callback to invoke when a row is clicked.  If this callback
       // is present, the rows will highlight on hover.
-      onItemClick : Backbone.UI.noop,
-
-      maxHeight : null
+      onItemClick : Backbone.UI.noop
     },
 
     initialize : function() {
@@ -2011,8 +1993,8 @@
       }
 
       // wrap the list in a scroller
-      if(this.options.enableScrolling) {
-        var style = _(this.options.maxHeight).exists() ? 'max-height:' + this.options.maxHeight + 'px' : null;
+      if(_(this.options.maxHeight).exists()) {
+        var style = 'max-height:' + this.options.maxHeight + 'px';
         var scroller = new Backbone.UI.Scroller({
           content : $.el.div({style : style}, container) 
         }).render();
@@ -2057,9 +2039,6 @@
     options : {
       className : 'text_area',
 
-      model : null,
-      property : null,
-
       // id to use on the actual textArea 
       textAreaId : null,
 
@@ -2067,9 +2046,6 @@
       disabled : false,
       
       enableScrolling : true,
-
-      // value for the text area
-      value : null,
 
       tabIndex : null 
     },
@@ -2084,7 +2060,7 @@
 
     render : function() {
       var value = (this.textArea && this.textArea.value.length) > 0 ? 
-        this.textArea.value : !_(this.options.value).isNull() ? this.options.value : 
+        this.textArea.value : 
         (!!this.model && !!this.options.property) ? 
         _(this.model).resolveProperty(this.options.property) : null;
 
@@ -2144,29 +2120,20 @@
 (function(){
   window.Backbone.UI.TextField = Backbone.View.extend({
     options : {
-      className : 'text_field',
-
-      model : null,
-
-      property : null,
-
       // disables the input text
       disabled : false,
       
-      // The type of input (text or password)
+      // The type of input (text, password, number, email, etc.)
       type : 'text',
 
       // the value to use for both the name and id attribute 
       // of the underlying input element
       name : null,
 
-      // value for the input
-      value : null,
-
-      label : null,
-
+      // the tab index to set on the underlying input field
       tabIndex : null,
 
+      // a callback to invoke when a key is pressed within the text field
       onKeyPress : Backbone.UI.noop,
 
       // if given, the text field will limit it's character count
@@ -2196,7 +2163,7 @@
 
     render : function() {
       var value = (this.input && this.input.value.length) > 0 ? 
-        this.input.value : !_(this.options.value).isNull() ? this.options.value : 
+        this.input.value : 
         (!!this.model && !!this.options.property) ? 
         _(this.model).resolveProperty(this.options.property) : null;
 
@@ -2216,10 +2183,6 @@
 
       this.setEnabled(!this.options.disabled);
 
-      if(this.options.label) {
-        $(this.options.label).attr({'for' : this.options.name});
-      }
-      
       return this;
     },
 
@@ -2265,6 +2228,7 @@
       // minute interval to use for pulldown menu
       interval : 30,
 
+      // the name given to the text field's input element
       name : null
     },
 

@@ -8,6 +8,7 @@
       // minute interval to use for pulldown menu
       interval : 30,
 
+      // the name given to the text field's input element
       name : null
     },
 

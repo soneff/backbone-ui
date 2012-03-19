@@ -25,9 +25,11 @@
       // the selected calendar date
       date : null, 
 
-      // the day that weeks start on (0 is Sunday)
+      // the week's start day (0 = Sunday, 1 = Monday, etc.)
       weekStart : 0,
 
+      // a callback to invoke when a new date selection is made.  The selected date
+      // will be passed in as the first argument
       onSelect : null
     },
 

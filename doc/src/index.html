@@ -49,16 +49,9 @@
       <section>
         <h1>Dependencies</h1>
 
-        <p>Backbone UI depends on the following libraries:</p>
-
-        <ul>
-          <li><a href='http://documentcloud.github.com/backbone/'>Backbone</a></li>
-          <li><a href='http://documentcloud.github.com/underscore/'>Underscore</a></li>
-          <li><a href='http://jquery.com/'>jQuery</a></li>
-          <li><a href='http://joestelmach.github.com/laconic/'>laconic</a></li>
-        </ul>
-
-        <p>
+        <p>Backbone UI depends on <a href='http://documentcloud.github.com/backbone/'>Backbone</a>, 
+          <a href='http://documentcloud.github.com/underscore/'>Underscore</a>, 
+          <a href='http://jquery.com/'>jQuery</a>, and <a href='http://joestelmach.github.com/laconic/'>laconic</a>.
           If you'd like to use the calendar or date picker components, than you'll 
           also need a copy of <a href='http://momentjs.com/'>moment.js</a>.
         <p>
@@ -67,17 +60,18 @@
       <section>
         <h1>Components</h1>
         <p>
-        All components inherit from Backbone.View, and each render method will return a reference to the view itself.  Feel free to pass any standard <a href='http://documentcloud.github.com/backbone/#View-constructor'>Backbone.View option</a> when creating these components.
+        All components inherit from Backbone.View, and each render method will return a reference to the view itself.  Feel free to pass any standard Backbone View <a href='http://documentcloud.github.com/backbone/#View-constructor'>option</a> when creating these components.
         As a convenience, the underscored version of the component's class name will be added to each component's element.  
         </p>
 
         <p>
         Components can be broken down into four categories:
         </p>
+
         <ul>
           <li>Model Bound</li>
+          <li>Model Bound with Alternatives</li>
           <li>Collection Bound</li>
-          <li>Model Bound with Collection Property</li>
           <li>Non-Bound</li>
         </ul>
 
@@ -102,7 +96,7 @@
       <h1>Model-Bound</h1>
 
       <p>
-      Model-Bound components are those that interact directly with one or more properties of a single model.
+      Model-Bound components are those that interact directly with one property of a single model.
       </p>
 
       <!-- MODEL_OPTIONS -->
@@ -113,7 +107,7 @@
     </section>
 
     <section class="component_type model_bound_with_collection">
-      <h1>Model-Bound with Collection Property</h1>
+      <h1>Model-Bound with Alternatives</h1>
       <p>
       These components are similar to regular Model-Bound components, but also include a bound collection of alternatives.  The <code>model</code> and <code>property</code> options are still used to define the selected value, and following additional options describe the collection of alternatives:
       </p>
@@ -130,6 +124,12 @@
 
     <section class="component_type collection_bound">
       <h1>Collection-Bound</h1>
+      <p>
+      These components are bound to a Backbone.Collection as opposed to a Model.  The rendering of a particular item in the collection is defined by the given itemView implementation.
+      </p>
+
+      <!-- COLLECTION_OPTIONS -->
+
       <div class="components">
         <!-- COLLECTION_BOUND -->
       </div>
@@ -137,6 +137,9 @@
 
     <section class="component_type non_bound">
       <h1>Non-Bound</h1>
+      <p>
+      The following components are not meant to be bound to a model or collection, and exist as general-purpose UI elements.
+      </p>
       <div class="components">
         <!-- NON_BOUND -->
       </div>

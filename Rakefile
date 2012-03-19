@@ -111,7 +111,10 @@ task :doc do
     build_options(collect_option_comments(File.read('src/js/has_model.js'))))
 
   src.gsub!('<!-- MODEL_COLLECTION_OPTIONS -->', 
-    build_options(collect_option_comments(File.read('src/js/has_collection_property.js'))))
+    build_options(collect_option_comments(File.read('src/js/has_alternative_property.js'))))
+
+  src.gsub!('<!-- COLLECTION_OPTIONS -->', 
+    build_options(collect_option_comments(File.read('src/js/collection_view.js'))))
 
   # insert widgets and their associated option comments
   src.gsub!('<!-- MODEL_BOUND -->', build_components('doc/src/widgets/model'))

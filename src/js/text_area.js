@@ -3,9 +3,6 @@
     options : {
       className : 'text_area',
 
-      model : null,
-      property : null,
-
       // id to use on the actual textArea 
       textAreaId : null,
 
@@ -13,9 +10,6 @@
       disabled : false,
       
       enableScrolling : true,
-
-      // value for the text area
-      value : null,
 
       tabIndex : null 
     },
@@ -30,7 +24,7 @@
 
     render : function() {
       var value = (this.textArea && this.textArea.value.length) > 0 ? 
-        this.textArea.value : !_(this.options.value).isNull() ? this.options.value : 
+        this.textArea.value : 
         (!!this.model && !!this.options.property) ? 
         _(this.model).resolveProperty(this.options.property) : null;
 

@@ -1,6 +1,24 @@
 (function(){
   window.Backbone.UI.CollectionView = Backbone.View.extend({
+    options : {
+      // The Backbone.Collection instance the view is bound to
+      model : null,
+
+      // A string, element, or function describing what should be displayed
+      // when the list is empty.
+      emptyContent : null,
+
+      // A callback to invoke when a row is clicked.  The associated model will be
+      // passed as the first argument.
+      onItemClick : Backbone.UI.noop,
+
+      // The maximum height in pixels that this table show grow to.  If the
+      // content exceeds this height, it will become scrollable.
+      maxHeight : null
+    },
+
     itemViews : {},
+
     _emptyContent : null,
 
     // must be over-ridden to describe how an item is rendered

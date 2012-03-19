@@ -1,14 +1,7 @@
 (function(){
   window.Backbone.UI.Button = Backbone.View.extend({
     options : {
-      // bar
       tagName : 'a',
-
-      // bar
-      className : 'button',
-
-      // the text displayed on the button
-      label : null,
 
       // true will disable the button
       // (muted non-clickable) 
@@ -18,19 +11,12 @@
       // (depressed and non-clickable)
       active : false,
 
-      // glyph to display to the left of the label
-      glyph : null,
-
-      // glyph to display to the right of the label
-      glyphRight : null,
-
-      // foo
       hasBorder : true,
 
       // A callback to invoke when the button is clicked
       onClick : null,
 
-      // bar
+      // renders this button as an input type=submit element as opposed to an anchor.
       isSubmit : false
     },
 
@@ -75,7 +61,7 @@
     },
 
     render : function() {
-      var labelText = _(this.model).resolveProperty(this.options.property) || this.options.label;
+      var labelText = _(this.model).resolveProperty(this.options.property);
 
       this._observeModel(this.render);
 
@@ -99,7 +85,6 @@
       this.insertGlyphRight(this.el, this.options.glyphRight);
 
       // add appropriate class names
-      $(this.el).toggleClass('no_label', !this.options.label);
       this.setEnabled(!this.options.disabled);
       this.setActive(this.options.active);
 

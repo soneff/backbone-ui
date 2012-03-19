@@ -3,7 +3,7 @@
   Backbone.UI.HasModel = {
     
     options : {
-      // The model this view is bound to
+      // The Backbone.Model instance the view is bound to
       model : null,
 
       // The property of the bound model this component should render / update

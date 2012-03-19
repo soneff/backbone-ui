@@ -1,16 +1,16 @@
- // A mixin for dealing with glyphs in widgets 
+ // A mixin for dealing with collection alternatives
 (function(){
-  // options added by this mixin:
-
-
-  Backbone.UI.HasCollectionProperty = {
+  Backbone.UI.HasAlternativeProperty = {
     options : {
-      // The collection of items representing the alternative choice
-      collection : null,
+      // The collection of items representing alternative choices
+      alternatives : null,
 
       // The property of the individual choice represent the the label to be displayed
       labelProperty : null,
 
+      // The property of the individual choice that represents the value to be stored
+      // in the bound model's property.  Omit this option if you'd like the choice 
+      // object itself to represent the value.
       valueProperty : null
     },
 
@@ -50,15 +50,15 @@
     },
 
     _collectionArray : function() {
-      return _(this.options.collection).exists() ?
-        this.options.collection.models || this.options.collection : [];
+      return _(this.options.alternatives).exists() ?
+        this.options.alternatives.models || this.options.alternatives : [];
     },
 
     _observeCollection : function(callback) {
-      if(_(this.options.collection).exists() && _(this.options.collection.bind).exists()) {
+      if(_(this.options.alternatives).exists() && _(this.options.alternatives.bind).exists()) {
         var key = 'change';
-        this.options.collection.unbind(key, callback);
-        this.options.collection.bind(key, callback);
+        this.options.alternatives.unbind(key, callback);
+        this.options.alternatives.bind(key, callback);
       }
     }
   };

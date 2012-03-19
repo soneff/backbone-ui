@@ -1,13 +1,11 @@
 (function(){
   window.Backbone.UI.TableView = Backbone.UI.CollectionView.extend({
     options : {
-      className : 'table_view',
-
-      // each column should contain:
-      //   label   : a string, element, or function describing the column's heading.
-      //   width   : the width of the column in pixels.
-      //   property : the name of the property the column's content should be bound
-      //              to.  This option is mutually exclusive with the content option.
+      // Each column should contain a <code>label</code> property to 
+      // describe the column's heading, a <code>property</code> property to
+      // declare which property the cell is bound to, and an optional 
+      // <code>width</code> property to declare the width of the column
+      // in pixels.
       columns : [],
 
       // A string, element, or function describing what should be displayed
@@ -16,9 +14,7 @@
 
       // A callback to invoke when a row is clicked.  If this callback
       // is present, the rows will highlight on hover.
-      onItemClick : Backbone.UI.noop,
-
-      maxHeight : null
+      onItemClick : Backbone.UI.noop
     },
 
     initialize : function() {
@@ -78,8 +74,8 @@
       }
 
       // wrap the list in a scroller
-      if(this.options.enableScrolling) {
-        var style = _(this.options.maxHeight).exists() ? 'max-height:' + this.options.maxHeight + 'px' : null;
+      if(_(this.options.maxHeight).exists()) {
+        var style = 'max-height:' + this.options.maxHeight + 'px';
         var scroller = new Backbone.UI.Scroller({
           content : $.el.div({style : style}, container) 
         }).render();

@@ -1,29 +1,20 @@
 (function(){
   window.Backbone.UI.TextField = Backbone.View.extend({
     options : {
-      className : 'text_field',
-
-      model : null,
-
-      property : null,
-
       // disables the input text
       disabled : false,
       
-      // The type of input (text or password)
+      // The type of input (text, password, number, email, etc.)
       type : 'text',
 
       // the value to use for both the name and id attribute 
       // of the underlying input element
       name : null,
 
-      // value for the input
-      value : null,
-
-      label : null,
-
+      // the tab index to set on the underlying input field
       tabIndex : null,
 
+      // a callback to invoke when a key is pressed within the text field
       onKeyPress : Backbone.UI.noop,
 
       // if given, the text field will limit it's character count
@@ -53,7 +44,7 @@
 
     render : function() {
       var value = (this.input && this.input.value.length) > 0 ? 
-        this.input.value : !_(this.options.value).isNull() ? this.options.value : 
+        this.input.value : 
         (!!this.model && !!this.options.property) ? 
         _(this.model).resolveProperty(this.options.property) : null;
 
@@ -73,10 +64,6 @@
 
       this.setEnabled(!this.options.disabled);
 
-      if(this.options.label) {
-        $(this.options.label).attr({'for' : this.options.name});
-      }
-      
       return this;
     },
 

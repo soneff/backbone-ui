@@ -2,11 +2,13 @@
   window.Backbone.UI.Menu = Backbone.View.extend({
 
     options : {
+      // an additional item to render at the top of the menu to 
+      // denote the lack of a selection
       emptyItem : null
     },
 
     initialize : function() {
-      this.mixin([Backbone.UI.HasModel, Backbone.UI.HasCollectionProperty]);
+      this.mixin([Backbone.UI.HasModel, Backbone.UI.HasAlternativeProperty]);
 
       _(this).bindAll('render');
 

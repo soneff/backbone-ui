@@ -5,14 +5,6 @@
       // selection has been made
       placeholder : 'Select...',
 
-      model : null,
-
-      property : null,
-
-      glyphProperty : null,
-
-      glyphRightProperty : null,
-
       // If true, the menu will be aligned to the right side
       alignRight : false,
 
@@ -63,9 +55,9 @@
       }
 
       // observe collection changes
-      if(_(this.options.collection).exists() && _(this.options.collection.bind).isFunction()) {
-        this.options.collection.unbind('all', _(this.render).bind(this));
-        this.options.collection.bind('all', _(this.render).bind(this));
+      if(_(this.options.alternatives).exists() && _(this.options.alternatives.bind).isFunction()) {
+        this.options.alternatives.unbind('all', _(this.render).bind(this));
+        this.options.alternatives.bind('all', _(this.render).bind(this));
       }
     },
 
@@ -78,7 +70,8 @@
       var item = this._menu.selectedItem;
       this.button = new Backbone.UI.Button({
         className  : 'pulldown_button',
-        label      : this._labelForItem(item),
+        model      : {label : this._labelForItem(item)},
+        property   : 'label',
         glyph      : _(item).resolveProperty(this.options.glyphProperty),
         glyphRight : '\u25bc',
         onClick    : _.bind(this.showMenu, this)

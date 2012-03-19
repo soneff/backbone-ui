@@ -1,23 +1,10 @@
 (function(){
   window.Backbone.UI.List = Backbone.UI.CollectionView.extend({
     options : {
-      className : 'list',
-
-      labelProperty : null,
-
-      // exclusive of the labelProperty
-      itemView : null,
-
-      // A string, element, or function describing what should be displayed
-      // when the list is empty.
-      emptyContent : null,
-
-      // If true, the contents will be placed inside of a UI.Scroller
-      enableScrolling : false, 
-
-      // A callback to invoke when a row is clicked.  If this callback
-      // is present, the rows will highlight on hover.
-      onItemClick : Backbone.UI.noop
+      // A Backbone.View implementation describing how to render a particular 
+      // item in the collection.  For simple use cases, you can pass a String 
+      // instead which will be interpreted as the property of the model to display.
+      itemView : null
     },
 
     initialize : function() {
@@ -51,9 +38,10 @@
       }
 
       // wrap the list in a scroller
-      if(this.options.enableScrolling) {
+      if(_(this.options.maxHeight).exists()) {
+        var style = 'max-height:' + this.options.maxHeight + 'px';
         var scroller = new Backbone.UI.Scroller({
-          content : $.el.div(this.collectionEl) 
+          content : $.el.div({style : style}, this.collectionEl) 
         }).render();
 
         this.el.appendChild(scroller.el);
@@ -71,14 +59,19 @@
     _renderItem : function(model, index) {
       var content;
       if(_(this.options.itemView).exists()) {
-        var view = new this.options.itemView({
-          model : model
-        }).render();
-        this.itemViews[model.cid] = view;
-        content = view.el;
-      }
-      else {
-        content = this.resolveContent(model, this.options.labelProperty);
+
+        if(_(this.options.itemView).isString()) {
+          content = this.resolveContent(model, this.options.itemView);
+        }
+
+        else {
+          var view = new this.options.itemView({
+            model : model
+          });
+          view.render();
+          this.itemViews[model.cid] = view;
+          content = view.el;
+        }
       }
 
       var item = $.el.li(content);

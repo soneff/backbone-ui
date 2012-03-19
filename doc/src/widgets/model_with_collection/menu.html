@@ -6,9 +6,9 @@
 
       window.addExample('#menu', function() {
         var menu = new Backbone.UI.Menu({
-          collection : regions,
           model : coffee,
           property : 'region',
+          alternatives : regions,
           labelProperty  : 'name'
         }).render();
         return menu;
