@@ -1,7 +1,14 @@
  // A mixin for those views that are model bound
 (function(){
-
   Backbone.UI.HasModel = {
+    
+    options : {
+      // The model this view is bound to
+      model : null,
+
+      // The property of the bound model this component should render / update
+      property : null
+    },
 
     _observeModel : function(callback) {
       if(_(this.model).exists() && _(this.model.unbind).isFunction()) {

@@ -7,9 +7,7 @@
     },
 
     initialize : function() {
-      _(this).extend(Backbone.UI.HasModel);
-      _(this).extend(Backbone.UI.HasGlyph);
-      _(this).extend(Backbone.UI.HasCollectionProperty);
+      this.mixin([Backbone.UI.HasGlyph, Backbone.UI.HasModel, Backbone.UI.HasCollectionProperty]);
       _(this).bindAll('render');
       $(this.el).addClass('radio_group');
     },

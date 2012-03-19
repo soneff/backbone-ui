@@ -23,7 +23,7 @@
     },
 
     initialize : function() {
-      _(this).extend(Backbone.UI.HasModel);
+      this.mixin([Backbone.UI.HasModel]);
       _(this).bindAll('render');
 
       $(this.el).click(_(this._onClick).bind(this));

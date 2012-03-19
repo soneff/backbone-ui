@@ -34,8 +34,7 @@
     input : null,
 
     initialize : function() {
-      _.extend(this, Backbone.UI.HasModel);
-      _.extend(this, Backbone.UI.HasGlyph);
+      this.mixin([Backbone.UI.HasGlyph, Backbone.UI.HasModel]);
       _(this).bindAll('_refreshValue');
 
       $(this.el).addClass('text_field');

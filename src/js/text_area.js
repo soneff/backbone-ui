@@ -24,7 +24,7 @@
     textArea : null,
 
     initialize : function() {
-      _.extend(this, Backbone.UI.HasGlyph);
+      this.mixin([Backbone.UI.HasGlyph, Backbone.UI.HasModel]);
       $(this.el).addClass('text_area');
     },
 

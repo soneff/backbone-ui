@@ -76,6 +76,13 @@ task :doc do
     options
   end
 
+  def build_options(map)
+    options_markup = map.keys.map do |key|
+      "<li><div class='key'>#{key}</div><div class='value'>#{map[key]}</div></li>"
+    end
+    "<div class='options'><h2>Options</h2><ul>#{options_markup.join}</ul></div>"
+  end
+
   def build_components(dir)
     Dir.glob("#{dir}/**/*.html").map do |file|
 
@@ -85,10 +92,7 @@ task :doc do
 
       map = collect_option_comments(File.read(name))
 
-      options_markup = map.keys.map do |key|
-        "<li><div class='key'>#{key}</div><div class='value'>#{map[key]}</div></li>"
-      end
-      options_markup = "<div class='options'><h2>Options</h2><ul>#{options_markup.join}</ul></div>"
+      options_markup = build_options(map)
 
       content = File.read(file)
       content.gsub!('<!-- OPTIONS -->', options_markup)
@@ -103,6 +107,12 @@ task :doc do
   src.gsub!('<!-- JS -->', build_script_tags(['lib/required', 'lib/optional', 'src/js']).join("\n"))
   src.gsub!('<!-- CSS -->', build_css_tags(['lib', 'src/css']).join("\n"))
 
+  src.gsub!('<!-- MODEL_OPTIONS -->', 
+    build_options(collect_option_comments(File.read('src/js/has_model.js'))))
+
+  src.gsub!('<!-- MODEL_COLLECTION_OPTIONS -->', 
+    build_options(collect_option_comments(File.read('src/js/has_collection_property.js'))))
+
   # insert widgets and their associated option comments
   src.gsub!('<!-- MODEL_BOUND -->', build_components('doc/src/widgets/model'))
   src.gsub!('<!-- MODEL_BOUND_WITH_COLLECTION -->', build_components('doc/src/widgets/model_with_collection'))
@@ -114,6 +124,8 @@ task :doc do
   # copy src and lib directories over to documentation root
   `cp -r lib doc/dist/`
   `cp -r src doc/dist/`
+  `cp doc/src/style.css doc/dist/style.css`
+  `cp doc/src/script.js doc/dist/script.js`
   `cp -r doc/lib doc/dist/`
   `cp -r doc/src/images doc/dist/`
 end

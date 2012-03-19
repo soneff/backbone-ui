@@ -3,6 +3,10 @@
   Backbone.UI.HasGlyph = {
     GLYPH_SIZE : 22,
 
+    options : {
+
+    },
+
     insertGlyph : function(el, name) {
       return this._insertGlyph(el, name, false);
     },

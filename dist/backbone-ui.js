@@ -41,6 +41,16 @@
       var hasModelProperty = _(property).exists() && _(model).exists();
       return hasModelProperty && _(model[property]).isFunction() ? model[property]() : 
         hasModelProperty ?  _(model).resolveProperty(property) : null;
+    },
+
+    mixin : function(objects) {
+      var options = _(this.options).clone();
+
+      _(objects).each(function(object) {
+        $.extend(true, this, object);
+      }, this);
+
+      $.extend(true, this.options, options);
     }
   });
 
@@ -307,8 +317,8 @@
     },
 
     initialize : function() {
-      _(this).extend(Backbone.UI.HasModel);
-      _(this).extend(Backbone.UI.HasGlyph);
+      this.mixin([Backbone.UI.HasModel, Backbone.UI.HasGlyph]);
+
       _(this).bindAll('render');
 
       $(this.el).addClass('button');
@@ -438,8 +448,6 @@
     },
 
     render : function() {
-    console.log('rendering');
-
       if(_(this.model).exists() && _(this.options.property).exists()) {
         this.date = _(this.model).resolveProperty(this.options.property);
         var key = 'change:' + this.options.property;
@@ -571,7 +579,7 @@
     },
 
     initialize : function() {
-      _(this).extend(Backbone.UI.HasModel);
+      this.mixin([Backbone.UI.HasModel]);
       _(this).bindAll('render');
 
       $(this.el).click(_(this._onClick).bind(this));
@@ -1050,11 +1058,17 @@
 (function(){
   // options added by this mixin:
 
-  // collection
-  // labelProperty
-  // valueProperty
 
   Backbone.UI.HasCollectionProperty = {
+    options : {
+      // The collection of items representing the alternative choice
+      collection : null,
+
+      // The property of the individual choice represent the the label to be displayed
+      labelProperty : null,
+
+      valueProperty : null
+    },
 
     _determineSelectedItem : function() {
       var item;
@@ -1110,6 +1124,10 @@
 (function(){
   Backbone.UI.HasGlyph = {
     GLYPH_SIZE : 22,
+
+    options : {
+
+    },
 
     insertGlyph : function(el, name) {
       return this._insertGlyph(el, name, false);
@@ -1168,8 +1186,15 @@
 }());
  // A mixin for those views that are model bound
 (function(){
-
   Backbone.UI.HasModel = {
+    
+    options : {
+      // The model this view is bound to
+      model : null,
+
+      // The property of the bound model this component should render / update
+      property : null
+    },
 
     _observeModel : function(callback) {
       if(_(this.model).exists() && _(this.model.unbind).isFunction()) {
@@ -1289,8 +1314,8 @@
     },
 
     initialize : function() {
-      _(this).extend(Backbone.UI.HasModel);
-      _(this).extend(Backbone.UI.HasCollectionProperty);
+      this.mixin([Backbone.UI.HasModel, Backbone.UI.HasCollectionProperty]);
+
       _(this).bindAll('render');
 
       $(this.el).addClass('menu');
@@ -1420,7 +1445,7 @@
     },
 
     initialize : function() {
-      _(this).extend(Backbone.UI.HasGlyph);
+      this.mixin([Backbone.UI.HasGlyph]);
       $(this.el).addClass('pulldown');
 
       var onChange = this.options.onChange;
@@ -1538,9 +1563,7 @@
     },
 
     initialize : function() {
-      _(this).extend(Backbone.UI.HasModel);
-      _(this).extend(Backbone.UI.HasGlyph);
-      _(this).extend(Backbone.UI.HasCollectionProperty);
+      this.mixin([Backbone.UI.HasGlyph, Backbone.UI.HasModel, Backbone.UI.HasCollectionProperty]);
       _(this).bindAll('render');
       $(this.el).addClass('radio_group');
     },
@@ -1830,7 +1853,7 @@
     },
 
     initialize : function() {
-      _.extend(this, Backbone.UI.HasGlyph);
+      $.extend(true, this, Backbone.UI.HasGlyph);
       $(this.el).addClass('tab_set');
     }, 
 
@@ -2055,7 +2078,7 @@
     textArea : null,
 
     initialize : function() {
-      _.extend(this, Backbone.UI.HasGlyph);
+      this.mixin([Backbone.UI.HasGlyph, Backbone.UI.HasModel]);
       $(this.el).addClass('text_area');
     },
 
@@ -2154,8 +2177,7 @@
     input : null,
 
     initialize : function() {
-      _.extend(this, Backbone.UI.HasModel);
-      _.extend(this, Backbone.UI.HasGlyph);
+      this.mixin([Backbone.UI.HasGlyph, Backbone.UI.HasModel]);
       _(this).bindAll('_refreshValue');
 
       $(this.el).addClass('text_field');

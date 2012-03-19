@@ -31,7 +31,7 @@
     },
 
     initialize : function() {
-      _(this).extend(Backbone.UI.HasGlyph);
+      this.mixin([Backbone.UI.HasGlyph]);
       $(this.el).addClass('pulldown');
 
       var onChange = this.options.onChange;

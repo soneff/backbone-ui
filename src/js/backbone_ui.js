@@ -41,6 +41,16 @@
       var hasModelProperty = _(property).exists() && _(model).exists();
       return hasModelProperty && _(model[property]).isFunction() ? model[property]() : 
         hasModelProperty ?  _(model).resolveProperty(property) : null;
+    },
+
+    mixin : function(objects) {
+      var options = _(this.options).clone();
+
+      _(objects).each(function(object) {
+        $.extend(true, this, object);
+      }, this);
+
+      $.extend(true, this.options, options);
     }
   });
 

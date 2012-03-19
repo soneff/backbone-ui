@@ -35,8 +35,8 @@
     },
 
     initialize : function() {
-      _(this).extend(Backbone.UI.HasModel);
-      _(this).extend(Backbone.UI.HasGlyph);
+      this.mixin([Backbone.UI.HasModel, Backbone.UI.HasGlyph]);
+
       _(this).bindAll('render');
 
       $(this.el).addClass('button');

@@ -39,8 +39,6 @@
     },
 
     render : function() {
-    console.log('rendering');
-
       if(_(this.model).exists() && _(this.options.property).exists()) {
         this.date = _(this.model).resolveProperty(this.options.property);
         var key = 'change:' + this.options.property;

@@ -7,237 +7,13 @@
     <!-- JS -->
     <!-- CSS -->
 
+    <script type="text/javascript" src="script.js"></script>
     <script type="text/javascript" src="lib/jsbeautify.js"></script>
     <script type="text/javascript" src="lib/prettify.js"></script>
 
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="lib/prettify.css">
     <link href='http://fonts.googleapis.com/css?family=Brawler' rel='stylesheet' type='text/css'>
-
-    <style>
-      body {
-        padding:120px 0 0 40px;
-        font-family:Brawler, serif;
-      }
-
-      section {
-        margin-bottom:80px;
-        width:800px;
-      }
-
-      section h1 {
-        font-size:20px;
-      }
-
-      section h2 {
-        font-size:15px;
-      }
-
-      section p {
-        text-align:justify;
-        line-height:28px;
-      }
-
-      section ul {
-        list-style-type:square;  
-      }
-
-      .component_type {
-        padding-left:20px;
-      }
-
-      .model_bound {
-        border-left:2px solid #a88e7d;
-      }
-
-      .model_bound_with_collection {
-        border-left:2px solid #aa7b5d;
-      }
-
-      .collection_bound {
-        border-left:2px solid #ab673a;
-      }
-
-      .non_bound {
-        border-left:2px solid #ae5317;
-      }
-
-      a {
-        color:#ae5317;
-        text-decoration:none;
-      }
-
-      .backbone_heading {
-        height:100px;
-        position:fixed;
-        top:0;
-        right:0;
-        left:0;
-        z-index:10000;
-        padding-left:37px;
-        line-height:80px;
-        font-size:36px;
-        font-weight:bold;
-        background:url(./images/fade.png) bottom left repeat-x;
-      }
-
-      .backbone_heading .container {
-        background-color:#fff;
-        height:80px;
-      }
-      
-      .components {
-        padding-left:20px;
-      }
-
-      .components .result {
-        width:240px;
-      }
-
-      .components .code {
-        float:right;
-        width:500px;
-      }
-
-      .code {
-        padding:0 0 0 20px;
-        background-color:#f3f3f3;
-        border-left:2px solid #666;
-      }
-
-      #example_data {
-        height:175px;
-        width:350px;
-        position:fixed;
-        left:490px;
-        top:120px;
-        border-radius:8px;
-        background-color:#222;
-        opacity:0.85;
-        color:#fff;
-      }
-
-      #example_data .title {
-        line-height:32px;
-        text-align:center;
-        font-style:italic;
-        font-size:14px;
-      }
-
-      #close_example {
-        float:right;
-        margin-right:15px;
-        color:#fff;
-        font-size:24px;
-        line-height:24px;
-      }
-
-      #example_state {
-        margin-top:-20px;
-      }
-
-      section .options ul {
-        list-style-type:none;
-      }
-
-      section .options li {
-        margin-bottom:10px;
-      }
-
-      .options .key {
-        width:150px;
-        text-align:right;
-        float:left;
-      }
-
-      .options .value {
-        margin-left:160px;
-      }
-
-      .options li {
-        clear:both;
-      }
-    </style>
-
-    <script>
-      window.beautify = function(func) {
-        var code = func.toString();
-        code = code.substring(code.indexOf('\n'))
-        code = code.substring(0, code.lastIndexOf('return'));
-        code = code.replace(/var lorem = \"[^\"]*"/, 'var lorem = "Lorem ipsum dolor sit..."');
-        code = js_beautify(code, {
-          indent_size : 2 
-        });
-        return code;
-      };
-
-      window.addExample = function(container, func) {
-        // remove function wrapper and return statement 
-        // from the code, then format it
-        var code = beautify(func);
-
-        var example = $.el.div(
-          $.el.div({className : 'code'}, 
-            $.el.pre({className : 'prettyprint'}, code)),
-          $.el.div({className : 'result'}, 
-            func().el),
-          $.el.br({style : 'clear:both'}));
-          
-          $(container)[0].insertBefore(example, $('.options', $(container)[0])[0]);
-      };
-
-      // setup sample data
-      $(window).load(function() {
-        setTimeout(prettyPrint, 0);
-
-        var func = function() {
-          window.regions = new Backbone.Collection([{
-            name : 'Americas',
-            notes : 'Bright'
-          }, {
-            name : 'Africa',
-            notes : 'Fruity'
-          }]);
-
-          window.coffee = new Backbone.Model({
-            roaster: 'Counter Culture',
-            name: 'Baroida',
-            roastedOn: new Date(2012, 2, 28, 6, 30),
-            acidic : true,
-            region : regions.at(0)
-          });
-
-          return;
-        };
-
-        func();
-
-        $.el.pre(beautify(func)).appendTo($('#setup_code')[0]);
-
-        // keep example state display data updated
-        var dataEl = $('#example_data')[0];
-        $(dataEl).hide();
-        var stateEl = $('#example_state')[0];
-        var renderState = function() {
-          $(stateEl).empty();
-          var json = (JSON.stringify(coffee.attributes, null, 2));
-          json = json.substring(json.indexOf('\n')).substring(0, json.lastIndexOf('\n'));
-          $.el.pre(json).appendTo(stateEl);
-
-          if(!$(dataEl).is(":visible")) {
-            $(dataEl).fadeIn();
-          }
-        };
-
-        var closeLink = $('#close_example')[0];
-        $(closeLink).click(function() {
-          $(dataEl).fadeOut();
-          return false;
-        });
-
-        coffee.bind('change', renderState);
-        regions.bind('change', renderState);
-      });
-    </script>
   </head>
 
   <body>
@@ -327,9 +103,10 @@
 
       <p>
       Model-Bound components are those that interact directly with one or more properties of a single model.
-      <div class="options">
-      </div>
       </p>
+
+      <!-- MODEL_OPTIONS -->
+
       <div class="components">
         <!-- MODEL_BOUND -->
       </div>
@@ -337,6 +114,15 @@
 
     <section class="component_type model_bound_with_collection">
       <h1>Model-Bound with Collection Property</h1>
+      <p>
+      These components are similar to regular Model-Bound components, but also include a bound collection of alternatives.  The <code>model</code> and <code>property</code> options are still used to define the selected value, and following additional options describe the collection of alternatives:
+      </p>
+
+      <!-- MODEL_COLLECTION_OPTIONS -->
+
+      <div class="options">
+      </div>
+
       <div class="components">
         <!-- MODEL_BOUND_WITH_COLLECTION -->
       </div>

@@ -2,11 +2,17 @@
 (function(){
   // options added by this mixin:
 
-  // collection
-  // labelProperty
-  // valueProperty
 
   Backbone.UI.HasCollectionProperty = {
+    options : {
+      // The collection of items representing the alternative choice
+      collection : null,
+
+      // The property of the individual choice represent the the label to be displayed
+      labelProperty : null,
+
+      valueProperty : null
+    },
 
     _determineSelectedItem : function() {
       var item;
