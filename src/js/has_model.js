@@ -6,7 +6,10 @@
       // The Backbone.Model instance the view is bound to
       model : null,
 
-      // The property of the bound model this component should render / update
+      // The property of the bound model this component should render / update.
+      // If a function is given, it will be invoked with the model and will 
+      // expect an element to be returned.  If no model is present, this 
+      // property may be a string or function describing the content to be rendered
       property : null
     },
 

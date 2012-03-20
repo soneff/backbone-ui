@@ -38,8 +38,10 @@
   _(Backbone.View.prototype).extend({
     // resolves the appropriate content from the given choices
     resolveContent : function(model, property) {
+
       var hasModelProperty = _(property).exists() && _(model).exists();
-      return hasModelProperty && _(model[property]).isFunction() ? model[property]() : 
+      return _(property).isFunction() ? property(model) : 
+        hasModelProperty && _(model[property]).isFunction() ? model[property]() : 
         hasModelProperty ?  _(model).resolveProperty(property) : null;
     },
 
@@ -251,34 +253,6 @@
       });
     }
   });
-
-  // Add some utility methods to Backbone.UI
-  _($).extend({
-    ui : function() {
-      var args = arguments;
-      var Constructor = Backbone.UI[args[0]];
-
-      // process any formation options or element attributes
-      var firstArg = args[1];
-      var startingIndex = 1;
-      var attributes = null;
-      if(firstArg.nodeType !== 1 && typeof(firstArg) === 'object') {
-        startingIndex = 2;
-        attributes = firstArg;
-      }
-      args = Array.prototype.slice.call(arguments, startingIndex);
-      var widget;
-      if(!!Constructor && _(Constructor).isFunction()) {
-        widget = new Constructor(attributes || {});
-        _(args).each(function(child) {
-          widget.el.appendChild(child);
-        });
-      }
-
-      return widget;
-    }
-  });
-
 }(this));
 (function(){
   window.Backbone.UI.Button = Backbone.View.extend({
@@ -1190,7 +1164,10 @@
       // The Backbone.Model instance the view is bound to
       model : null,
 
-      // The property of the bound model this component should render / update
+      // The property of the bound model this component should render / update.
+      // If a function is given, it will be invoked with the model and will 
+      // expect that an element is returned.  If no model is present, this 
+      // property may be a string or function describing the content to be rendered
       property : null
     },
 
@@ -1827,14 +1804,9 @@
 (function(){
   Backbone.UI.TabSet = Backbone.View.extend({
     options : {
-      className : 'tab_set',
-
-      // Tabs to initially add to this tab set.  Each entry may contain:
-      //   label 
-      //   glyph
-      //   glypRight
-      //   content
-      //   onActivate : a callback to invoke when this tab is activated.
+      // Tabs to initially add to this tab set.  Each entry may contain
+      // a <code>label</label>, <code>content</code>, and <code>onActivate</code>
+      // option.
       tabs : []
     },
 

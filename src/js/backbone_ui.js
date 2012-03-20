@@ -38,8 +38,10 @@
   _(Backbone.View.prototype).extend({
     // resolves the appropriate content from the given choices
     resolveContent : function(model, property) {
+
       var hasModelProperty = _(property).exists() && _(model).exists();
-      return hasModelProperty && _(model[property]).isFunction() ? model[property]() : 
+      return _(property).isFunction() ? property(model) : 
+        hasModelProperty && _(model[property]).isFunction() ? model[property]() : 
         hasModelProperty ?  _(model).resolveProperty(property) : null;
     },
 
@@ -251,32 +253,4 @@
       });
     }
   });
-
-  // Add some utility methods to Backbone.UI
-  _($).extend({
-    ui : function() {
-      var args = arguments;
-      var Constructor = Backbone.UI[args[0]];
-
-      // process any formation options or element attributes
-      var firstArg = args[1];
-      var startingIndex = 1;
-      var attributes = null;
-      if(firstArg.nodeType !== 1 && typeof(firstArg) === 'object') {
-        startingIndex = 2;
-        attributes = firstArg;
-      }
-      args = Array.prototype.slice.call(arguments, startingIndex);
-      var widget;
-      if(!!Constructor && _(Constructor).isFunction()) {
-        widget = new Constructor(attributes || {});
-        _(args).each(function(child) {
-          widget.el.appendChild(child);
-        });
-      }
-
-      return widget;
-    }
-  });
-
 }(this));
