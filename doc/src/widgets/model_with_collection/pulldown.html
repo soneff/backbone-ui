@@ -7,9 +7,9 @@
       window.addExample('#pulldown', function() {
         var pulldown = new Backbone.UI.Pulldown({
           model : coffee,
-          property : 'region',
+          content : 'region',
           alternatives : regions,
-          labelProperty  : 'name'
+          altLabelContent : 'name'
         }).render();
         return pulldown;
       });

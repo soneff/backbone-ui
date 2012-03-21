@@ -6,7 +6,7 @@
       window.addExample('#text_area', function() {
         var area = new Backbone.UI.TextArea({
           model : coffee.get('region'),
-          property : 'name'
+          content : 'name'
         }).render();
         return area;
       });

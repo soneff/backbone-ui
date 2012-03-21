@@ -15,7 +15,7 @@
       this._calendar = new Backbone.UI.Calendar({
         className : 'date_picker_calendar',
         model : this.model,
-        property : this.options.property,
+        property : this.options.content,
         onSelect : _(this._selectDate).bind(this)
       });
       $(this._calendar.el).hide();
@@ -27,8 +27,8 @@
       });
 
       // listen for model changes
-      if(!!this.model && this.options.property) {
-        this.model.bind('change:' + this.options.property, _(this.render).bind(this));
+      if(!!this.model && this.options.content) {
+        this.model.bind('change:' + this.options.content, _(this.render).bind(this));
       }
     },
 
@@ -44,8 +44,8 @@
 
       this.el.appendChild(this._textField.el);
 
-      this._selectedDate = (!!this.model && !!this.options.property) ? 
-        _(this.model).resolveProperty(this.options.property) : this.options.date;
+      this._selectedDate = (!!this.model && !!this.options.content) ? 
+        _(this.model).resolveProperty(this.options.content) : this.options.date;
       
       if(!!this._selectedDate) {
         this._calendar.options.selectedDate = this._selectedDate;
@@ -108,13 +108,13 @@
         this._hideCalendar();
 
         // update our bound model (but only the date portion)
-        if(!!this.model && this.options.property) {
-          var boundDate = _(this.model).resolveProperty(this.options.property);
+        if(!!this.model && this.options.content) {
+          var boundDate = _(this.model).resolveProperty(this.options.content);
           var updatedDate = new Date(boundDate.getTime());
           updatedDate.setMonth(newDate.month());
           updatedDate.setDate(newDate.date());
           updatedDate.setFullYear(newDate.year());
-          _(this.model).setProperty(this.options.property, updatedDate);
+          _(this.model).setProperty(this.options.content, updatedDate);
         }
 
         if(_(this.options.onChange).isFunction()) {

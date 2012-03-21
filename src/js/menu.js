@@ -102,7 +102,7 @@
 
     _labelForItem : function(item) {
       return !_(item).exists() ? this.options.placeholder : 
-        _(item).resolveProperty(this.options.labelProperty);
+        _(item).resolveProperty(this.options.altLabelContent);
     }
   });
 }());

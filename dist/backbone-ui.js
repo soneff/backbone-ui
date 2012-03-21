@@ -317,7 +317,7 @@
     },
 
     render : function() {
-      var labelText = _(this.model).resolveProperty(this.options.property);
+      var labelText = _(this.model).resolveProperty(this.options.content);
 
       this._observeModel(this.render);
 
@@ -409,9 +409,9 @@
     },
 
     render : function() {
-      if(_(this.model).exists() && _(this.options.property).exists()) {
-        this.date = _(this.model).resolveProperty(this.options.property);
-        var key = 'change:' + this.options.property;
+      if(_(this.model).exists() && _(this.options.content).exists()) {
+        this.date = _(this.model).resolveProperty(this.options.content);
+        var key = 'change:' + this.options.content;
         this.model.unbind(key, this.render);
         this.model.bind(key, this.render);
       }
@@ -427,16 +427,16 @@
 
     _selectDate : function(date) {
       this.date = date;
-      if(_(this.model).exists() && _(this.options.property).exists()) {
+      if(_(this.model).exists() && _(this.options.content).exists()) {
 
         // we only want to set the bound property's date portion
-        var boundDate = _(this.model).resolveProperty(this.options.property);
+        var boundDate = _(this.model).resolveProperty(this.options.content);
         var updatedDate = new Date(boundDate.getTime());
         updatedDate.setMonth(date.getMonth());
         updatedDate.setDate(date.getDate());
         updatedDate.setFullYear(date.getFullYear());
 
-        _(this.model).setProperty(this.options.property, updatedDate);
+        _(this.model).setProperty(this.options.content, updatedDate);
       }
       this.render();
       if(_(this.options.onSelect).isFunction()) {
@@ -523,10 +523,7 @@
 
       // The property of the model describing the label that 
       // should be placed next to the checkbox
-      labelProperty : null,
-
-      // A callback to invoke when a change is made 
-      onChange : null,
+      labelContent : null,
 
       // enables / disables the checkbox
       disabled : false
@@ -547,13 +544,13 @@
 
       $(this.el).empty();
 
-      this.checked = this.checked || _(this.model).resolveProperty(this.options.property);
+      this.checked = this.checked || _(this.model).resolveProperty(this.options.content);
       var mark = $.el.div({className : 'checkmark'});
       if(this.checked) {
         mark.appendChild($.el.div({className : 'checkmark_fill'}));
       }
 
-      var labelText = _(this.model).resolveProperty(this.options.labelProperty);
+      var labelText = _(this.model).resolveProperty(this.options.labelContent);
       this._label = $.el.div({className : 'label'}, labelText);
 
       this.el.appendChild(mark);
@@ -569,17 +566,14 @@
       }
 
       this.checked = !this.checked;
-      if(_(this.model).exists() && _(this.options.property).exists()) {
-        _(this.model).setProperty(this.options.property, this.checked);
+      if(_(this.model).exists() && _(this.options.content).exists()) {
+        _(this.model).setProperty(this.options.content, this.checked);
       }
 
       else {
         this.render();
       }
 
-      if (_(this.options.onChange).isFunction()) {
-        this.options.onChange(this.checked);
-      }
       return false;
     }
   });
@@ -709,7 +703,7 @@
       this._calendar = new Backbone.UI.Calendar({
         className : 'date_picker_calendar',
         model : this.model,
-        property : this.options.property,
+        property : this.options.content,
         onSelect : _(this._selectDate).bind(this)
       });
       $(this._calendar.el).hide();
@@ -721,8 +715,8 @@
       });
 
       // listen for model changes
-      if(!!this.model && this.options.property) {
-        this.model.bind('change:' + this.options.property, _(this.render).bind(this));
+      if(!!this.model && this.options.content) {
+        this.model.bind('change:' + this.options.content, _(this.render).bind(this));
       }
     },
 
@@ -738,8 +732,8 @@
 
       this.el.appendChild(this._textField.el);
 
-      this._selectedDate = (!!this.model && !!this.options.property) ? 
-        _(this.model).resolveProperty(this.options.property) : this.options.date;
+      this._selectedDate = (!!this.model && !!this.options.content) ? 
+        _(this.model).resolveProperty(this.options.content) : this.options.date;
       
       if(!!this._selectedDate) {
         this._calendar.options.selectedDate = this._selectedDate;
@@ -802,13 +796,13 @@
         this._hideCalendar();
 
         // update our bound model (but only the date portion)
-        if(!!this.model && this.options.property) {
-          var boundDate = _(this.model).resolveProperty(this.options.property);
+        if(!!this.model && this.options.content) {
+          var boundDate = _(this.model).resolveProperty(this.options.content);
           var updatedDate = new Date(boundDate.getTime());
           updatedDate.setMonth(newDate.month());
           updatedDate.setDate(newDate.date());
           updatedDate.setFullYear(newDate.year());
-          _(this.model).setProperty(this.options.property, updatedDate);
+          _(this.model).setProperty(this.options.content, updatedDate);
         }
 
         if(_(this.options.onChange).isFunction()) {
@@ -1034,25 +1028,25 @@
       alternatives : null,
 
       // The property of the individual choice represent the the label to be displayed
-      labelProperty : null,
+      altLabelContent : null,
 
       // The property of the individual choice that represents the value to be stored
       // in the bound model's property.  Omit this option if you'd like the choice 
       // object itself to represent the value.
-      valueProperty : null
+      altValueContent : null
     },
 
     _determineSelectedItem : function() {
       var item;
 
       // if a bound property has been given, we attempt to resolve it
-      if(_(this.model).exists() && _(this.options.property).exists()) {
-        item = _(this.model).resolveProperty(this.options.property);
+      if(_(this.model).exists() && _(this.options.content).exists()) {
+        item = _(this.model).resolveProperty(this.options.content);
 
         // if a value property is given, we further resolve our selected item
-        if(_(this.options.valueProperty).exists()) {
+        if(_(this.options.altValueContent).exists()) {
           var otherItem = _(this._collectionArray()).detect(function(collectionItem) {
-            return (collectionItem.attributes || collectionItem)[this.options.valueProperty] === item;
+            return (collectionItem.attributes || collectionItem)[this.options.altValueContent] === item;
           }, this);
           if(!_(otherItem).isUndefined()) item = otherItem;
         }
@@ -1065,15 +1059,15 @@
       this.selectedValue = item;
       this.selectedItem = item;
 
-      if(_(this.model).exists() && _(this.options.property).exists()) {
+      if(_(this.model).exists() && _(this.options.content).exists()) {
         this.selectedValue = this._valueForItem(item);
-        _(this.model).setProperty(this.options.property, this.selectedValue);
+        _(this.model).setProperty(this.options.content, this.selectedValue);
       }
     },
 
     _valueForItem : function(item) {
-      return _(this.options.valueProperty).exists() ? 
-        _(item).resolveProperty(this.options.valueProperty) :
+      return _(this.options.altValueContent).exists() ? 
+        _(item).resolveProperty(this.options.altValueContent) :
         item;
     },
 
@@ -1166,14 +1160,14 @@
 
       // The property of the bound model this component should render / update.
       // If a function is given, it will be invoked with the model and will 
-      // expect that an element is returned.  If no model is present, this 
+      // expect an element to be returned.  If no model is present, this 
       // property may be a string or function describing the content to be rendered
-      property : null
+      content : null
     },
 
     _observeModel : function(callback) {
       if(_(this.model).exists() && _(this.model.unbind).isFunction()) {
-        _(['property', 'labelProperty', 'valueProperty']).each(function(prop) {
+        _(['content', 'labelContent']).each(function(prop) {
           var key = this.options[prop];
           if(_(key).exists()) {
             key = 'change:' + key;
@@ -1378,7 +1372,7 @@
 
     _labelForItem : function(item) {
       return !_(item).exists() ? this.options.placeholder : 
-        _(item).resolveProperty(this.options.labelProperty);
+        _(item).resolveProperty(this.options.altLabelContent);
     }
   });
 }());
@@ -1433,8 +1427,8 @@
         this.model.unbind('change', _(this.render).bind(this));
         
         // observe model changes
-        if(_(this.options.property).exists()) {
-          this.model.bind('change:' + this.options.property, _(this.render).bind(this));
+        if(_(this.options.content).exists()) {
+          this.model.bind('change:' + this.options.content, _(this.render).bind(this));
         }
       }
 
@@ -1455,7 +1449,7 @@
       this.button = new Backbone.UI.Button({
         className  : 'pulldown_button',
         model      : {label : this._labelForItem(item)},
-        property   : 'label',
+        content    : 'label',
         glyph      : _(item).resolveProperty(this.options.glyphProperty),
         glyphRight : '\u25bc',
         onClick    : _.bind(this.showMenu, this)
@@ -1471,7 +1465,7 @@
 
     _labelForItem : function(item) {
       return !_(item).exists() ? this.options.placeholder : 
-        _(item).resolveProperty(this.options.labelProperty);
+        _(item).resolveProperty(this.options.altLabelContent);
     },
 
     // sets the selected item
@@ -1549,7 +1543,7 @@
 
         var selected = selectedValue === this._valueForItem(item);
 
-        var label = _(item).resolveProperty(this.options.labelProperty);
+        var label = _(item).resolveProperty(this.options.altLabelContent);
         
         var li = $.el.li(
           $.el.a({className : 'choice' + (selected ? ' selected' : '')},
@@ -2033,8 +2027,8 @@
     render : function() {
       var value = (this.textArea && this.textArea.value.length) > 0 ? 
         this.textArea.value : 
-        (!!this.model && !!this.options.property) ? 
-        _(this.model).resolveProperty(this.options.property) : null;
+        (!!this.model && !!this.options.content) ? 
+        _(this.model).resolveProperty(this.options.content) : null;
 
       $(this.el).empty();
 
@@ -2085,7 +2079,7 @@
     },
 
     _updateModel : function() {
-      _(this.model).setProperty(this.options.property, this.textArea.value);
+      _(this.model).setProperty(this.options.content, this.textArea.value);
     }
   });
 }());
@@ -2136,8 +2130,8 @@
     render : function() {
       var value = (this.input && this.input.value.length) > 0 ? 
         this.input.value : 
-        (!!this.model && !!this.options.property) ? 
-        _(this.model).resolveProperty(this.options.property) : null;
+        (!!this.model && !!this.options.content) ? 
+        _(this.model).resolveProperty(this.options.content) : null;
 
       $(this.el).empty();
 
@@ -2178,13 +2172,13 @@
     },
 
     _updateModel : function() {
-      _(this.model).setProperty(this.options.property, this.input.value);
+      _(this.model).setProperty(this.options.content, this.input.value);
     },
 
     _refreshValue : function() {
-      var newValue = this.model.get(this.options.property);
+      var newValue = this.model.get(this.options.content);
       if(this.input && this.input.value !== newValue) {
-        this.input.value = this.model.get(this.options.property);
+        this.input.value = this.model.get(this.options.content);
       }
     }
   });
@@ -2210,9 +2204,9 @@
       this._timeModel = {};
       this._menu = new Backbone.UI.Menu({
         model : this._timeModel,
-        labelProperty : 'label',
-        valueProperty : 'label',
-        property : 'value',
+        altLabelContent : 'label',
+        altValueContent : 'label',
+        content : 'value',
         onChange : _(this._onSelectTimeItem).bind(this)
       });
       $(this._menu.el).hide();
@@ -2222,8 +2216,8 @@
       document.body.appendChild(this._menu.el);
 
       // listen for model changes
-      if(!!this.model && this.options.property) {
-        this.model.bind('change:' + this.options.property, _(this.render).bind(this));
+      if(!!this.model && this.options.content) {
+        this.model.bind('change:' + this.options.content, _(this.render).bind(this));
       }
     },
 
@@ -2237,8 +2231,8 @@
       $(this._textField.input).keyup(_(this._timeEdited).bind(this));
       this.el.appendChild(this._textField.el);
 
-      var date = (!!this.model && !!this.options.property) ? 
-        _(this.model).resolveProperty(this.options.property) : null;
+      var date = (!!this.model && !!this.options.content) ? 
+        _(this.model).resolveProperty(this.options.content) : null;
       
       if(!!date) {
         var value = moment(date).format(this.options.format);
@@ -2247,7 +2241,7 @@
         this._selectedTime = date;
       }
 
-      this._menu.options.collection = this._collectTimes();
+      this._menu.options.alternatives = this._collectTimes();
       this._menu.options.model = this._timeModel;
       this._menu.render();
       
@@ -2317,12 +2311,12 @@
         this._hideMenu();
 
         // update our bound model (but only the date portion)
-        if(!!this.model && this.options.property) {
-          var boundDate = _(this.model).resolveProperty(this.options.property);
+        if(!!this.model && this.options.content) {
+          var boundDate = _(this.model).resolveProperty(this.options.content);
           var updatedDate = new Date(boundDate);
           updatedDate.setHours(newDate.hours());
           updatedDate.setMinutes(newDate.minutes());
-          _(this.model).setProperty(this.options.property, updatedDate);
+          _(this.model).setProperty(this.options.content, updatedDate);
         }
 
         if(_(this.options.onChange).isFunction()) {

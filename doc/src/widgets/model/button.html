@@ -8,7 +8,7 @@
 
         var button = new Backbone.UI.Button({
           model : coffee,
-          property : 'roaster',
+          content : 'roaster',
           onClick : _(alert).bind(window, 'pressed')
         }).render();
         return button;

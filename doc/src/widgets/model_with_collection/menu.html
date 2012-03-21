@@ -7,9 +7,9 @@
       window.addExample('#menu', function() {
         var menu = new Backbone.UI.Menu({
           model : coffee,
-          property : 'region',
+          content : 'region',
           alternatives : regions,
-          labelProperty  : 'name'
+          altLabelContent : 'name'
         }).render();
         return menu;
       });

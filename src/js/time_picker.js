@@ -18,9 +18,9 @@
       this._timeModel = {};
       this._menu = new Backbone.UI.Menu({
         model : this._timeModel,
-        labelProperty : 'label',
-        valueProperty : 'label',
-        property : 'value',
+        altLabelContent : 'label',
+        altValueContent : 'label',
+        content : 'value',
         onChange : _(this._onSelectTimeItem).bind(this)
       });
       $(this._menu.el).hide();
@@ -30,8 +30,8 @@
       document.body.appendChild(this._menu.el);
 
       // listen for model changes
-      if(!!this.model && this.options.property) {
-        this.model.bind('change:' + this.options.property, _(this.render).bind(this));
+      if(!!this.model && this.options.content) {
+        this.model.bind('change:' + this.options.content, _(this.render).bind(this));
       }
     },
 
@@ -45,8 +45,8 @@
       $(this._textField.input).keyup(_(this._timeEdited).bind(this));
       this.el.appendChild(this._textField.el);
 
-      var date = (!!this.model && !!this.options.property) ? 
-        _(this.model).resolveProperty(this.options.property) : null;
+      var date = (!!this.model && !!this.options.content) ? 
+        _(this.model).resolveProperty(this.options.content) : null;
       
       if(!!date) {
         var value = moment(date).format(this.options.format);
@@ -55,7 +55,7 @@
         this._selectedTime = date;
       }
 
-      this._menu.options.collection = this._collectTimes();
+      this._menu.options.alternatives = this._collectTimes();
       this._menu.options.model = this._timeModel;
       this._menu.render();
       
@@ -125,12 +125,12 @@
         this._hideMenu();
 
         // update our bound model (but only the date portion)
-        if(!!this.model && this.options.property) {
-          var boundDate = _(this.model).resolveProperty(this.options.property);
+        if(!!this.model && this.options.content) {
+          var boundDate = _(this.model).resolveProperty(this.options.content);
           var updatedDate = new Date(boundDate);
           updatedDate.setHours(newDate.hours());
           updatedDate.setMinutes(newDate.minutes());
-          _(this.model).setProperty(this.options.property, updatedDate);
+          _(this.model).setProperty(this.options.content, updatedDate);
         }
 
         if(_(this.options.onChange).isFunction()) {

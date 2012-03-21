@@ -7,9 +7,9 @@
       window.addExample('#radio_group', function() {
         var group = new Backbone.UI.RadioGroup({
           model : coffee,
-          property : 'region',
+          content : 'region',
           alternatives : regions,
-          labelProperty  : 'name'
+          altLabelContent : 'name'
         }).render();
         return group;
       });

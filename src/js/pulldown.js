@@ -49,8 +49,8 @@
         this.model.unbind('change', _(this.render).bind(this));
         
         // observe model changes
-        if(_(this.options.property).exists()) {
-          this.model.bind('change:' + this.options.property, _(this.render).bind(this));
+        if(_(this.options.content).exists()) {
+          this.model.bind('change:' + this.options.content, _(this.render).bind(this));
         }
       }
 
@@ -71,7 +71,7 @@
       this.button = new Backbone.UI.Button({
         className  : 'pulldown_button',
         model      : {label : this._labelForItem(item)},
-        property   : 'label',
+        content    : 'label',
         glyph      : _(item).resolveProperty(this.options.glyphProperty),
         glyphRight : '\u25bc',
         onClick    : _.bind(this.showMenu, this)
@@ -87,7 +87,7 @@
 
     _labelForItem : function(item) {
       return !_(item).exists() ? this.options.placeholder : 
-        _(item).resolveProperty(this.options.labelProperty);
+        _(item).resolveProperty(this.options.altLabelContent);
     },
 
     // sets the selected item

@@ -6,10 +6,7 @@
 
       // The property of the model describing the label that 
       // should be placed next to the checkbox
-      labelProperty : null,
-
-      // A callback to invoke when a change is made 
-      onChange : null,
+      labelContent : null,
 
       // enables / disables the checkbox
       disabled : false
@@ -30,13 +27,13 @@
 
       $(this.el).empty();
 
-      this.checked = this.checked || _(this.model).resolveProperty(this.options.property);
+      this.checked = this.checked || _(this.model).resolveProperty(this.options.content);
       var mark = $.el.div({className : 'checkmark'});
       if(this.checked) {
         mark.appendChild($.el.div({className : 'checkmark_fill'}));
       }
 
-      var labelText = _(this.model).resolveProperty(this.options.labelProperty);
+      var labelText = _(this.model).resolveProperty(this.options.labelContent);
       this._label = $.el.div({className : 'label'}, labelText);
 
       this.el.appendChild(mark);
@@ -52,17 +49,14 @@
       }
 
       this.checked = !this.checked;
-      if(_(this.model).exists() && _(this.options.property).exists()) {
-        _(this.model).setProperty(this.options.property, this.checked);
+      if(_(this.model).exists() && _(this.options.content).exists()) {
+        _(this.model).setProperty(this.options.content, this.checked);
       }
 
       else {
         this.render();
       }
 
-      if (_(this.options.onChange).isFunction()) {
-        this.options.onChange(this.checked);
-      }
       return false;
     }
   });

@@ -45,8 +45,8 @@
     render : function() {
       var value = (this.input && this.input.value.length) > 0 ? 
         this.input.value : 
-        (!!this.model && !!this.options.property) ? 
-        _(this.model).resolveProperty(this.options.property) : null;
+        (!!this.model && !!this.options.content) ? 
+        _(this.model).resolveProperty(this.options.content) : null;
 
       $(this.el).empty();
 
@@ -87,13 +87,13 @@
     },
 
     _updateModel : function() {
-      _(this.model).setProperty(this.options.property, this.input.value);
+      _(this.model).setProperty(this.options.content, this.input.value);
     },
 
     _refreshValue : function() {
-      var newValue = this.model.get(this.options.property);
+      var newValue = this.model.get(this.options.content);
       if(this.input && this.input.value !== newValue) {
-        this.input.value = this.model.get(this.options.property);
+        this.input.value = this.model.get(this.options.content);
       }
     }
   });

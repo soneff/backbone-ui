@@ -25,8 +25,8 @@
     render : function() {
       var value = (this.textArea && this.textArea.value.length) > 0 ? 
         this.textArea.value : 
-        (!!this.model && !!this.options.property) ? 
-        _(this.model).resolveProperty(this.options.property) : null;
+        (!!this.model && !!this.options.content) ? 
+        _(this.model).resolveProperty(this.options.content) : null;
 
       $(this.el).empty();
 
@@ -77,7 +77,7 @@
     },
 
     _updateModel : function() {
-      _(this.model).setProperty(this.options.property, this.textArea.value);
+      _(this.model).setProperty(this.options.content, this.textArea.value);
     }
   });
 }());

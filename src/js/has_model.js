@@ -10,12 +10,12 @@
       // If a function is given, it will be invoked with the model and will 
       // expect an element to be returned.  If no model is present, this 
       // property may be a string or function describing the content to be rendered
-      property : null
+      content : null
     },
 
     _observeModel : function(callback) {
       if(_(this.model).exists() && _(this.model.unbind).isFunction()) {
-        _(['property', 'labelProperty', 'valueProperty']).each(function(prop) {
+        _(['content', 'labelContent']).each(function(prop) {
           var key = this.options[prop];
           if(_(key).exists()) {
             key = 'change:' + key;

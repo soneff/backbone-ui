@@ -41,9 +41,9 @@
     },
 
     render : function() {
-      if(_(this.model).exists() && _(this.options.property).exists()) {
-        this.date = _(this.model).resolveProperty(this.options.property);
-        var key = 'change:' + this.options.property;
+      if(_(this.model).exists() && _(this.options.content).exists()) {
+        this.date = _(this.model).resolveProperty(this.options.content);
+        var key = 'change:' + this.options.content;
         this.model.unbind(key, this.render);
         this.model.bind(key, this.render);
       }
@@ -59,16 +59,16 @@
 
     _selectDate : function(date) {
       this.date = date;
-      if(_(this.model).exists() && _(this.options.property).exists()) {
+      if(_(this.model).exists() && _(this.options.content).exists()) {
 
         // we only want to set the bound property's date portion
-        var boundDate = _(this.model).resolveProperty(this.options.property);
+        var boundDate = _(this.model).resolveProperty(this.options.content);
         var updatedDate = new Date(boundDate.getTime());
         updatedDate.setMonth(date.getMonth());
         updatedDate.setDate(date.getDate());
         updatedDate.setFullYear(date.getFullYear());
 
-        _(this.model).setProperty(this.options.property, updatedDate);
+        _(this.model).setProperty(this.options.content, updatedDate);
       }
       this.render();
       if(_(this.options.onSelect).isFunction()) {
