@@ -237,6 +237,11 @@ a.button {
   right:3px;
 }
 
+.list ul {
+  list-style-type:none;
+  margin:0;
+  padding:0;
+}
 .menu {
   max-height:150px;
   margin-right:3px;

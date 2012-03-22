@@ -37,12 +37,13 @@
 
   _(Backbone.View.prototype).extend({
     // resolves the appropriate content from the given choices
-    resolveContent : function(model, property) {
-
-      var hasModelProperty = _(property).exists() && _(model).exists();
-      return _(property).isFunction() ? property(model) : 
-        hasModelProperty && _(model[property]).isFunction() ? model[property]() : 
-        hasModelProperty ?  _(model).resolveProperty(property) : null;
+    resolveContent : function(model, content) {
+      model = model || this.model;
+      content = content || this.options.content;
+      var hasModelProperty = _(content).exists() && _(model).exists();
+      return _(content).isFunction() ? content(model) : 
+        hasModelProperty && _(model[content]).isFunction() ? model[content]() : 
+        hasModelProperty ?  _(model).resolveProperty(content) : content;
     },
 
     mixin : function(objects) {
@@ -317,7 +318,7 @@
     },
 
     render : function() {
-      var labelText = _(this.model).resolveProperty(this.options.content);
+      var labelText = this.resolveContent(this.model, this.options.content);
 
       this._observeModel(this.render);
 
@@ -410,7 +411,7 @@
 
     render : function() {
       if(_(this.model).exists() && _(this.options.content).exists()) {
-        this.date = _(this.model).resolveProperty(this.options.content);
+        this.date = this.resolveContent();
         var key = 'change:' + this.options.content;
         this.model.unbind(key, this.render);
         this.model.bind(key, this.render);
@@ -430,7 +431,7 @@
       if(_(this.model).exists() && _(this.options.content).exists()) {
 
         // we only want to set the bound property's date portion
-        var boundDate = _(this.model).resolveProperty(this.options.content);
+        var boundDate = this.resolveContent();
         var updatedDate = new Date(boundDate.getTime());
         updatedDate.setMonth(date.getMonth());
         updatedDate.setDate(date.getDate());
@@ -544,7 +545,7 @@
 
       $(this.el).empty();
 
-      this.checked = this.checked || _(this.model).resolveProperty(this.options.content);
+      this.checked = this.checked || this.resolveContent();
       var mark = $.el.div({className : 'checkmark'});
       if(this.checked) {
         mark.appendChild($.el.div({className : 'checkmark_fill'}));
@@ -583,6 +584,9 @@
     options : {
       // The Backbone.Collection instance the view is bound to
       model : null,
+
+      // The Backbone.View class responsible for rendering a single item in the collection
+      itemView : null,
 
       // A string, element, or function describing what should be displayed
       // when the list is empty.
@@ -733,7 +737,7 @@
       this.el.appendChild(this._textField.el);
 
       this._selectedDate = (!!this.model && !!this.options.content) ? 
-        _(this.model).resolveProperty(this.options.content) : this.options.date;
+        this.resolveContent() : this.options.date;
       
       if(!!this._selectedDate) {
         this._calendar.options.selectedDate = this._selectedDate;
@@ -797,7 +801,7 @@
 
         // update our bound model (but only the date portion)
         if(!!this.model && this.options.content) {
-          var boundDate = _(this.model).resolveProperty(this.options.content);
+          var boundDate = this.resolveContent();
           var updatedDate = new Date(boundDate.getTime());
           updatedDate.setMonth(newDate.month());
           updatedDate.setDate(newDate.date());
@@ -1543,7 +1547,7 @@
 
         var selected = selectedValue === this._valueForItem(item);
 
-        var label = _(item).resolveProperty(this.options.altLabelContent);
+        var label = this.resolveContent(item, this.options.altLabelContent);
         
         var li = $.el.li(
           $.el.a({className : 'choice' + (selected ? ' selected' : '')},
@@ -1799,7 +1803,7 @@
   Backbone.UI.TabSet = Backbone.View.extend({
     options : {
       // Tabs to initially add to this tab set.  Each entry may contain
-      // a <code>label</label>, <code>content</code>, and <code>onActivate</code>
+      // a <code>label</code>, <code>content</code>, and <code>onActivate</code>
       // option.
       tabs : []
     },
@@ -1983,7 +1987,7 @@
       _(this.options.columns).each(function(column, index, list) {
         var width = !!column.width ? parseInt(column.width, 10) + 5 : null;
         var style = width ? 'width:' + width + 'px; max-width:' + width + 'px': null;
-        var content = this.resolveContent(model, column.property);
+        var content = this.resolveContent(model, column.content);
         row.appendChild($.el.td(
           {className : _(list).nameForIndex(index), style : style}, 
           $.el.div({className : 'wrapper', style : style}, content)));
@@ -2026,9 +2030,7 @@
 
     render : function() {
       var value = (this.textArea && this.textArea.value.length) > 0 ? 
-        this.textArea.value : 
-        (!!this.model && !!this.options.content) ? 
-        _(this.model).resolveProperty(this.options.content) : null;
+        this.textArea.value : this.resolveContent();
 
       $(this.el).empty();
 
@@ -2129,9 +2131,7 @@
 
     render : function() {
       var value = (this.input && this.input.value.length) > 0 ? 
-        this.input.value : 
-        (!!this.model && !!this.options.content) ? 
-        _(this.model).resolveProperty(this.options.content) : null;
+        this.input.value : this.resolveContent();
 
       $(this.el).empty();
 
@@ -2231,8 +2231,7 @@
       $(this._textField.input).keyup(_(this._timeEdited).bind(this));
       this.el.appendChild(this._textField.el);
 
-      var date = (!!this.model && !!this.options.content) ? 
-        _(this.model).resolveProperty(this.options.content) : null;
+      var date = this.resolveContent();
       
       if(!!date) {
         var value = moment(date).format(this.options.format);
@@ -2312,7 +2311,7 @@
 
         // update our bound model (but only the date portion)
         if(!!this.model && this.options.content) {
-          var boundDate = _(this.model).resolveProperty(this.options.content);
+          var boundDate = this.resolveContent();
           var updatedDate = new Date(boundDate);
           updatedDate.setHours(newDate.hours());
           updatedDate.setMinutes(newDate.minutes());

@@ -27,7 +27,7 @@
 
       $(this.el).empty();
 
-      this.checked = this.checked || _(this.model).resolveProperty(this.options.content);
+      this.checked = this.checked || this.resolveContent();
       var mark = $.el.div({className : 'checkmark'});
       if(this.checked) {
         mark.appendChild($.el.div({className : 'checkmark_fill'}));

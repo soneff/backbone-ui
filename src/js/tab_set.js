@@ -2,7 +2,7 @@
   Backbone.UI.TabSet = Backbone.View.extend({
     options : {
       // Tabs to initially add to this tab set.  Each entry may contain
-      // a <code>label</label>, <code>content</code>, and <code>onActivate</code>
+      // a <code>label</code>, <code>content</code>, and <code>onActivate</code>
       // option.
       tabs : []
     },

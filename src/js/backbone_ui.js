@@ -37,12 +37,13 @@
 
   _(Backbone.View.prototype).extend({
     // resolves the appropriate content from the given choices
-    resolveContent : function(model, property) {
-
-      var hasModelProperty = _(property).exists() && _(model).exists();
-      return _(property).isFunction() ? property(model) : 
-        hasModelProperty && _(model[property]).isFunction() ? model[property]() : 
-        hasModelProperty ?  _(model).resolveProperty(property) : null;
+    resolveContent : function(model, content) {
+      model = model || this.model;
+      content = content || this.options.content;
+      var hasModelProperty = _(content).exists() && _(model).exists();
+      return _(content).isFunction() ? content(model) : 
+        hasModelProperty && _(model[content]).isFunction() ? model[content]() : 
+        hasModelProperty ?  _(model).resolveProperty(content) : content;
     },
 
     mixin : function(objects) {

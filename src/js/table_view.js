@@ -98,7 +98,7 @@
       _(this.options.columns).each(function(column, index, list) {
         var width = !!column.width ? parseInt(column.width, 10) + 5 : null;
         var style = width ? 'width:' + width + 'px; max-width:' + width + 'px': null;
-        var content = this.resolveContent(model, column.property);
+        var content = this.resolveContent(model, column.content);
         row.appendChild($.el.td(
           {className : _(list).nameForIndex(index), style : style}, 
           $.el.div({className : 'wrapper', style : style}, content)));

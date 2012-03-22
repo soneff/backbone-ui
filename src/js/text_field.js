@@ -44,9 +44,7 @@
 
     render : function() {
       var value = (this.input && this.input.value.length) > 0 ? 
-        this.input.value : 
-        (!!this.model && !!this.options.content) ? 
-        _(this.model).resolveProperty(this.options.content) : null;
+        this.input.value : this.resolveContent();
 
       $(this.el).empty();
 

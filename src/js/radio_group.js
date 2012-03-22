@@ -30,7 +30,7 @@
 
         var selected = selectedValue === this._valueForItem(item);
 
-        var label = _(item).resolveProperty(this.options.altLabelContent);
+        var label = this.resolveContent(item, this.options.altLabelContent);
         
         var li = $.el.li(
           $.el.a({className : 'choice' + (selected ? ' selected' : '')},

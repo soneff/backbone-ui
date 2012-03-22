@@ -24,9 +24,7 @@
 
     render : function() {
       var value = (this.textArea && this.textArea.value.length) > 0 ? 
-        this.textArea.value : 
-        (!!this.model && !!this.options.content) ? 
-        _(this.model).resolveProperty(this.options.content) : null;
+        this.textArea.value : this.resolveContent();
 
       $(this.el).empty();
 

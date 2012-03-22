@@ -45,8 +45,7 @@
       $(this._textField.input).keyup(_(this._timeEdited).bind(this));
       this.el.appendChild(this._textField.el);
 
-      var date = (!!this.model && !!this.options.content) ? 
-        _(this.model).resolveProperty(this.options.content) : null;
+      var date = this.resolveContent();
       
       if(!!date) {
         var value = moment(date).format(this.options.format);
@@ -126,7 +125,7 @@
 
         // update our bound model (but only the date portion)
         if(!!this.model && this.options.content) {
-          var boundDate = _(this.model).resolveProperty(this.options.content);
+          var boundDate = this.resolveContent();
           var updatedDate = new Date(boundDate);
           updatedDate.setHours(newDate.hours());
           updatedDate.setMinutes(newDate.minutes());

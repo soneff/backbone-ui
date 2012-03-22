@@ -76,4 +76,51 @@ $(window).load(function() {
 
   coffee.bind('change', renderState);
   regions.bind('change', renderState);
+
+  // task example
+  var taskFunc = function() {
+    var TaskView = Backbone.View.extend({
+      render : function() {
+        $(this.el).empty();
+
+        var check = new Backbone.UI.Checkbox({
+          model : this.model,
+          labelContent : 'title',
+          content : 'done'
+        }).render();
+
+        this.el.appendChild(check.el);
+      }
+    });
+
+    var list = new Backbone.UI.List({
+      model : new Backbone.Collection({
+        title : 'foo',
+        done : false
+      }),
+      itemView : TaskView 
+    }).render();
+
+    var button = new Backbone.UI.Button({
+      content : 'add task',
+      onClick : function() {
+        list.options.model.add({
+          title : 'bar',
+          checked : false
+        });
+      }
+    }).render();
+
+    return $.el.div(list.el, button.el);
+  };
+
+  var code = js_beautify(taskFunc.toString(), {
+    indent_size : 2 
+  });
+
+  $.el.pre(code).appendTo($('#task_list_code')[0]);
+
+  var result = taskFunc();
+  $('#task_list_result')[0].appendChild(result);
 });
+

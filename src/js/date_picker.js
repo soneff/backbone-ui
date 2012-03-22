@@ -45,7 +45,7 @@
       this.el.appendChild(this._textField.el);
 
       this._selectedDate = (!!this.model && !!this.options.content) ? 
-        _(this.model).resolveProperty(this.options.content) : this.options.date;
+        this.resolveContent() : this.options.date;
       
       if(!!this._selectedDate) {
         this._calendar.options.selectedDate = this._selectedDate;
@@ -109,7 +109,7 @@
 
         // update our bound model (but only the date portion)
         if(!!this.model && this.options.content) {
-          var boundDate = _(this.model).resolveProperty(this.options.content);
+          var boundDate = this.resolveContent();
           var updatedDate = new Date(boundDate.getTime());
           updatedDate.setMonth(newDate.month());
           updatedDate.setDate(newDate.date());

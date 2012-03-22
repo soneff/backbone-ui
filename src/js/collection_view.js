@@ -4,6 +4,9 @@
       // The Backbone.Collection instance the view is bound to
       model : null,
 
+      // The Backbone.View class responsible for rendering a single item in the collection
+      itemView : null,
+
       // A string, element, or function describing what should be displayed
       // when the list is empty.
       emptyContent : null,
