@@ -158,6 +158,7 @@ a.button {
 .checkbox {
   text-decoration:none;
   height:30px;
+  white-space:nowrap;
 }
 
 .checkbox:hover {
@@ -202,6 +203,7 @@ a.button {
   padding:0 0 0 10px;
   text-decoration:none;
   color:#222;
+  overflow:hidden;
 }
 
 .checkbox,

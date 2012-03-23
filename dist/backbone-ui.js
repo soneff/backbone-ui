@@ -318,7 +318,7 @@
     },
 
     render : function() {
-      var labelText = this.resolveContent(this.model, this.options.content);
+      var labelText = this.resolveContent();
 
       this._observeModel(this.render);
 
@@ -640,9 +640,6 @@
 
       // update the first / last class names
       this._updateClassNames();
-
-      // notify that a change to the collection view has occurred
-      if(this.options.onChange) this.options.onChange();
     },
 
     _onItemChanged : function(model) {
@@ -650,16 +647,13 @@
       // re-render the individual item view if it's a backbone view
       if(!!view && view.el && view.el.parentNode) {
         view.render();
+        this._ensureProperPosition(view);
       }
 
       // otherwise, we re-render the entire collection
-      // TODO this is terribly inefficient
       else {
         this.render();
       }
-      if(this.options.onChange) this.options.onChange();
-
-      // TODO this may require re-sorting
     },
 
     _onItemRemoved : function(model) {
@@ -672,8 +666,6 @@
 
       // update the first / last class names
       this._updateClassNames();
-
-      if(this.options.onChange) this.options.onChange();
     },
 
     _updateClassNames : function() {
@@ -685,6 +677,21 @@
         });
         $(children[0]).addClass('first');
         $(children[children.length - 1]).addClass('last');
+      }
+    },
+
+    _ensureProperPosition : function(view) {
+      if(_(this.model.comparator).isFunction()) {
+        this.model.sort({silent : true});
+        var itemEl = view.el.parentNode;
+        var currentIndex = Array.prototype.indexOf.call(
+          this.collectionEl.childNodes, itemEl);
+        var properIndex = this.model.indexOf(view.model);
+        if(currentIndex !== properIndex) {
+          itemEl.parentNode.removeChild(itemEl);
+          var refNode = this.collectionEl.childNodes[properIndex];
+          this.collectionEl.insertBefore(itemEl, refNode);
+        }
       }
     }
   });
@@ -1182,6 +1189,68 @@
       }
     }
   };
+}());
+
+(function(){
+  window.Backbone.UI.Link = Backbone.View.extend({
+    options : {
+      tagName : 'a',
+
+      // disables the link (non-clickable) 
+      disabled : false,
+
+      // A callback to invoke when the link is clicked
+      onClick : null
+    },
+
+    initialize : function() {
+      this.mixin([Backbone.UI.HasModel, Backbone.UI.HasGlyph]);
+
+      _(this).bindAll('render');
+
+      $(this.el).addClass('link');
+
+      $(this.el).bind('click', _(function(e) {
+        if(!this.options.disabled && this.options.onClick) {
+          this.options.onClick(e); 
+        }
+        return false;
+      }).bind(this));
+    },
+
+    render : function() {
+      var labelText = this.resolveContent();
+
+      this._observeModel(this.render);
+
+      $(this.el).empty();
+
+      // insert label
+      $.el.span({
+        className : 'label'
+      }, labelText).appendTo(this.el);
+
+      // insert glyphs
+      this.insertGlyph(this.el, this.options.glyph);
+      this.insertGlyphRight(this.el, this.options.glyphRight);
+
+      // add appropriate class names
+      this.setEnabled(!this.options.disabled);
+
+      return this;
+    },
+
+    // sets the enabled state of the button
+    setEnabled : function(enabled) {
+      if(enabled) {
+        this.el.href = '#';
+      } else { 
+        this.el.removeAttribute('href');
+      }
+      this.options.disabled = !enabled;
+      $(this.el)[enabled ? 'removeClass' : 'addClass']('disabled');
+    }
+  });
 }());
 
 (function(){

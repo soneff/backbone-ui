@@ -1,6 +1,7 @@
 body {
   padding:120px 0 0 40px;
   font-family:Brawler, serif;
+  font-size:14px;
 }
 
 section {
@@ -140,4 +141,28 @@ section .options li {
 
 .options li {
   clear:both;
+}
+
+#task_list_code {
+  padding:2px 15px;
+  margin-top:20px;
+}
+
+#task_list_result {
+  width:300px;
+}
+
+#task_list_result .text_field {
+  width:300px;
+  margin-bottom:10px;
+}
+
+#task_list_result .checkbox {
+  max-width:240px;
+  overflow:hidden;
+}
+
+#task_list_result .link {
+  line-height:30px;
+  float:right;
 }

@@ -59,9 +59,6 @@
 
       // update the first / last class names
       this._updateClassNames();
-
-      // notify that a change to the collection view has occurred
-      if(this.options.onChange) this.options.onChange();
     },
 
     _onItemChanged : function(model) {
@@ -69,16 +66,13 @@
       // re-render the individual item view if it's a backbone view
       if(!!view && view.el && view.el.parentNode) {
         view.render();
+        this._ensureProperPosition(view);
       }
 
       // otherwise, we re-render the entire collection
-      // TODO this is terribly inefficient
       else {
         this.render();
       }
-      if(this.options.onChange) this.options.onChange();
-
-      // TODO this may require re-sorting
     },
 
     _onItemRemoved : function(model) {
@@ -91,8 +85,6 @@
 
       // update the first / last class names
       this._updateClassNames();
-
-      if(this.options.onChange) this.options.onChange();
     },
 
     _updateClassNames : function() {
@@ -104,6 +96,21 @@
         });
         $(children[0]).addClass('first');
         $(children[children.length - 1]).addClass('last');
+      }
+    },
+
+    _ensureProperPosition : function(view) {
+      if(_(this.model.comparator).isFunction()) {
+        this.model.sort({silent : true});
+        var itemEl = view.el.parentNode;
+        var currentIndex = Array.prototype.indexOf.call(
+          this.collectionEl.childNodes, itemEl);
+        var properIndex = this.model.indexOf(view.model);
+        if(currentIndex !== properIndex) {
+          itemEl.parentNode.removeChild(itemEl);
+          var refNode = this.collectionEl.childNodes[properIndex];
+          this.collectionEl.insertBefore(itemEl, refNode);
+        }
       }
     }
   });

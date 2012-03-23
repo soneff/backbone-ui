@@ -79,11 +79,25 @@ $(window).load(function() {
 
   // task example
   var taskFunc = function() {
+    // create a sorted backbone collection to store our tasks
+    var tasks = new Backbone.Collection([], {
+      comparator : function(task) {
+        return task.get('done') ? 1 : 0;
+      }
+    });
+
+    // define how each individual task should render
     var TaskView = Backbone.View.extend({
       render : function() {
-
         $(this.el).empty();
 
+        // add a link to remove this task from the list
+        this.el.appendChild(new Backbone.UI.Link({
+          content : 'delete',
+          onClick : _(tasks.remove).bind(tasks, this.model)
+        }).render().el);
+
+        // a checkbox to mark / unmark the done status of this task 
         this.el.appendChild(new Backbone.UI.Checkbox({
           model : this.model,
           labelContent : 'title',
@@ -92,43 +106,40 @@ $(window).load(function() {
       }
     });
 
-    var field = new Backbone.UI.TextField({
-      model : this.model
+    // create our list view to render our collection
+    var list = new Backbone.UI.List({
+      itemView : TaskView,
+      model : tasks
     }).render();
 
-    var button = new Backbone.UI.Button({
-      content : 'add task',
-      onClick : function() {
-        var value = field.getValue();
-        if(value.length > 0) {
-          list.options.model.add({
-            title : field.getValue(),
-            checked : false 
-          });
-          field.setValue('');
+    // create a text field to add new items 
+    var newItem = new Backbone.Model;
+    var field = new Backbone.UI.TextField({ 
+      model : newItem,
+      content : 'title',
+      placeholder : 'add a new item',
+      onKeyPress : function(e) {
+        if(e.keyCode == 13) {
+          list.options.model.add(newItem.clone());
+          newItem.set({ title : ''});
         }
       }
     }).render();
 
-    var list = new Backbone.UI.List({
-      itemView : TaskView,
-      model : new Backbone.Collection([], {
-        comparator : function(task) {
-          return task.get('done');
-        }
-      })
-    }).render();
+    var appEl = $.el.div(field.el, list.el);
 
-    var app = $.el.div(field.el, button.el, list.el);
-
-    return app; 
+    return appEl; 
   };
 
-  var code = js_beautify(taskFunc.toString(), {
+  var code = taskFunc.toString();
+  code = code.substring(code.indexOf('\n'));
+  code = code.substring(0, code.lastIndexOf('return'));
+
+  code = js_beautify(code, {
     indent_size : 2 
   });
 
-  $.el.pre(code).appendTo($('#task_list_code')[0]);
+  $.el.pre({className : 'prettyprint'}, code).appendTo($('#task_list_code')[0]);
 
   var result = taskFunc();
   $('#task_list_result')[0].appendChild(result);

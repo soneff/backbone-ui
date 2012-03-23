@@ -61,7 +61,7 @@
     },
 
     render : function() {
-      var labelText = this.resolveContent(this.model, this.options.content);
+      var labelText = this.resolveContent();
 
       this._observeModel(this.render);
 
