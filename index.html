@@ -2,33 +2,515 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1"/>
+    <title>Backbone UI</title>
 
-    <style type="text/css">
-      body {
-        font-family:helvetica;
-        padding:0 20px;
-      }
+    <script src='./lib/required/0_jquery-1.6.1.js' type='text/javascript''></script>
+<script src='./lib/required/1_underscore-1.3.1.js' type='text/javascript''></script>
+<script src='./lib/required/2_json2.js' type='text/javascript''></script>
+<script src='./lib/required/3_backbone-0.9.2.js' type='text/javascript''></script>
+<script src='./lib/required/4_laconic.js' type='text/javascript''></script>
+<script src='./lib/optional/jquery-mousewheel-3.0.4.js' type='text/javascript''></script>
+<script src='./lib/optional/moment-1.4.0.js' type='text/javascript''></script>
+<script src='./src/js/backbone_ui.js' type='text/javascript''></script>
+<script src='./src/js/button.js' type='text/javascript''></script>
+<script src='./src/js/calendar.js' type='text/javascript''></script>
+<script src='./src/js/checkbox.js' type='text/javascript''></script>
+<script src='./src/js/collection_view.js' type='text/javascript''></script>
+<script src='./src/js/date_picker.js' type='text/javascript''></script>
+<script src='./src/js/drag_session.js' type='text/javascript''></script>
+<script src='./src/js/has_alternative_property.js' type='text/javascript''></script>
+<script src='./src/js/has_glyph.js' type='text/javascript''></script>
+<script src='./src/js/has_model.js' type='text/javascript''></script>
+<script src='./src/js/link.js' type='text/javascript''></script>
+<script src='./src/js/list.js' type='text/javascript''></script>
+<script src='./src/js/menu.js' type='text/javascript''></script>
+<script src='./src/js/pulldown.js' type='text/javascript''></script>
+<script src='./src/js/radio_group.js' type='text/javascript''></script>
+<script src='./src/js/scroller.js' type='text/javascript''></script>
+<script src='./src/js/tab_set.js' type='text/javascript''></script>
+<script src='./src/js/table_view.js' type='text/javascript''></script>
+<script src='./src/js/text_area.js' type='text/javascript''></script>
+<script src='./src/js/text_field.js' type='text/javascript''></script>
+<script src='./src/js/time_picker.js' type='text/javascript''></script>
+    
+<link rel='stylesheet' type='text/css' href='./src/css/button.css'>
+<link rel='stylesheet' type='text/css' href='./src/css/calendar.css'>
+<link rel='stylesheet' type='text/css' href='./src/css/checkbox.css'>
+<link rel='stylesheet' type='text/css' href='./src/css/date_picker.css'>
+<link rel='stylesheet' type='text/css' href='./src/css/has_glyph.css'>
+<link rel='stylesheet' type='text/css' href='./src/css/list.css'>
+<link rel='stylesheet' type='text/css' href='./src/css/menu.css'>
+<link rel='stylesheet' type='text/css' href='./src/css/pulldown.css'>
+<link rel='stylesheet' type='text/css' href='./src/css/radio_group.css'>
+<link rel='stylesheet' type='text/css' href='./src/css/scroller.css'>
+<link rel='stylesheet' type='text/css' href='./src/css/tab_set.css'>
+<link rel='stylesheet' type='text/css' href='./src/css/table_view.css'>
+<link rel='stylesheet' type='text/css' href='./src/css/text_area.css'>
+<link rel='stylesheet' type='text/css' href='./src/css/text_field.css'>
+<link rel='stylesheet' type='text/css' href='./src/css/time_picker.css'>
 
-      a {
-        color:#000;
-      }
-    </style>
+    <script type="text/javascript" src="script.js"></script>
+    <script type="text/javascript" src="lib/jsbeautify.js"></script>
+    <script type="text/javascript" src="lib/prettify.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="lib/prettify.css">
+    <link href='http://fonts.googleapis.com/css?family=Brawler' rel='stylesheet' type='text/css'>
   </head>
 
   <body>
-    <h1>Backbone UI</h1>
-    <ul>
-      <li>
-        <a href="./examples/sandbox/index.html">Dig around in the sandbox</a>
-      </li>
-      <li>
-        <a href="./examples/todo/index.html">Todo List Example</a>
-      </li>
-      <li>
-        <a href="./test/test.html">Test Suite</a>
-      </li>
-    </ul>
-  </body>
+    <div class="backbone_heading">
+      <div class="container">
+        <div class="name">Backbone UI</div>
+      </div>
+    </div>
 
+    <div class="section">
+      <section>
+        <h1>Overview</h1>
+
+        <p>
+        Backbone UI provides a simple way to represent your Backbone Models and Collections as UI components.  The need to shuffle data in and out of your UI is replaced with simple data binding techniques.  All components are skinnable with CSS, and will render consistently accross browsers.
+        </p>
+      </section>
+
+      <section>
+        <h1>Philosiphy</h1>
+
+        <p>
+        This framework is written to embrace the DOM rather than fight it.  You won't see any messy HTML templates or <code>innerHTML</code> references hanging around.  What you will see is heavy use of the <a href="http://joestelmach.github.com/laconic/">laconic</a> library to help ease the pain of DOM manipluation so we can happily stay in the context of writing JavaScript.
+        </p>
+        <p>
+        Not all people will agree with this philosiphy, and not all projects will benefit from embracing it.  This framework facilitates the creation of highly dynamic front-end clients that request only data from the back-end, not markup.  If you have a more traditional application in which your markup is generated before your JavaScript executes, you may still find this framework useful, but keep in mind that it was not designed for such a case.
+        </p>
+        <p>
+        Another major theme you'll encounter is the concept of data binding.  This means that you tell your component which property of the model it's responsible for rendering, and then you forget about shuffling data back and forth.  If the model's value changes, the component will re-render.  If the user changes the value, the model will be updated.  Easy.
+        </p>
+      </section>
+
+      <section>
+        <h1>Dependencies</h1>
+
+        <p>Backbone UI depends on <a href='http://documentcloud.github.com/backbone/'>Backbone</a>, 
+          <a href='http://documentcloud.github.com/underscore/'>Underscore</a>, 
+          <a href='http://jquery.com/'>jQuery</a>, and <a href='http://joestelmach.github.com/laconic/'>laconic</a>.
+          If you'd like to use the calendar or date picker components, than you'll 
+          also need a copy of <a href='http://momentjs.com/'>moment.js</a>.
+        <p>
+      </section>
+
+      <section>
+        <h1>Components</h1>
+        <p>
+        All components inherit from Backbone.View, and each render method will return a reference to the view itself.  Feel free to pass any standard Backbone View <a href='http://documentcloud.github.com/backbone/#View-constructor'>option</a> when creating these components.
+        As a convenience, the underscored version of the component's class name will be added to each component's element.  
+        </p>
+
+        <p>
+        Components can be broken down into four categories:
+        </p>
+
+        <ul>
+          <li>Model Bound</li>
+          <li>Model Bound with Alternatives</li>
+          <li>Collection Bound</li>
+          <li>Non-Bound</li>
+        </ul>
+
+        <p>
+        The following data will be used throughout the examples:
+        </p>
+
+        <div class="code">
+          <code><pre id="setup_code" class="prettyprint"></pre></code>
+        </div>
+      </section>
+
+    </div>
+
+    <div id="example_data" style="display:none">
+      <a href="#" id="close_example">&times;</a>
+      <div class="title">Coffee Model State</div>
+      <div id="example_state"></div>
+    </div>
+
+    <section class="component_type model_bound">
+      <h1>Model-Bound</h1>
+
+      <p>
+      Model-Bound components are those that interact directly with one property of a single model.
+      </p>
+
+      <div class='options'><h2>Options</h2><ul><li><div class='key'>content</div><div class='value'> The property of the bound model this component should render / update. If a function is given, it will be invoked with the model and will  expect an element to be returned.  If no model is present, this  property may be a string or function describing the content to be rendered</div></li><li><div class='key'>model</div><div class='value'> The Backbone.Model instance the view is bound to</div></li></ul></div>
+
+      <div class="components">
+        <section id="button" class="example">
+  <h1>Button</h1>
+
+  <script type="text/javascript">
+    $(window).load(function() {
+
+      window.addExample('#button', function() {
+
+        var button = new Backbone.UI.Button({
+          model : coffee,
+          content : 'roaster',
+          onClick : _(alert).bind(window, 'pressed')
+        }).render();
+        return button;
+      });
+    });
+  </script>
+
+  <div class='options'><h2>Options</h2><ul><li><div class='key'>onClick</div><div class='value'> A callback to invoke when the button is clicked</div></li><li><div class='key'>isSubmit</div><div class='value'> renders this button as an input type=submit element as opposed to an anchor.</div></li><li><div class='key'>disabled</div><div class='value'> true will disable the button (muted non-clickable) </div></li><li><div class='key'>active</div><div class='value'> true will activate the button (depressed and non-clickable)</div></li></ul></div>
+</section>
+
+<section id="calendar" class="example">
+  <h1>Calendar</h1>
+
+  <script type="text/javascript">
+    $(window).load(function() {
+      window.addExample('#calendar', function() {
+        var calendar = new Backbone.UI.Calendar({
+          model : coffee,
+          content : 'roastedOn'
+        }).render();
+
+        return calendar;
+      });
+    });
+  </script>
+
+  <div class='options'><h2>Options</h2><ul><li><div class='key'>date</div><div class='value'> the selected calendar date</div></li><li><div class='key'>weekStart</div><div class='value'> the week's start day (0 = Sunday, 1 = Monday, etc.)</div></li><li><div class='key'>onSelect</div><div class='value'> a callback to invoke when a new date selection is made.  The selected date will be passed in as the first argument</div></li></ul></div>
+</section>
+
+<section id="checkbox" class="example">
+  <h1>Checkbox</h1>
+
+  <script type="text/javascript">
+    $(window).load(function() {
+      window.addExample('#checkbox', function() {
+        var checkbox = new Backbone.UI.Checkbox({
+          model : coffee,
+          content : 'acidic',
+          labelContent : 'roaster'
+        }).render();
+        return checkbox;
+      });
+    });
+  </script>
+
+  <div class='options'><h2>Options</h2><ul><li><div class='key'>disabled</div><div class='value'> enables / disables the checkbox</div></li><li><div class='key'>labelContent</div><div class='value'> The property of the model describing the label that  should be placed next to the checkbox</div></li></ul></div>
+</section>
+
+<section id="date_picker" class="example">
+  <h1>Date Picker</h1>
+
+  <script type="text/javascript">
+    $(window).load(function() {
+      window.addExample('#date_picker', function() {
+        var picker = new Backbone.UI.DatePicker({
+          model : coffee,
+          content : 'roastedOn'
+        }).render();
+        return picker;
+      });
+    });
+  </script>
+
+  <div class='options'><h2>Options</h2><ul><li><div class='key'>format</div><div class='value'> a moment.js format : http://momentjs.com/docs/#/display/format</div></li></ul></div>
+
+</section>
+
+<section id="link" class="example">
+  <h1>Link</h1>
+
+  <script type="text/javascript">
+    $(window).load(function() {
+
+      window.addExample('#link', function() {
+
+        var link = new Backbone.UI.Link({
+          model : coffee,
+          content : 'roaster',
+          onClick : _(alert).bind(window, 'pressed')
+        }).render();
+        return link;
+      });
+    });
+  </script>
+
+  <div class='options'><h2>Options</h2><ul><li><div class='key'>onClick</div><div class='value'> A callback to invoke when the link is clicked</div></li><li><div class='key'>disabled</div><div class='value'> disables the link (non-clickable) </div></li></ul></div>
+</section>
+
+<section id="text_area" class="example">
+  <h1>Text Area</h1>
+
+  <script type="text/javascript">
+    $(window).load(function() {
+      window.addExample('#text_area', function() {
+        var area = new Backbone.UI.TextArea({
+          model : coffee.get('region'),
+          content : 'name'
+        }).render();
+        return area;
+      });
+    });
+  </script>
+
+  <div class='options'><h2>Options</h2><ul><li><div class='key'>disabled</div><div class='value'> disables the text area</div></li><li><div class='key'>textAreaId</div><div class='value'> id to use on the actual textArea </div></li></ul></div>
+</section>
+
+<section id="text_field" class="example">
+  <h1>Text Field</h1>
+
+  <script type="text/javascript">
+    $(window).load(function() {
+      window.addExample('#text_field', function() {
+        var field = new Backbone.UI.TextField({
+          model : coffee,
+          content : 'roaster'
+        }).render();
+        return field;
+      });
+    });
+  </script>
+
+  <div class='options'><h2>Options</h2><ul><li><div class='key'>tabIndex</div><div class='value'> the tab index to set on the underlying input field</div></li><li><div class='key'>type</div><div class='value'> The type of input (text, password, number, email, etc.)</div></li><li><div class='key'>disabled</div><div class='value'> disables the input text</div></li><li><div class='key'>onKeyPress</div><div class='value'> a callback to invoke when a key is pressed within the text field</div></li><li><div class='key'>name</div><div class='value'> the value to use for both the name and id attribute  of the underlying input element</div></li><li><div class='key'>maxLength</div><div class='value'> if given, the text field will limit it's character count</div></li></ul></div>
+</section>
+
+<section id="time_picker" class="example">
+  <h1>Time Picker</h1>
+
+  <script type="text/javascript">
+    $(window).load(function() {
+      window.addExample('#time_picker', function() {
+        var picker = new Backbone.UI.TimePicker({
+          model : coffee,
+          content : 'roastedOn'
+        }).render();
+        return picker;
+      });
+    });
+  </script>
+
+  <div class='options'><h2>Options</h2><ul><li><div class='key'>interval</div><div class='value'> minute interval to use for pulldown menu</div></li><li><div class='key'>format</div><div class='value'> a moment.js format : http://momentjs.com/docs/#/display/format</div></li><li><div class='key'>name</div><div class='value'> the name given to the text field's input element</div></li></ul></div>
+</section>
+
+      </div>
+    </section>
+
+    <section class="component_type model_bound_with_collection">
+      <h1>Model-Bound with Alternatives</h1>
+      <p>
+      These components are similar to regular Model-Bound components, but also include a bound collection of alternatives.  The <code>model</code> and <code>property</code> options are still used to define the selected value, and following additional options describe the collection of alternatives:
+      </p>
+
+      <div class='options'><h2>Options</h2><ul><li><div class='key'>alternatives</div><div class='value'> The collection of items representing alternative choices</div></li><li><div class='key'>altLabelContent</div><div class='value'> The property of the individual choice represent the the label to be displayed</div></li><li><div class='key'>altValueContent</div><div class='value'> The property of the individual choice that represents the value to be stored in the bound model's property.  Omit this option if you'd like the choice  object itself to represent the value.</div></li></ul></div>
+
+      <div class="options">
+      </div>
+
+      <div class="components">
+        <section id="menu" class="example">
+  <h1>Menu</h1>
+
+  <script type="text/javascript">
+    $(window).load(function() {
+
+      window.addExample('#menu', function() {
+        var menu = new Backbone.UI.Menu({
+          model : coffee,
+          content : 'region',
+          alternatives : regions,
+          altLabelContent : 'name'
+        }).render();
+        return menu;
+      });
+    });
+  </script>
+
+  <div class='options'><h2>Options</h2><ul><li><div class='key'>emptyItem</div><div class='value'> an additional item to render at the top of the menu to  denote the lack of a selection</div></li></ul></div>
+</section>
+
+<section id="pulldown" class="example">
+  <h1>Pulldown</h1>
+
+  <script type="text/javascript">
+    $(window).load(function() {
+
+      window.addExample('#pulldown', function() {
+        var pulldown = new Backbone.UI.Pulldown({
+          model : coffee,
+          content : 'region',
+          alternatives : regions,
+          altLabelContent : 'name'
+        }).render();
+        return pulldown;
+      });
+    });
+  </script>
+
+  <div class='options'><h2>Options</h2><ul><li><div class='key'>onMenuShow</div><div class='value'> A callback to invoke when the pulldown menu is shown, passing the  button click event.</div></li><li><div class='key'>onMenuHide</div><div class='value'> A callback to invoke when the pulldown menu is hidden, if the menu was hidden as a result of a second click on the pulldown button, the button click event  will be passed.</div></li><li><div class='key'>placeholder</div><div class='value'> text to place in the pulldown button before a selection has been made</div></li><li><div class='key'>onChange</div><div class='value'> A callback to invoke with a particular item when that item is selected from the pulldown menu.</div></li><li><div class='key'>alignRight</div><div class='value'> If true, the menu will be aligned to the right side</div></li></ul></div>
+</section>
+
+
+<section id="radio_group" class="example">
+  <h1>Radio Group</h1>
+
+  <script type="text/javascript">
+    $(window).load(function() {
+      window.addExample('#radio_group', function() {
+        var group = new Backbone.UI.RadioGroup({
+          model : coffee,
+          content : 'region',
+          alternatives : regions,
+          altLabelContent : 'name'
+        }).render();
+        return group;
+      });
+    });
+  </script>
+
+  <div class='options'><h2>Options</h2><ul><li><div class='key'>onChange</div><div class='value'> A callback to invoke with the selected item whenever the selection changes</div></li></ul></div>
+</section>
+
+      </div>
+    </section>
+
+    <section class="component_type collection_bound">
+      <h1>Collection-Bound</h1>
+      <p>
+      These components are bound to a Backbone.Collection as opposed to a Model.  The rendering of a particular item in the collection is defined by the given itemView implementation.
+      </p>
+
+      <div class='options'><h2>Options</h2><ul><li><div class='key'>onItemClick</div><div class='value'> A callback to invoke when a row is clicked.  The associated model will be passed as the first argument.</div></li><li><div class='key'>maxHeight</div><div class='value'> The maximum height in pixels that this table show grow to.  If the content exceeds this height, it will become scrollable.</div></li><li><div class='key'>itemView</div><div class='value'> The Backbone.View class responsible for rendering a single item in the collection</div></li><li><div class='key'>model</div><div class='value'> The Backbone.Collection instance the view is bound to</div></li><li><div class='key'>emptyContent</div><div class='value'> A string, element, or function describing what should be displayed when the list is empty.</div></li></ul></div>
+
+      <div class="components">
+        <section id="list" class="example">
+  <h1>List View</h1>
+
+  <script type="text/javascript">
+    $(window).load(function() {
+      window.addExample('#list', function() {
+        var Item = Backbone.View.extend({
+          render : function() {
+            $.el.div(this.model.get('name')).appendTo(this.el);
+          }
+        });
+
+        var list = new Backbone.UI.List({
+          model : regions,
+          itemView : Item
+        }).render();
+
+        return list;
+      });
+    });
+  </script>
+
+  <div class='options'><h2>Options</h2><ul><li><div class='key'>itemView</div><div class='value'> A Backbone.View implementation describing how to render a particular  item in the collection.  For simple use cases, you can pass a String  instead which will be interpreted as the property of the model to display.</div></li></ul></div>
+</section>
+
+
+<section id="table_view" class="example">
+  <h1>Table View</h1>
+  <p>
+  Table Views are similar to List Views, but allow you to pass a small amount of table meta-data as opposed to writing your own itemView implementation.
+  </p>
+
+  <script type="text/javascript">
+    $(window).load(function() {
+      window.addExample('#table_view', function() {
+        var table = new Backbone.UI.TableView({
+          model : regions,
+          onItemClick : function(model) {
+            alert(model.get('name'));
+          },
+          columns : [{
+            label : 'Name',
+            content : 'name'
+          }, {
+            label : 'Notes',
+            width : 100,
+            content : 'notes'
+          }]
+        }).render();
+
+        return table;
+      });
+    });
+  </script>
+
+  <div class='options'><h2>Options</h2><ul><li><div class='key'>onItemClick</div><div class='value'> A callback to invoke when a row is clicked.  If this callback is present, the rows will highlight on hover.</div></li><li><div class='key'>columns</div><div class='value'> Each column should contain a <code>label</code> property to  describe the column's heading, a <code>property</code> property to declare which property the cell is bound to, and an optional  <code>width</code> property to declare the width of the column in pixels.</div></li><li><div class='key'>emptyContent</div><div class='value'> A string, element, or function describing what should be displayed when the table is empty.</div></li></ul></div>
+</section>
+
+
+      </div>
+    </section>
+
+    <section class="component_type non_bound">
+      <h1>Non-Bound</h1>
+      <p>
+      The following components are not meant to be bound to a model or collection, and exist as general-purpose UI elements.
+      </p>
+      <div class="components">
+        <section id="scroller" class="example">
+  <h1>Scroller</h1>
+
+  <script type="text/javascript">
+    $(window).load(function() {
+      window.addExample('#scroller', function() {
+        var lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu metus turpis. Vestibulum quis mauris quis lectus tincidunt sollicitudin. Nunc a lobortis urna. Vivamus pharetra, odio ut sollicitudin mattis, metus nulla scelerisque sapien, sit amet pulvinar dui tellus a velit. Aliquam sapien tellus, auctor et pellentesque in, sodales et lectus. Praesent in massa nec dui hendrerit elementum. Vestibulum egestas, velit non pharetra porta, leo ligula tincidunt dui, sed egestas tortor ipsum in nisl. Vestibulum tincidunt tortor quis metus lacinia non pretium velit bibendum. Donec id erat at dui sodales adipiscing. Sed eleifend vulputate magna, luctus placerat nibh lobortis eu. Aenean vehicula molestie enim, ac suscipit nulla fermentum a. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla sodales, nisl id volutpat blandit, sem erat tincidunt massa, ac pharetra neque lacus ut justo. Vestibulum auctor hendrerit risus, vitae ultrices risus porttitor id. " 
+
+        var scroller = new Backbone.UI.Scroller({
+          content : $.el.p({style : 'height:150px'}, lorem)
+        }).render();
+        return scroller;
+      });
+    });
+  </script>
+
+  <div class='options'><h2>Options</h2><ul><li><div class='key'>onScroll</div><div class='value'> A callback to invoke when scrolling occurs</div></li><li><div class='key'>content</div><div class='value'> The content to be scrolled.  This element should be  of a fixed height.</div></li><li><div class='key'>scrollAmount</div><div class='value'> The amount to scroll on each wheel click</div></li></ul></div>
+</section>
+
+<section id="tab_set" class="example">
+  <h1>Tab Set</h1>
+
+  <script type="text/javascript">
+    $(window).load(function() {
+      window.addExample('#tab_set', function() {
+        var set = new Backbone.UI.TabSet({
+          tabs : [
+            {label : 'Foo', content : "foo's content"},
+            {label : 'Bar', content : "bar's content"} ,
+            {label : 'Baz', content : "baz's content"} 
+          ]
+        }).render();
+        return set;
+      });
+    });
+  </script>
+
+  <div class='options'><h2>Options</h2><ul><li><div class='key'>tabs</div><div class='value'> Tabs to initially add to this tab set.  Each entry may contain a <code>label</code>, <code>content</code>, and <code>onActivate</code> option.</div></li></ul></div>
+</section>
+
+      </div>
+    </section>
+
+    <section>
+      <h1>Example Application</h1>
+      <p>
+      What would a framework be these days without an example task list application.
+      <p>
+
+      <div id="task_list_result"></div>
+
+      <p>
+      The entirety of this application is listed below:
+      </p>
+      <div id="task_list_code" class="code"></div>
+
+    </section>
+  </body>
 </html>
