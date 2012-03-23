@@ -1,0 +1,53 @@
+.table_view table.heading {
+  border-width:1px;
+  border-style:solid;
+  border-color:#222;
+}
+
+.table_view table {
+  text-align:left;
+  width:100%;
+  border-collapse:collapse;
+}
+
+.table_view table th {
+  padding:0;
+  margin:0;
+  background-color:#eee;
+}
+
+.table_view th.first {
+  padding-left:5px;
+  border-left:none;
+}
+
+.table_view th.last {
+  padding-right:5px;
+}
+
+.table_view .content{
+  background-color:#fff;
+  border-width:0 1px 1px 1px;
+  border-color:#222;
+  border-style:solid;
+  padding:5px;
+}
+
+.table_view .wrapper {
+  border:none;
+  padding:5px;
+}
+
+.table_view tr.first .wrapper {
+}
+
+.table_view .content td {
+  white-space:nowrap;
+  overflow:hidden;
+}
+
+.table_view.clickable .content tr:hover .wrapper {
+  background-color:#ddd;
+  cursor:pointer;
+}
+

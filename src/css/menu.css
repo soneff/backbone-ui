@@ -1,0 +1,71 @@
+.menu {
+  max-height:150px;
+  margin-right:3px;
+  position:relative;
+}
+
+.menu ul {
+  padding:5px;
+}
+
+.menu .menu_scroller {
+  border:1px solid #666;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  background-color:#fff;
+  -moz-box-shadow: 2px 2px 2px #666;
+  -webkit-box-shadow: 2px 2px 2px #666;
+  box-shadow: 2px 2px 2px #666;
+}
+
+.menu .menu_scroller .content {
+  margin:0;
+  max-height:150px;
+}
+
+.menu .menu_scroller.disabled .content {
+  margin-right:0;
+}
+
+.menu li {
+  position:relative;
+  font-size:14px;
+  white-space:nowrap;
+  margin:2px 0;
+}
+
+.menu li a {
+  text-decoration:none;
+  line-height:28px;
+  color:#222;
+  padding:0 5px;
+  display:block;  
+  position:relative;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+}
+
+.menu li a:hover span,
+.menu li a:link span,
+.menu li a:active span,
+.menu li a:visited span{
+  text-decoration:none;
+  color:#222;
+}
+
+.menu li a:hover,
+.menu li a.selected {
+  background-color:#e9d4c7;
+  text-decoration:none;
+}
+
+.menu li a.has_glyph {
+  padding-left:24px;
+}
+
+.menu li .glyph.right {
+  top:4px;
+  right:4px;
+}
