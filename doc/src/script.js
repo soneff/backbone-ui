@@ -81,37 +81,47 @@ $(window).load(function() {
   var taskFunc = function() {
     var TaskView = Backbone.View.extend({
       render : function() {
+
         $(this.el).empty();
 
-        var check = new Backbone.UI.Checkbox({
+        this.el.appendChild(new Backbone.UI.Checkbox({
           model : this.model,
           labelContent : 'title',
           content : 'done'
-        }).render();
-
-        this.el.appendChild(check.el);
+        }).render().el);
       }
     });
 
-    var list = new Backbone.UI.List({
-      model : new Backbone.Collection({
-        title : 'foo',
-        done : false
-      }),
-      itemView : TaskView 
+    var field = new Backbone.UI.TextField({
+      model : this.model
     }).render();
 
     var button = new Backbone.UI.Button({
       content : 'add task',
       onClick : function() {
-        list.options.model.add({
-          title : 'bar',
-          checked : false
-        });
+        var value = field.getValue();
+        if(value.length > 0) {
+          list.options.model.add({
+            title : field.getValue(),
+            checked : false 
+          });
+          field.setValue('');
+        }
       }
     }).render();
 
-    return $.el.div(list.el, button.el);
+    var list = new Backbone.UI.List({
+      itemView : TaskView,
+      model : new Backbone.Collection([], {
+        comparator : function(task) {
+          return task.get('done');
+        }
+      })
+    }).render();
+
+    var app = $.el.div(field.el, button.el, list.el);
+
+    return app; 
   };
 
   var code = js_beautify(taskFunc.toString(), {
