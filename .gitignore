@@ -1,3 +1,4 @@
 dev
+dist/*
 doc/dist
 *.DS_Store

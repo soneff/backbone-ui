@@ -1,9 +1,13 @@
 require 'rubygems'
 require 'rkelly'
+require 'closure-compiler'
+require 'yui/compressor'
 
 desc "build the backbone-ui-min.js file for distribution"
 task :build => [:doc] do
   puts 'generating distribution'
+
+  `rm -rf dist/*`
 
   css_source_files = Dir.entries("./src/css").find_all do |source_file|
     source_file.match /\.css$/
@@ -13,6 +17,12 @@ task :build => [:doc] do
       source = File.read './src/css/' + source_file
       dev_file.write source
     end
+  end
+
+  compressor = YUI::CssCompressor.new
+  source = File.read('dist/backbone-ui.css')
+  File.open('dist/backbone-ui-min.css', 'w+') do |file|
+    file.write compressor.compress(source)
   end
 
   js_source_files = Dir.entries("./src/js").find_all do |source_file|
@@ -25,6 +35,14 @@ task :build => [:doc] do
       dev_file.write source
     end
   end
+ 
+  source = File.read 'dist/backbone-ui.js'
+  File.open('dist/backbone-ui-min.js', 'w+') do |file|
+    file.write Closure::Compiler.new.compress(source)
+  end
+
+  `zip dist/backbone-ui-min.zip dist/backbone-ui-min.js dist/backbone-ui-min.css`
+  `zip dist/backbone-ui.zip dist/backbone-ui.js dist/backbone-ui.css`
 end
 
 
@@ -133,6 +151,3 @@ task :doc do
   `cp -r doc/src/images doc/dist/`
 end
 
-task :insert_scripts do
-
-end
