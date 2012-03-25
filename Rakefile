@@ -161,7 +161,7 @@ task :push_doc => [:doc] do
   `git checkout gh-pages`
   `git pull origin gh-pages`
   `rm -rf *`
-  `cp -r /tmp/docs/* .`
+  `cp -r /tmp/docs/dist/* .`
   `git add . && git commit -a -m "updating docs" && git push origin gh-pages`
   `git checkout master`
 end
