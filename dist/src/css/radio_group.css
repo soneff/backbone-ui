@@ -1,0 +1,53 @@
+
+.radio_group .choice:hover {
+  cursor:pointer;
+}
+
+.radio_group .mark {
+  margin:0 5px 0 0;
+  width:20px;
+  height:20px;
+  line-height:17px;
+  border:1px solid #666;
+  -moz-border-radius: 11px;
+  -webkit-border-radius: 11px;
+  border-radius: 11px;
+  color:#222;
+  font-family:Verdana;
+  text-align:center;
+  font-size:16px;
+}
+.radio_group .choice:hover .mark {
+  background-color:#eee;
+  border-color:#222;
+}
+
+.radio_group ul {
+  margin:0;
+  padding:0;
+}
+
+.radio_group li {
+  margin-left:10px;
+}
+
+.radio_group li a {
+  display:block;
+  text-decoration:none;
+}
+
+.radio_group .label {
+  line-height:22px;
+  color:#222;
+}
+
+.radio_group .mark,
+.radio_group li,
+.radio_group .label {
+  /* inline-block with IE7 hack */
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  vertical-align:top;
+}
+
