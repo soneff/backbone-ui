@@ -8,6 +8,7 @@ task :build => [:doc] do
   puts 'generating distribution'
 
   `rm -rf dist/*`
+  `mkdir -p dist`
 
   css_source_files = Dir.entries("./src/css").find_all do |source_file|
     source_file.match /\.css$/
@@ -50,6 +51,7 @@ desc "generate the documentation in doc/dist"
 task :doc do 
   puts 'generating documentation'
   `rm -rf doc/dist/*`
+  `mkdir -p doc/dist`
 
   def build_script_tags(dirs)
     dirs.map do |dir|
