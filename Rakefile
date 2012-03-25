@@ -151,3 +151,15 @@ task :doc do
   `cp -r doc/src/images doc/dist/`
 end
 
+desc "pushing docs to gh-pages"
+task :push_doc => [:doc] do
+  puts "pushing docs to gh-pages"
+
+  `cp -r doc/dist /tmp/docs`
+  `git checkout gh-pages`
+  `git pull origin gh-pages`
+  `rm -rf *`
+  `cp -r /tmp/docs/* .`
+  `git add . && git commit -a -m "updating docs" && git push origin gh-pages`
+  `git checkout master`
+end
