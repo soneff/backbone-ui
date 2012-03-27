@@ -8,6 +8,7 @@
     $(window).load(function() {
       window.addExample('#table_view', function() {
         var table = new Backbone.UI.TableView({
+          sortable : true,
           model : regions,
           onItemClick : function(model) {
             alert(model.get('name'));
