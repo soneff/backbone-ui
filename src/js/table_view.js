@@ -29,7 +29,7 @@
     initialize : function() {
       Backbone.UI.CollectionView.prototype.initialize.call(this, arguments);
       $(this.el).addClass('table_view');
-      this._reverse = {}; // sort state of each column
+      this._sortState = {};
     },
 
     render : function() {
@@ -53,12 +53,13 @@
           return item1.get(column.content) < item2.get(column.content) ? -1 :
             item1.get(column.content) > item2.get(column.content) ? 1 : 0;
         };
+        var sortLabel = this._sortState.content === column.content ? (this._sortState.reverse ? '\u25b2 ' : '\u25bc ') : '';
         var onclick = this.options.sortable ? (this.options.onSort === Backbone.UI.noop ?
           _(function() { this._sort(column); }).bind(this) :
           _(function() { this.options.onSort(column)}).bind(this)) : Backbone.UI.noop;
         headingRow.appendChild($.el.th(
           {className : _(list).nameForIndex(index), style : style, onclick : onclick},
-          $.el.div({className : 'wrapper'}, (this._reverse[column.content] ? '\u25b2 ' : '\u25bc ') + label)));
+          $.el.div({className : 'wrapper'}, sortLabel + label)));
       }).bind(this));
 
       // Add the heading row to it's very own table so we can allow the
@@ -131,9 +132,10 @@
     },
 
     _sort : function(column) {
-      this._reverse[column.content] = !this._reverse[column.content];
+      this._sortState.reverse = !this._sortState.reverse;
+      this._sortState.content = column.content;
       comp = column.comparator;
-      if (this._reverse[column.content]) {
+      if (this._sortState.reverse) {
         comp = function(item1, item2) {
           return -column.comparator(item1, item2);
         };
