@@ -15,6 +15,7 @@
   margin:0;
   background-color:#eee;
   line-height:18px;
+  position:relative
 }
 
 .table_view th.first {
@@ -52,3 +53,10 @@
   cursor:pointer;
 }
 
+.table_view th.first .glyph {
+  padding-left:5px;
+}
+
+.table_view .sorted {
+  padding-left:16px;
+}

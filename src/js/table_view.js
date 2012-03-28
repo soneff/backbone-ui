@@ -30,7 +30,7 @@
     initialize : function() {
       Backbone.UI.CollectionView.prototype.initialize.call(this, arguments);
       $(this.el).addClass('table_view');
-      this._sortState = {};
+      this._sortState = {reverse : true};
     },
 
     render : function() {
@@ -47,8 +47,7 @@
       var sortFirstColumn = false;
       var firstHeading = null;
       _(this.options.columns).each(_(function(column, index, list) {
-        if (!this._sortState.content) {
-          this._sortState.content = column.content; // sort on first column by default
+        if (this.options.sortable && !this._sortState.content) {
           sortFirstColumn = true;
         }
         var label = _(column.label).isFunction() ? column.label() : column.label;
@@ -59,12 +58,14 @@
           return item1.get(column.content) < item2.get(column.content) ? -1 :
             item1.get(column.content) > item2.get(column.content) ? 1 : 0;
         };
-        var sortLabel = this._sortState.content === column.content ? (this._sortState.reverse ? '\u25b2 ' : '\u25bc ') : '';
+        var firstSort = (sortFirstColumn && firstHeading === null);
+        var sortHeader = this._sortState.content === column.content || firstSort;
+        var sortLabel = $.el.div({className : 'glyph'}, sortHeader ? (this._sortState.reverse && !firstSort ? '\u25b2 ' : '\u25bc ') : '');
         var onclick = this.options.sortable ? (_(this.options.onSort).isFunction() ?
           _(function(e) { this.options.onSort(column); }).bind(this) :
           _(function(e, silent) { this._sort(column, silent); }).bind(this)) : Backbone.UI.noop;
         var th = $.el.th({className : _(list).nameForIndex(index), style : style, onclick : onclick},
-          $.el.div({className : 'wrapper'}, sortLabel + label));
+          sortLabel, $.el.div({className : 'wrapper' + (sortHeader ? ' sorted' : '')}, label));
         headingRow.appendChild(th);
         if (firstHeading === null) firstHeading = th;
       }).bind(this));
