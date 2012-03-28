@@ -19,11 +19,12 @@
 
       // Clicking on the column headers will sort the table. See
       // <code>comparator</code> property description on columns.
+      // The table is sorted by the first column by default.
       sortable : false,
 
       // A callback to invoke when the table is to be sorted. The callback will
       // be passed the <code>column</code> on which to sort.
-      onSort : Backbone.UI.noop
+      onSort : null
     },
 
     initialize : function() {
@@ -43,8 +44,13 @@
 
       // generate a table row for our headings
       var headingRow = $.el.tr();
+      var sortFirstColumn = false;
+      var firstHeading = null;
       _(this.options.columns).each(_(function(column, index, list) {
-
+        if (!this._sortState.content) {
+          this._sortState.content = column.content; // sort on first column by default
+          sortFirstColumn = true;
+        }
         var label = _(column.label).isFunction() ? column.label() : column.label;
         var width = !!column.width ? parseInt(column.width, 10) + 5 : null;
         var style = width ? 'width:' + width + 'px; max-width:' + width + 'px; ' : '';
@@ -54,13 +60,17 @@
             item1.get(column.content) > item2.get(column.content) ? 1 : 0;
         };
         var sortLabel = this._sortState.content === column.content ? (this._sortState.reverse ? '\u25b2 ' : '\u25bc ') : '';
-        var onclick = this.options.sortable ? (this.options.onSort === Backbone.UI.noop ?
-          _(function() { this._sort(column); }).bind(this) :
-          _(function() { this.options.onSort(column)}).bind(this)) : Backbone.UI.noop;
-        headingRow.appendChild($.el.th(
-          {className : _(list).nameForIndex(index), style : style, onclick : onclick},
-          $.el.div({className : 'wrapper'}, sortLabel + label)));
+        var onclick = this.options.sortable ? (_(this.options.onSort).isFunction() ?
+          _(function(e) { this.options.onSort(column); }).bind(this) :
+          _(function(e, silent) { this._sort(column, silent); }).bind(this)) : Backbone.UI.noop;
+        var th = $.el.th({className : _(list).nameForIndex(index), style : style, onclick : onclick},
+          $.el.div({className : 'wrapper'}, sortLabel + label));
+        headingRow.appendChild(th);
+        if (firstHeading === null) firstHeading = th;
       }).bind(this));
+      if (sortFirstColumn && !!firstHeading) {
+        firstHeading.onclick(null, true);
+      }
 
       // Add the heading row to it's very own table so we can allow the
       // actual table to scroll with a fixed heading.
@@ -131,17 +141,17 @@
       return row;
     },
 
-    _sort : function(column) {
+    _sort : function(column, silent) {
       this._sortState.reverse = !this._sortState.reverse;
       this._sortState.content = column.content;
-      comp = column.comparator;
+      var comp = column.comparator;
       if (this._sortState.reverse) {
         comp = function(item1, item2) {
           return -column.comparator(item1, item2);
         };
       }
       this.model.comparator = comp;
-      this.model.sort();
+      this.model.sort({silent : !!silent});
     }
   });
 }());
